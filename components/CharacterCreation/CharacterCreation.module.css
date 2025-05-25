@@ -1,0 +1,265 @@
+.main{
+    max-width: 1400px;
+    margin: auto;
+    position: relative;
+}
+
+.title{
+    font-size: 50px;
+    color: #E2A23B;
+    text-align: center;
+    padding-top: 30px;
+}
+
+.iconSeperator{
+    display: block;
+    margin: 1em auto auto auto;
+}
+
+.genderContainer{
+    margin-top: 80px;
+}
+
+.chooseClassText,
+.chooseGenderText{
+    color: #E2A23B;
+    font-size: 24px;
+    text-align: center;
+}
+
+.genderImagesContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin-top: 20px;
+    color: #E2A23B;
+}
+
+.nameInputContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 50px;
+}
+
+.nameInput{
+    background: url('../../public/input-background.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    text-align: center;
+    width: 350px;
+    height: 80px;
+    padding: 2em;
+    border: none;
+    font-size: 18px;
+    font-family: "MedievalSharp", sans-serif;
+    font-weight: bold;
+}
+
+.nameInput:focus{
+    outline: none;
+}
+
+.submitButton{
+    border: none;
+    background: #f2d1a6;
+    border-radius: 3px;
+    width: 280px;
+    padding: 1em 2em;
+    font-family: "MedievalSharp", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.pictureGenerateButton{
+    border: none;
+    background: #f2d1a6;
+    border-radius: 3px;
+    width: 280px;
+    padding: 1em 2em;
+    font-family: "MedievalSharp", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    margin: 0; /* Remove auto margin since it's now in a flex container */
+}
+
+.pictureGenerateButton:hover{
+    background: #E2A23B;
+}
+
+.imageButtonsContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 40px auto 20px auto;
+    flex-wrap: wrap;
+}
+
+.defaultImageButton{
+    border: none;
+    background: #6B8CAE;
+    border-radius: 3px;
+    width: 280px;
+    padding: 1em 2em;
+    font-family: "MedievalSharp", sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.defaultImageButton:hover{
+    background: #5A7B9E;
+}
+
+.characterFullContainer{
+    background: linear-gradient(180deg, #000000 0%, rgba(37, 43, 66, 0.01) 85.5%),
+    linear-gradient(180deg, #000000 0%, rgba(37, 43, 66, 0.01) 10%),
+    linear-gradient(0deg, #000000 0%, rgba(37, 43, 66, 0.01) 10%),
+    url('../../public/background2.webp');
+    background-size: cover;
+    background-position: center;
+    animation: slideIn 1.5s ease-in-out;
+    padding: 2em;
+    margin-top: 30px;
+    color: white;
+    border-radius: 15px;
+    border: 3px solid #E2A23B;
+}
+
+.characterFullTitle{
+    font-size: 32px;
+    color: #E2A23B;
+    text-align: center;
+    margin-bottom: 1.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.characterFeature{
+    margin-top: 0.5em;
+    font-size: 16px;
+    line-height: 1.6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.imagesMultiple{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.imagesSingle{
+    width: 335px;
+    border: 15px solid #B88846;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='75' height='75'%3E%3Cg fill='none' stroke='%23B88846' stroke-width='2'%3E%3Cpath d='M1 1h73v73H1z'/%3E%3Cpath d='M8 8h59v59H8z'/%3E%3Cpath d='M8 8h16v16H8zM51 8h16v16H51zM51 51h16v16H51zM8 51h16v16H8z'/%3E%3C/g%3E%3Cg fill='%23B88846'%3E%3Ccircle cx='16' cy='16' r='2'/%3E%3Ccircle cx='59' cy='16' r='2'/%3E%3Ccircle cx='59' cy='59' r='2'/%3E%3Ccircle cx='16' cy='59' r='2'/%3E%3C/g%3E%3C/svg%3E") 25;
+}
+
+.characterSection {
+    margin-bottom: 2em;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 1.5em;
+    border-radius: 10px;
+    border-left: 4px solid #E2A23B;
+}
+
+.sectionTitle {
+    color: #E2A23B;
+    font-family: "MedievalSharp", sans-serif;
+    font-size: 20px;
+    margin-bottom: 0.5em;
+    text-transform: uppercase;
+}
+
+.statsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.statItem {
+    background: rgba(226, 162, 59, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(226, 162, 59, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statName {
+    color: #E2A23B;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.statValue {
+    color: #fff;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.adventureSection {
+  text-align: center;
+  margin-top: 30px;
+  padding: 25px;
+  background: rgba(226, 162, 59, 0.1);
+  border-radius: 10px;
+  border: 2px solid #E2A23B;
+}
+
+.startAdventureButton {
+  background: linear-gradient(45deg, #E2A23B, #f2d1a6);
+  color: #1a1a2e;
+  border: none;
+  padding: 20px 40px;
+  font-size: 24px;
+  font-family: "MedievalSharp", sans-serif;
+  font-weight: bold;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(226, 162, 59, 0.4);
+  margin-bottom: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.startAdventureButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(226, 162, 59, 0.6);
+  background: linear-gradient(45deg, #f2d1a6, #E2A23B);
+}
+
+.adventureDescription {
+  color: #E2A23B;
+  font-size: 14px;
+  margin: 0;
+  font-style: italic;
+}
+
+@keyframes slideIn {
+    0%{
+        opacity: 0;
+        transform: translateY(-45px);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .genderImagesContainer{
+        flex-direction: column;
+        gap: 20px;
+    }
+}

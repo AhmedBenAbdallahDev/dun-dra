@@ -1,0 +1,314 @@
+.adventureContainer {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  font-family: "MedievalSharp", sans-serif;
+}
+
+.statsSidebar {
+  width: 300px;
+  background: rgba(0, 0, 0, 0.8);
+  border-right: 2px solid #E2A23B;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.statsTitle {
+  color: #E2A23B;
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 1px solid #E2A23B;
+  padding-bottom: 10px;
+}
+
+.characterInfo {
+  flex: 1;
+}
+
+.characterName {
+  color: #f2d1a6;
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.characterDetail {
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.characterStory {
+  margin-top: 15px;
+  font-size: 11px;
+  line-height: 1.3;
+  opacity: 0.9;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(226, 162, 59, 0.1);
+  border-radius: 5px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+}
+
+.statName {
+  color: #E2A23B;
+  font-weight: bold;
+}
+
+.statValue {
+  color: #f2d1a6;
+  margin-top: 2px;
+}
+
+.backButton {
+  background: #6B8CAE;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "MedievalSharp", sans-serif;
+  margin-top: 20px;
+}
+
+.backButton:hover {
+  background: #5A7B9E;
+}
+
+.chatContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: url('../../public/papyrus.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.chatHeader {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 15px 20px;
+  border-bottom: 2px solid #E2A23B;
+}
+
+.chatTitle {
+  color: #E2A23B;
+  font-size: 24px;
+  margin: 0;
+  text-align: center;
+}
+
+.startScreen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.startTitle {
+  color: #E2A23B;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.startDescription {
+  color: #f2d1a6;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  max-width: 500px;
+}
+
+.startAdventureButton {
+  background: linear-gradient(45deg, #E2A23B, #f2d1a6);
+  color: #1a1a2e;
+  border: none;
+  padding: 20px 40px;
+  font-size: 20px;
+  font-family: "MedievalSharp", sans-serif;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(226, 162, 59, 0.3);
+}
+
+.startAdventureButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(226, 162, 59, 0.4);
+}
+
+.startAdventureButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.messagesContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.message {
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.message.system {
+  background: rgba(226, 162, 59, 0.2);
+  border-left: 4px solid #E2A23B;
+  color: #f2d1a6;
+}
+
+.message.user {
+  background: rgba(107, 140, 174, 0.2);
+  border-left: 4px solid #6B8CAE;
+  color: #ffffff;
+  margin-left: 50px;
+}
+
+.message.error {
+  background: rgba(220, 53, 69, 0.2);
+  border-left: 4px solid #dc3545;
+  color: #ffdddd;
+}
+
+.messageContent {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.messageTime {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-top: 8px;
+  text-align: right;
+}
+
+.loadingMessage {
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(226, 162, 59, 0.1);
+  border-left: 4px solid #E2A23B;
+  animation: pulse 1.5s infinite;
+}
+
+.inputForm {
+  display: flex;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  border-top: 2px solid #E2A23B;
+  gap: 10px;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #E2A23B;
+  border-radius: 25px;
+  background: rgba(242, 209, 166, 0.1);
+  color: #f2d1a6;
+  font-family: "MedievalSharp", sans-serif;
+  font-size: 14px;
+}
+
+.messageInput:focus {
+  outline: none;
+  background: rgba(242, 209, 166, 0.2);
+  box-shadow: 0 0 10px rgba(226, 162, 59, 0.3);
+}
+
+.messageInput::placeholder {
+  color: rgba(242, 209, 166, 0.6);
+}
+
+.sendButton {
+  background: linear-gradient(45deg, #E2A23B, #f2d1a6);
+  color: #1a1a2e;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-family: "MedievalSharp", sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sendButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(226, 162, 59, 0.3);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .adventureContainer {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .statsSidebar {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .characterDetail, .characterStory {
+    font-size: 10px;
+  }
+}
