@@ -7,10 +7,14 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {      fontFamily: {
+    extend: {
+      fontFamily: {
         'medieval': ['serif'], // Fallback to serif for now
         'signika': ['system-ui', 'sans-serif'], // Use system fonts as fallback
       },
+      height: {
+        'game-panel': 'calc(50% - 0.5rem)', // For two panels in a column with gap
+      }
     }
   },
 }

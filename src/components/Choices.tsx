@@ -10,24 +10,21 @@ interface ChoicesProps {
 
 export default function Choices({ onChoiceSelect }: ChoicesProps) {
   const [customInput, setCustomInput] = useState('');
-  const [delay, setDelay] = useState(-300);
   
   const { gameData } = useGameStore();
   const { loading, interactivePoints, setInteractivePoints } = useMiscStore();
   const { setErrorWarnMsg } = useUIStore();
 
   const choices = gameData.choices || [];
-
-  const getDelayTime = () => {
-    setDelay(prev => prev + 300);
-    return delay + 300;
-  };
+    console.log('Choices render:', {
+    choicesLength: choices.length,
+    choices: choices.slice(0, 2), // Show first 2 choices
+    hasStory: !!gameData.story,
+    loading
+  });
 
   const handleChoiceClick = async (choice: string) => {
     if (loading || !choice) return;
-    
-    // Reset delay for transitions
-    setDelay(-300);
     
     // Pass choice to parent component
     if (onChoiceSelect) {
@@ -56,9 +53,6 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
     const currentInput = customInput;
     setCustomInput('');
     
-    // Reset delay for transitions
-    setDelay(-300);
-    
     // Pass custom answer to parent component
     if (onChoiceSelect) {
       onChoiceSelect(currentInput);
@@ -78,30 +72,33 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   return (
     <div className="choices w-full space-y-2">
       {/* Choice buttons */}
-      {choices.map((choice, index) => (
-        <button
-          key={index}
-          disabled={loading}
-          className="choice-button w-full bg-black/60 backdrop-blur-sm hover:bg-black/70 
+      {choices.map((choice, index) => {
+        const calculatedDelay = index * 150; // Simple stagger based on index
+        return (
+          <button
+            key={index}
+            disabled={loading}
+            className="choice-button w-full bg-black/60 backdrop-blur-sm hover:bg-black/70 
                      border border-gray-600/50 rounded-lg p-3 text-left text-gray-200 
                      hover:text-white transition-all duration-200 hover:border-amber-500/50
                      disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-          onClick={() => handleChoiceClick(choice)}
-          style={{
-            animationDelay: `${getDelayTime()}ms`,
-            opacity: loading ? 0.5 : 1
-          }}
-        >
-          {choice}
-        </button>
-      ))}
+            onClick={() => handleChoiceClick(choice)}
+            style={{
+              animationDelay: `${calculatedDelay}ms`, // Use calculated delay
+              opacity: loading ? 0.5 : 1
+            }}
+          >
+            {choice}
+          </button>
+        );
+      })}
       
       {/* Custom input */}
       {choices.length >= 1 && (
         <div className="choice-input bg-black/50 backdrop-blur-sm border border-gray-600/50 
                         rounded-lg p-3 flex items-center gap-2"
              style={{
-               animationDelay: `${getDelayTime()}ms`
+               animationDelay: `${choices.length * 150}ms` // Delay after all choices
              }}>
           <input
             type="text"

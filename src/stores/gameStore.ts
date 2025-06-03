@@ -46,7 +46,7 @@ export interface ChatMessage {
   timestamp?: number
 }
 
-interface GameData {
+export interface GameData {
   lootBox: LootItem[]
   placeAndTime: PlaceAndTime
   shop: LootItem[]
