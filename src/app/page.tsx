@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useGameStore, useAdventureStore, useCharacterStore } from '@/stores';
 import { useUIStore } from '@/stores/uiStore';
+import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { loadCharacterStarterData } from '@/lib/gameData';
 import { toast } from 'sonner';
 import GamePanel from '@/components/GamePanel';
@@ -13,6 +14,7 @@ import CombatUI from '@/components/CombatUI';
 import DescriptionWindow from '@/components/DescriptionWindow';
 import MessageWindows from '@/components/MessageWindows';
 import ShopUI from '@/components/ShopUI';
+import LootUI from '@/components/LootUI';
 import SettingsUI from '@/components/SettingsUI';
 import InGameWarnMsgs from '@/components/InGameWarnMsgs';
 import HomePage from '@/components/HomePage';
@@ -21,6 +23,7 @@ export default function Home() {
   const { gameData, setGameData } = useGameStore();
   const { getCurrentAdventure, currentAdventureId, updateAdventure } = useAdventureStore();
   const { setStats, setGold, setInventory, setSpells, stats, gold, inventory, spells } = useCharacterStore();
+  const { decrementCooldowns } = useCooldownsStore();
   const [showHomePage, setShowHomePage] = useState(true);
 
   const currentAdventure = getCurrentAdventure();
@@ -334,6 +337,9 @@ Current game state: ${JSON.stringify(gameData)}`
       // Add user's choice to chat/story
       console.log('User selected choice:', choice);
       
+      // Decrement all spell cooldowns when a choice is made
+      decrementCooldowns();
+      
       // Here you would make an AI call to continue the story based on the choice
       // For now, let's just log it
       toast.info(`You selected: ${choice}`);
@@ -343,6 +349,21 @@ Current game state: ${JSON.stringify(gameData)}`
     } catch (error) {
       console.error('Error handling choice selection:', error);
       toast.error('Failed to process your choice');
+    }
+  };
+
+  const handleLootAnswer = async (answer: string) => {
+    try {
+      console.log('Loot answer:', answer);
+      // The LootUI component handles the loot logic internally
+      // This handler is mainly for any additional post-loot actions
+      
+      // You could add AI continuation logic here if needed
+      // For now, just log the action
+      
+    } catch (error) {
+      console.error('Error handling loot answer:', error);
+      toast.error('Failed to process loot action');
     }
   };
 
@@ -415,6 +436,7 @@ Current game state: ${JSON.stringify(gameData)}`
       {/* Modal/Overlay Components */}
       <CombatUI />
       <ShopUI />
+      <LootUI onAnswer={handleLootAnswer} />
       <SettingsUI />
       <DescriptionWindow />
       <MessageWindows />

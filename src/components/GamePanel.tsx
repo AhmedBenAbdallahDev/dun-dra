@@ -1,6 +1,7 @@
 'use client';
 
 import { useCharacterStore, useSelectedItemStore, useUIStore } from '@/stores';
+import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { CharacterItem } from '@/stores/characterStore';
 
 interface GamePanelProps {
@@ -12,11 +13,17 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem } = useCharacterStore();
   const { setSelectedItem, name: selectedItemName } = useSelectedItemStore();
   const { setShowDescription } = useUIStore();
+  const { cooldowns, setCooldown, isCooldownActive } = useCooldownsStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
-
   const handleItemClick = (item: CharacterItem) => {
+    // Check if spell is on cooldown
+    if (item.type === 'spell' && item.cooldown && isCooldownActive(item.name, item.cooldown)) {
+      console.log(`${item.name} is on cooldown`);
+      return;
+    }
+
     // Set selected item for combat or general use
     setSelectedItem({
       name: item.name,
@@ -39,6 +46,11 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     if (item.type === 'potion') {
       handlePotionUse(item);
     }
+
+    // If it's a spell, set cooldown
+    if (item.type === 'spell' && item.cooldown) {
+      setCooldown(item.name, item.cooldown);
+    }
   };
 
   const handlePotionUse = (item: CharacterItem) => {
@@ -53,9 +65,22 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       console.log(`Used ${item.name} - restored ${Math.abs(item.manaCost)} MP`);
     }
   };
-
   const isItemSelected = (item: CharacterItem) => {
     return selectedItemName === item.name;
+  };
+
+  const isItemDisabled = (item: CharacterItem) => {
+    return item.type === 'spell' && item.cooldown && isCooldownActive(item.name, item.cooldown);
+  };
+
+  const getItemCooldownText = (item: CharacterItem) => {
+    if (item.type === 'spell' && item.cooldown) {
+      const currentCooldown = cooldowns[item.name] || 0;
+      if (currentCooldown > 0) {
+        return `${currentCooldown}/${item.cooldown}`;
+      }
+    }
+    return null;
   };
 
   return (<div className="game-panel h-full bg-black/60 backdrop-blur-lg rounded-lg md:rounded-xl border border-gray-700/50 overflow-hidden">
@@ -99,16 +124,22 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       {/* Panel Content */}
       <div className="panel-content p-2 md:p-4 h-full overflow-y-auto">
         {actions && actions.length > 0 ? (
-          <div className="space-y-1 md:space-y-2">            {actions.map((item, index) => (
-              <div
-                key={index}
-                className={`action-item border rounded-md md:rounded-lg p-2 md:p-3 cursor-pointer transition-all duration-200 group ${
-                  isItemSelected(item) 
-                    ? 'bg-amber-800/60 border-amber-500 hover:bg-amber-700/60' 
-                    : 'bg-gray-800/60 hover:bg-gray-700/60 border-gray-600/50 hover:border-amber-500/50'
-                }`}
-                onClick={() => handleItemClick(item)}
-              >
+          <div className="space-y-1 md:space-y-2">            {actions.map((item, index) => {
+              const cooldownText = getItemCooldownText(item);
+              const disabled = isItemDisabled(item);
+              
+              return (
+                <div
+                  key={index}
+                  className={`action-item border rounded-md md:rounded-lg p-2 md:p-3 transition-all duration-200 group ${
+                    disabled
+                      ? 'bg-gray-900/60 border-gray-700 cursor-not-allowed opacity-50'
+                      : isItemSelected(item) 
+                        ? 'bg-amber-800/60 border-amber-500 hover:bg-amber-700/60 cursor-pointer' 
+                        : 'bg-gray-800/60 hover:bg-gray-700/60 border-gray-600/50 hover:border-amber-500/50 cursor-pointer'
+                  }`}
+                  onClick={() => !disabled && handleItemClick(item)}
+                >
                 <div className="flex items-center gap-2 md:gap-3">
                   {/* Item Icon */}
                   <div className="item-icon w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-amber-600 to-amber-800 rounded border border-amber-500/50 flex items-center justify-center">
@@ -129,16 +160,21 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                       {item.element && <span className="text-purple-400">{getElementIcon(item.element)} {item.element}</span>}
                     </div>
                   </div>
-                  
-                  {/* Item Count/Price */}
+                    {/* Item Count/Price/Cooldown */}
                   {item.quantity && item.quantity > 1 && (
                     <div className="text-xs bg-amber-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
                       {item.quantity}
                     </div>
                   )}
+                  {cooldownText && (
+                    <div className="text-xs bg-red-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
+                      {cooldownText}
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+            )
+            })}
           </div>
         ) : (
           <div className="text-center text-gray-500 py-4 md:py-8">

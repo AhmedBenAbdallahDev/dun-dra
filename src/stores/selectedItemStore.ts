@@ -80,12 +80,11 @@ export const useCooldownsStore = create<CooldownsState>()(
     setCooldown: (spellName, cooldown) => set((state) => ({
       cooldowns: { ...state.cooldowns, [spellName]: cooldown }
     })),
-    
-    decrementCooldowns: () => set((state) => {
+      decrementCooldowns: () => set((state) => {
       const newCooldowns = { ...state.cooldowns }
       Object.keys(newCooldowns).forEach(key => {
         if (newCooldowns[key] > 0) {
-          newCooldowns[key] += 1
+          newCooldowns[key] -= 1
         }
       })
       return { cooldowns: newCooldowns }

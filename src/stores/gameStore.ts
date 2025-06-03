@@ -19,7 +19,7 @@ interface PlaceAndTime {
   time: string
 }
 
-interface LootItem {
+export interface LootItem {
   id?: string
   name: string
   damage?: number
