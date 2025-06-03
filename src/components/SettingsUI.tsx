@@ -189,10 +189,9 @@ export default function SettingsUI() {
                 <div className="space-y-4">
                   {/* AI Provider */}
                   <div className="space-y-2">
-                    <Label className="text-slate-200 text-sm font-medium">AI Provider</Label>
-                    <Select
+                    <Label className="text-slate-200 text-sm font-medium">AI Provider</Label>                    <Select
                       value={aiConfig.provider}
-                      onValueChange={(value: any) => setAIConfig({ ...aiConfig, provider: value })}
+                      onValueChange={(value) => setAIConfig({ ...aiConfig, provider: value as typeof aiConfig.provider })}
                     >
                       <SelectTrigger className="bg-slate-800/60 border-slate-700 text-slate-200 h-9">
                         <SelectValue />

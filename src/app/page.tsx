@@ -14,6 +14,7 @@ import DescriptionWindow from '@/components/DescriptionWindow';
 import MessageWindows from '@/components/MessageWindows';
 import ShopUI from '@/components/ShopUI';
 import SettingsUI from '@/components/SettingsUI';
+import InGameWarnMsgs from '@/components/InGameWarnMsgs';
 import HomePage from '@/components/HomePage';
 
 export default function Home() {
@@ -328,6 +329,23 @@ Current game state: ${JSON.stringify(gameData)}`
     setShowHomePage(true);
   };
 
+  const handleChoiceSelection = async (choice: string) => {
+    try {
+      // Add user's choice to chat/story
+      console.log('User selected choice:', choice);
+      
+      // Here you would make an AI call to continue the story based on the choice
+      // For now, let's just log it
+      toast.info(`You selected: ${choice}`);
+      
+      // TODO: Implement AI continuation logic similar to autoStartAdventure
+      
+    } catch (error) {
+      console.error('Error handling choice selection:', error);
+      toast.error('Failed to process your choice');
+    }
+  };
+
   // Memoize story message to prevent recreation on every render
   const storyMessage = useMemo(() => {
     return gameData.story ? { content: gameData.story } : null;
@@ -367,7 +385,7 @@ Current game state: ${JSON.stringify(gameData)}`
           {/* Mobile: Choices First (Most Important) */}
           <div className="choices-panel w-full md:flex-1 h-48 md:h-full order-1 md:order-2">
             {gameData.choices && gameData.choices.length > 0 ? (
-              <Choices choices={gameData.choices} />
+              <Choices onChoiceSelect={handleChoiceSelection} />
             ) : (
               <div className="h-full bg-black/60 backdrop-blur-lg rounded-lg md:rounded-xl border border-gray-700/50 flex items-center justify-center">
                 <p className="text-gray-400 text-center text-sm md:text-base">Waiting for your adventure to begin...</p>
@@ -400,6 +418,7 @@ Current game state: ${JSON.stringify(gameData)}`
       <SettingsUI />
       <DescriptionWindow />
       <MessageWindows />
+      <InGameWarnMsgs />
     </div>
   );
 }

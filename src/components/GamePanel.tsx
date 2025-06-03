@@ -1,6 +1,6 @@
 'use client';
 
-import { useCharacterStore } from '@/stores';
+import { useCharacterStore, useSelectedItemStore, useUIStore } from '@/stores';
 import { CharacterItem } from '@/stores/characterStore';
 
 interface GamePanelProps {
@@ -9,17 +9,56 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const { stats } = useCharacterStore();
+  const { stats, heal, restoreMp, removeInventoryItem } = useCharacterStore();
+  const { setSelectedItem, name: selectedItemName } = useSelectedItemStore();
+  const { setShowDescription } = useUIStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
 
   const handleItemClick = (item: CharacterItem) => {
-    // Handle item usage logic here - same as Svelte version
-    console.log('Using item:', item);
+    // Set selected item for combat or general use
+    setSelectedItem({
+      name: item.name,
+      damage: item.damage,
+      healing: item.healing,
+      manaCost: item.manaCost,
+      type: item.type,
+      weaponClass: item.weaponClass,
+      element: item.element,
+      combatScore: item.damage || item.healing || 0,
+      showDescription: item.name
+    });
+
+    // Show item description
+    if (setShowDescription) {
+      setShowDescription(item.name);
+    }
+
+    // If it's a consumable item (potion), use it immediately
+    if (item.type === 'potion') {
+      handlePotionUse(item);
+    }
   };
 
-  return (    <div className="game-panel h-full bg-black/60 backdrop-blur-lg rounded-lg md:rounded-xl border border-gray-700/50 overflow-hidden">
+  const handlePotionUse = (item: CharacterItem) => {
+    if (item.healing && stats.hp < stats.maxHp) {
+      heal(item.healing);
+      removeInventoryItem(item.name);
+      console.log(`Used ${item.name} - healed for ${item.healing} HP`);
+    } else if (item.manaCost && item.manaCost < 0 && stats.mp < stats.maxMp) {
+      // Negative mana cost means it restores mana
+      restoreMp(Math.abs(item.manaCost));
+      removeInventoryItem(item.name);
+      console.log(`Used ${item.name} - restored ${Math.abs(item.manaCost)} MP`);
+    }
+  };
+
+  const isItemSelected = (item: CharacterItem) => {
+    return selectedItemName === item.name;
+  };
+
+  return (<div className="game-panel h-full bg-black/60 backdrop-blur-lg rounded-lg md:rounded-xl border border-gray-700/50 overflow-hidden">
       {/* Panel Header */}
       <div className="panel-header bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-3 md:px-4 py-2 md:py-3 border-b border-amber-700/50">
         <h3 className="text-base md:text-lg font-semibold text-amber-200 font-medieval">{title}</h3>
@@ -60,11 +99,14 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       {/* Panel Content */}
       <div className="panel-content p-2 md:p-4 h-full overflow-y-auto">
         {actions && actions.length > 0 ? (
-          <div className="space-y-1 md:space-y-2">
-            {actions.map((item, index) => (
+          <div className="space-y-1 md:space-y-2">            {actions.map((item, index) => (
               <div
                 key={index}
-                className="action-item bg-gray-800/60 hover:bg-gray-700/60 border border-gray-600/50 rounded-md md:rounded-lg p-2 md:p-3 cursor-pointer transition-all duration-200 hover:border-amber-500/50 group"
+                className={`action-item border rounded-md md:rounded-lg p-2 md:p-3 cursor-pointer transition-all duration-200 group ${
+                  isItemSelected(item) 
+                    ? 'bg-amber-800/60 border-amber-500 hover:bg-amber-700/60' 
+                    : 'bg-gray-800/60 hover:bg-gray-700/60 border-gray-600/50 hover:border-amber-500/50'
+                }`}
                 onClick={() => handleItemClick(item)}
               >
                 <div className="flex items-center gap-2 md:gap-3">
