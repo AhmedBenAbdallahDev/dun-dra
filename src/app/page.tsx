@@ -17,6 +17,7 @@ import ShopUI from '@/components/ShopUI';
 import LootUI from '@/components/LootUI';
 import SettingsUI from '@/components/SettingsUI';
 import InGameWarnMsgs from '@/components/InGameWarnMsgs';
+import DeathUI from '@/components/DeathUI';
 import HomePage from '@/components/HomePage';
 
 export default function Home() {
@@ -24,7 +25,8 @@ export default function Home() {
   const { getCurrentAdventure, currentAdventureId, updateAdventure } = useAdventureStore();
   const { setStats, setGold, setInventory, setSpells, stats, gold, inventory, spells } = useCharacterStore();
   const { decrementCooldowns } = useCooldownsStore();
-  const [showHomePage, setShowHomePage] = useState(true);
+  const { death, setDeath } = useUIStore();
+  const [showHomePage, setShowHomePage] = useState(true); // Always start with home page
 
   const currentAdventure = getCurrentAdventure();
   const hasActiveAdventure = currentAdventureId && currentAdventure;
@@ -32,6 +34,7 @@ export default function Home() {
   // Use a ref to track if we've already loaded this adventure
   const loadedAdventureId = useRef<string | null>(null);
   const [hasAutoStarted, setHasAutoStarted] = useState(false);
+  const [adventureManuallyStarted, setAdventureManuallyStarted] = useState(false); // Track if user manually started adventure
 
   // Function to auto-start adventure with AI
   const autoStartAdventure = async (retryCount = 0) => {
@@ -221,8 +224,8 @@ Current game state: ${JSON.stringify(gameData)}`
   };
 
   useEffect(() => {
-    // Prevent infinite loops by checking if we've already loaded this adventure
-    if (currentAdventure && currentAdventureId !== loadedAdventureId.current) {
+    // Only load adventure data when user manually starts game, not automatically
+    if (currentAdventure && currentAdventureId !== loadedAdventureId.current && !showHomePage && adventureManuallyStarted) {
       loadedAdventureId.current = currentAdventureId;
       
       // If the adventure doesn't have a story yet, load starter data
@@ -265,8 +268,6 @@ Current game state: ${JSON.stringify(gameData)}`
       setGold(currentAdventure.gold);
       setInventory(currentAdventure.inventory);
       setSpells(currentAdventure.spells);
-
-      setShowHomePage(false);
       
       // Auto-start the adventure if it has story but no choices, or has starter choices
       console.log('🔍 Auto-start check - story:', !!storyData, 'choices:', choicesData);
@@ -289,12 +290,8 @@ Current game state: ${JSON.stringify(gameData)}`
       } else {
         console.log('❌ Auto-start skipped - story:', !!storyData, 'choices:', choicesData.length);
       }
-    } else if (!currentAdventure) {
-      loadedAdventureId.current = null;
-      setShowHomePage(true);
-      setHasAutoStarted(false);
     }
-  }, [currentAdventure, currentAdventureId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentAdventure, currentAdventureId, showHomePage, adventureManuallyStarted]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync adventure data when game state changes
   useEffect(() => {
@@ -324,12 +321,47 @@ Current game state: ${JSON.stringify(gameData)}`
     }
   }, [stats.hp, stats.maxHp, stats.mp, stats.maxMp, gold, currentAdventureId, showHomePage]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Reset any persisted death state or dead character data on app start
+  useEffect(() => {
+    // On initial load, ensure we're on home page and death state is cleared
+    console.log('🏠 App initializing - resetting states');
+    setDeath(false);
+    setHasAutoStarted(false);
+    setAdventureManuallyStarted(false);
+    loadedAdventureId.current = null;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Death detection - trigger death UI when HP reaches 0 (only when game is actually running)
+  useEffect(() => {
+    // Only check for death when:
+    // 1. Not on home page
+    // 2. User manually started an adventure 
+    // 3. Character data has been loaded (maxHp > 0 indicates proper character)
+    // 4. Adventure is properly loaded
+    if (!showHomePage && adventureManuallyStarted && stats.maxHp > 0 && currentAdventure) {
+      if (stats.hp <= 0 && !death) {
+        console.log('💀 Character has died, triggering death UI');
+        setDeath(true);
+      } else if (stats.hp > 0 && death) {
+        // Resurrection or healing brought character back
+        console.log('❤️ Character is alive again, hiding death UI');
+        setDeath(false);
+      }
+    }
+  }, [stats.hp, death, showHomePage, adventureManuallyStarted, stats.maxHp, currentAdventure, setDeath]);
+
   const handleStartGame = () => {
     setShowHomePage(false);
+    setAdventureManuallyStarted(true); // Mark that user manually started
+    // Reset death state when starting a new game session
+    setDeath(false);
   };
 
   const handleBackToHome = () => {
     setShowHomePage(true);
+    setAdventureManuallyStarted(false); // Reset manual start flag
+    setDeath(false); // Reset death state when going back to home
+    loadedAdventureId.current = null; // Reset loaded adventure tracking
   };
 
   const handleChoiceSelection = async (choice: string) => {
@@ -364,6 +396,19 @@ Current game state: ${JSON.stringify(gameData)}`
     } catch (error) {
       console.error('Error handling loot answer:', error);
       toast.error('Failed to process loot action');
+    }
+  };
+
+  const handleMapTravel = async (destination: string) => {
+    try {
+      console.log('Map travel to:', destination);
+      
+      // Use the same AI interaction system as choice selection
+      await handleChoiceSelection(destination);
+      
+    } catch (error) {
+      console.error('Error handling map travel:', error);
+      toast.error('Failed to travel to destination');
     }
   };
 
@@ -431,7 +476,7 @@ Current game state: ${JSON.stringify(gameData)}`
       </div>
 
       {/* UI Buttons - Overlay */}
-      <UiButtons onBackToHome={handleBackToHome} />
+      <UiButtons onBackToHome={handleBackToHome} onMapTravel={handleMapTravel} />
       
       {/* Modal/Overlay Components */}
       <CombatUI />
@@ -441,6 +486,7 @@ Current game state: ${JSON.stringify(gameData)}`
       <DescriptionWindow />
       <MessageWindows />
       <InGameWarnMsgs />
+      <DeathUI />
     </div>
   );
 }

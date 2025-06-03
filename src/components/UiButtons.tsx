@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useCharacterStore, useGameStore, useUIStore } from '@/stores';
 import { generateShop } from '@/lib/gameData';
 import { Button } from '@/components/ui/button';
@@ -24,15 +25,70 @@ import {
 
 interface UiButtonsProps {
   onBackToHome?: () => void;
+  onMapTravel?: (destination: string) => void;
 }
 
-export default function UiButtons({ onBackToHome }: UiButtonsProps) {
+export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps) {
   const [showStats, setShowStats] = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showSpells, setShowSpells] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const { stats, inventory, spells } = useCharacterStore();
-  const { gameData, setCurrentShop, gold } = useGameStore();
-  const { loading, toggleShopWindow, toggleSettingsWindow, setStarted, reset: resetUI } = useUIStore();
+  const { gameData, setCurrentShop, gold } = useGameStore();  const { loading, toggleShopWindow, toggleSettingsWindow, setStarted, reset: resetUI, started } = useUIStore();
+  
+  const handleMusicToggle = async () => {
+    try {
+      if (!audioElement) {
+        // Create audio element with placeholder/example audio
+        // In a real implementation, this would load from a music file
+        const audio = new Audio();
+        audio.loop = true;
+        audio.volume = 0.3; // Set a reasonable volume
+        
+        // For now, we'll just toggle the state without actual audio
+        // This can be extended later when audio files are available
+        setAudioElement(audio);
+        setAudioPlaying(true);
+        console.log('Music started (placeholder - no audio file available)');
+      } else {
+        if (audioPlaying) {
+          audioElement.pause();
+          setAudioPlaying(false);
+          console.log('Music paused');
+        } else {
+          try {
+            await audioElement.play();
+            setAudioPlaying(true);
+            console.log('Music resumed');
+          } catch (error) {
+            console.log('Audio play failed (no file available):', error);
+            setAudioPlaying(!audioPlaying); // Toggle state anyway for UI feedback
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Music toggle error:', error);
+      // Still toggle state for UI feedback
+      setAudioPlaying(!audioPlaying);
+    }
+  };
+
+  const handleFullscreenToggle = () => {
+    try {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    } catch (error) {
+      console.error('Fullscreen toggle error:', error);
+    }
+  };
+
     // Add click outside listener to close the menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -243,6 +299,120 @@ export default function UiButtons({ onBackToHome }: UiButtonsProps) {
       </CardContent>
     </Card>
   );
+
+  const MapCard = () => (
+    <Card className="absolute bottom-16 md:bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900/95 border-slate-700 text-white z-50 backdrop-blur-sm shadow-2xl max-w-md w-[calc(100vw-2rem)] md:w-auto">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
+          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
+          </svg>
+          Quick Travel
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to nearest Tavern to rest.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/tavern.svg" alt="Tavern" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Tavern</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to nearest Town.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/town.svg" alt="Town" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Town</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to nearest Woods.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/forest.svg" alt="Woods" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Woods</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to nearest Harbor.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/dock.svg" alt="Harbor" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Harbor</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to weaponsmith.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/shop1.svg" alt="Weaponsmith" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Weaponsmith</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to spell shop.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200"
+          >
+            <Image src="/images/landscape-svgs/shop2.svg" alt="Spell Shop" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Spell Shop</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={loading || gameData.event?.inCombat}
+            onClick={() => {
+              setShowMap(false);
+              onMapTravel?.("I'll go to potion shop.");
+            }}
+            className="h-auto p-3 flex flex-col items-center space-y-2 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 col-span-2"
+          >
+            <Image src="/images/landscape-svgs/shop3.svg" alt="Potion Shop" width={32} height={32} className="w-8 h-8" />
+            <span className="text-xs">Potion Shop</span>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30">
       {/* Modern Bottom Navbar */}
@@ -301,8 +471,7 @@ export default function UiButtons({ onBackToHome }: UiButtonsProps) {
                   <Backpack className="h-4 w-4 mr-2" />
                   Inventory
                 </Button>
-                
-                <Button
+                  <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowSpells(!showSpells)}
@@ -310,6 +479,19 @@ export default function UiButtons({ onBackToHome }: UiButtonsProps) {
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
                   Spells
+                </Button>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMap(!showMap)}
+                  disabled={loading || gameData.event?.inCombat}
+                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                >
+                  <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
+                  </svg>
+                  Map
                 </Button>
               </div>
               
@@ -434,12 +616,41 @@ export default function UiButtons({ onBackToHome }: UiButtonsProps) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Stat overlays */}
+      </div>      {/* Stat overlays */}
       {showStats && <StatCard />}
       {showInventory && <InventoryCard />}
       {showSpells && <SpellsCard />}
+      {showMap && <MapCard />}
+      
+      {/* Music and Fullscreen buttons - floating position like Svelte version */}
+      {started && (
+        <>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleMusicToggle}
+            className="fixed top-4 right-4 z-40 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 backdrop-blur-sm transition-all duration-200 transform hover:scale-105 active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d={audioPlaying 
+                ? "M6 7l8-5v20l-8-5v-10zm8 0h4v10h-4v-10z" // Pause icon
+                : "M8 5v14l11-7z" // Play icon
+              }/>
+            </svg>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleFullscreenToggle}
+            className="fixed top-4 right-16 z-40 text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 backdrop-blur-sm transition-all duration-200 transform hover:scale-105 active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+            </svg>
+          </Button>
+        </>
+      )}
         {/* Enhanced loading indicator with mobile improvements */}
       {loading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -450,7 +661,6 @@ export default function UiButtons({ onBackToHome }: UiButtonsProps) {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )}    </div>
   );
 }
