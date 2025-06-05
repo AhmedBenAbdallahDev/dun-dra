@@ -647,9 +647,9 @@ Format example:
     }
   };
 
-  // Determine if any major overlay is active
+  // Determine if any major overlay is active (Combat UI should NOT hide main UI)
   const isOverlayActive = useMemo(() => {
-    const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || gameData.event.inCombat || !!gameData.event.shopMode;
+    const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || !!gameData.event.shopMode;
     console.log('Overlay state check:', {
       death,
       settingsWindow,
