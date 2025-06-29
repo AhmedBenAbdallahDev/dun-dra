@@ -17,11 +17,10 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { name: selectedItemName, setSelectedItemData } = useSelectedItemStore();
+  const { setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
+  const { cooldowns, setCooldown } = useCooldownsStore();
   const { gameData } = useGameStore();
-  const { interactivePoints, setInteractivePoints } = useMiscStore();
   const { setDescription } = useDescriptionStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;

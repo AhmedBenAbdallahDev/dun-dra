@@ -677,51 +677,6 @@ Current state: ${JSON.stringify(gameData)}`
     }
   };
 
-  // Debug function to test loot system
-  const debugLootSystem = () => {
-    const testLoot = [
-      {
-        name: "Iron Sword",
-        damage: 5,
-        price: 50,
-        type: "weapon",
-        weaponClass: "sword"
-      },
-      {
-        name: "Health Potion",
-        healing: 30,
-        price: 25,
-        type: "potion"
-      },
-      {
-        name: "Lightning Bolt",
-        damage: 7,
-        price: 80,
-        manaCost: 15,
-        type: "destruction spell",
-        element: "lightning",
-        cooldown: 2
-      },
-      {
-        name: "gold",
-        type: "currency",
-        amount: 50
-      }
-    ];
-
-    // Manually set loot data to test UI
-    setGameData({
-      ...gameData,
-      lootBox: testLoot,
-      event: {
-        ...gameData.event,
-        lootMode: true
-      }
-    });
-    
-    toast.success('Debug loot activated! Check if items appear now.');
-  };
-
   // Determine if any major overlay is active (Combat UI should NOT hide main UI)
   const isOverlayActive = useMemo(() => {
     const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || !!gameData.event.shopMode;
@@ -789,14 +744,6 @@ Current state: ${JSON.stringify(gameData)}`
       <InGameWarnMsgs />
       <MessageWindows />
       {death && <DeathUI onRestart={handleBackToHome} />}
-      
-      {/* Debug button for testing loot system - Remove in production */}
-      <button
-        onClick={debugLootSystem}
-        className="fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 z-50"
-      >
-        🧪 Test Loot UI
-      </button>
     </div>
   );
 }

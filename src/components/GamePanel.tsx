@@ -6,7 +6,6 @@ import { useSelectedItemStore } from '@/stores/selectedItemStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { useGameStore } from '@/stores/gameStore';
-import { useMiscStore } from '@/stores/miscStore';
 import { useDescriptionStore } from '@/stores/miscStore';
 import { CharacterItem } from '@/stores/characterStore';
 
@@ -17,11 +16,10 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { name: selectedItemName, setSelectedItemData } = useSelectedItemStore();
+  const { setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
+  const { cooldowns, setCooldown } = useCooldownsStore();
   const { gameData } = useGameStore();
-  const { interactivePoints, setInteractivePoints } = useMiscStore();
   const { setDescription } = useDescriptionStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
@@ -34,7 +32,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     return baseValue * diceRoll;
   };
 
-  const handleMouseMove = (event: React.MouseEvent, item: CharacterItem) => {
+  const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>, item: CharacterItem) => {
     const { setMousePosition } = useUIStore.getState();
     setShowDescription(true);
     setMousePosition(event.clientX, event.clientY);
