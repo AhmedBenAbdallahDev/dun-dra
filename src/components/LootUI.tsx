@@ -92,6 +92,12 @@ export default function LootUI({ onAnswer }: LootUIProps) {
     setEvent({ lootMode: false });
   };
 
+  const skipLoot = () => {
+    clearLootBox();
+    onAnswer("I'll leave the loot and continue my adventure. (clear the gameData.lootBox array in your next response!)");
+    setEvent({ lootMode: false });
+  };
+
   const getItemImage = (item: LootItem) => {
     if (item.type === 'weapon' && item.weaponClass) {
       return `/images/${item.weaponClass}.svg`;
@@ -140,6 +146,20 @@ export default function LootUI({ onAnswer }: LootUIProps) {
                 className="loot-all-btn"
               >
                 Loot All
+              </button>
+              <button
+                disabled={loading}
+                onClick={skipLoot}
+                className="skip-loot-btn"
+              >
+                Continue without looting
+              </button>
+              <button
+                disabled={loading}
+                onClick={skipLoot}
+                className="skip-loot-btn"
+              >
+                Skip Loot
               </button>
             </>
           )}
@@ -216,6 +236,22 @@ export default function LootUI({ onAnswer }: LootUIProps) {
           height: auto !important;
           font-size: 0.9rem;
           color: white;
+        }
+
+        .skip-loot-btn {
+          padding: 0.5rem 1rem;
+          width: auto !important;
+          height: auto !important;
+          font-size: 0.9rem;
+          color: white;
+          background-color: rgb(255 0 0 / 29%);
+          border: none;
+          border-radius: 0.4rem;
+          cursor: pointer;
+        }
+
+        .skip-loot-btn:hover {
+          background-color: rgb(255 0 0 / 50%);
         }
 
         .buyable-img {

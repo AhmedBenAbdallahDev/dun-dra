@@ -170,6 +170,21 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
     // Game data is auto-saved via Zustand persist middleware
     // Show confirmation message
     console.log('Game saved successfully!');
+    const toast = document.createElement('div');
+    toast.textContent = 'Game Saved Successfully!';
+    toast.style.cssText = `
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      background: #10b981; 
+      color: white; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      z-index: 9999;
+      font-weight: 500;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => document.body.removeChild(toast), 3000);
   };
   const handleLoadGame = () => {
     // First hide the menu to prevent any state issues
@@ -178,11 +193,28 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
       menuElement.style.display = 'none';
     }
     
+    // Show loading message
+    const toast = document.createElement('div');
+    toast.textContent = 'Loading Game...';
+    toast.style.cssText = `
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      background: #3b82f6; 
+      color: white; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      z-index: 9999;
+      font-weight: 500;
+    `;
+    document.body.appendChild(toast);
+    
     // Game data is auto-loaded via Zustand persist middleware
     // Add a delay to break potential update cycles
     setTimeout(() => {
+      document.body.removeChild(toast);
       window.location.href = window.location.pathname; // Reload without state update cycles
-    }, 100);
+    }, 1000);
   };  const StatCard = () => (
     <Card className="absolute bottom-16 md:bottom-20 left-2 md:left-4 bg-slate-900/95 border-slate-700 text-white z-50 backdrop-blur-sm shadow-2xl max-w-[280px] w-[calc(100vw-1rem)] md:w-auto">
       <CardHeader className="pb-3">
@@ -305,7 +337,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
           <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
+            <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zM9 21l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
           </svg>
           Quick Travel
         </CardTitle>
