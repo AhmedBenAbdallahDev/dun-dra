@@ -207,8 +207,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
       
       {/* Custom input */}
       {choices.length >= 1 && (
-        <div className="choice-input bg-black/50 backdrop-blur-sm border border-purple-500/30 
-                        rounded-lg p-3 transition-all duration-300"
+        <div className="choice-input bg-black/50 backdrop-blur-sm border border-purple-500/30 rounded-lg p-3 transition-all duration-300"
              style={{
                animationDelay: `${choices.length * 100}ms`,
                animation: 'fadeInUp 0.6s ease-out forwards'
