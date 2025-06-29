@@ -118,6 +118,18 @@ All of your responses MUST include a valid json object, with this exact properti
   "lootBox": []
 }
 
+🎁 CRITICAL LOOT SYSTEM RULES:
+- After defeating enemies, ALWAYS offer loot-checking choices like "Search the fallen enemy" or "Check for loot"
+- If player chooses to check loot: populate gameData.lootBox with 1-3 items AND set lootMode: true
+- If gameData.lootBox has items: set lootMode to true ALWAYS!
+- NPCs giving items: add to lootBox and set lootMode: true
+
+📦 LOOT EXAMPLES:
+- Weapon: {"name": "Iron Sword", "damage": 5, "price": 85, "type": "weapon", "weaponClass": "sword"}
+- Spell: {"name": "Lightning Bolt", "damage": 7, "manaCost": 20, "type": "destruction spell", "element": "lightning", "cooldown": 3}
+- Potion: {"name": "Health Potion", "healing": 50, "type": "potion"}
+- Gold: {"name": "gold", "type": "currency", "amount": 50}
+
 Important rules:
 - Always provide at least 3 unique choices
 - inCombat, shopMode, and lootMode must be null/false if not in use
@@ -498,23 +510,41 @@ Current game state: ${JSON.stringify(gameData)}`
         const messages = [
           {
             role: 'system',
-            content: `You are the game master for "Mythic Conjurer", an interactive fantasy RPG. Continue the story based on the player's choice: "${choice}". Respond only with a JSON object containing the game state. Include story, choices (array of 3 options), event status, and any relevant game elements.
+            content: `You are the game master for "Mythic Conjurer", an interactive fantasy RPG. Continue the story based on the player's choice: "${choice}".
 
-Format example:
+RESPOND ONLY WITH A VALID JSON OBJECT containing the complete game state:
+
 {
   "gameData": {
-    "story": "Your story continuation here...",
+    "story": "Your narrative content here",
     "choices": ["Choice 1", "Choice 2", "Choice 3"],
-    "event": {
-      "inCombat": false,
-      "shopMode": null,
-      "lootMode": false
-    },
+    "event": { "inCombat": false, "shopMode": null, "lootMode": false },
     "enemy": {},
     "lootBox": [],
     "shop": []
   }
-}`
+}
+
+🎁 CRITICAL LOOT SYSTEM RULES:
+- After defeating enemies, ALWAYS offer loot-checking choices like "Search the fallen enemy" or "Check for loot"
+- If player chooses to check loot: populate gameData.lootBox with 1-3 items AND set lootMode: true
+- If gameData.lootBox has items: set lootMode to true ALWAYS!
+- NPCs giving items: add to lootBox and set lootMode: true
+
+📦 LOOT EXAMPLES:
+- Weapon: {"name": "Iron Sword", "damage": 5, "price": 85, "type": "weapon", "weaponClass": "sword"}
+- Spell: {"name": "Lightning Bolt", "damage": 7, "manaCost": 20, "type": "destruction spell", "element": "lightning", "cooldown": 3}
+- Potion: {"name": "Health Potion", "healing": 50, "type": "potion"}
+- Gold: {"name": "gold", "type": "currency", "amount": 50}
+
+⚔️ GAME RULES:
+- Enemies: bandit, golem, kobold, satyr, skritt, ghoul, goblin, wolf, ogre, harpy
+- Weapons: sword, dagger, bow, mace, spear, axe, flail
+- Elements: light, fire, dark, ice, lightning, toxic
+- Max weapon damage: 9, Max gold: 200
+- Always give 3+ unique choices
+
+Current state: ${JSON.stringify(gameData)}`
           },
           {
             role: 'user',
@@ -647,6 +677,51 @@ Format example:
     }
   };
 
+  // Debug function to test loot system
+  const debugLootSystem = () => {
+    const testLoot = [
+      {
+        name: "Iron Sword",
+        damage: 5,
+        price: 50,
+        type: "weapon",
+        weaponClass: "sword"
+      },
+      {
+        name: "Health Potion",
+        healing: 30,
+        price: 25,
+        type: "potion"
+      },
+      {
+        name: "Lightning Bolt",
+        damage: 7,
+        price: 80,
+        manaCost: 15,
+        type: "destruction spell",
+        element: "lightning",
+        cooldown: 2
+      },
+      {
+        name: "gold",
+        type: "currency",
+        amount: 50
+      }
+    ];
+
+    // Manually set loot data to test UI
+    setGameData({
+      ...gameData,
+      lootBox: testLoot,
+      event: {
+        ...gameData.event,
+        lootMode: true
+      }
+    });
+    
+    toast.success('Debug loot activated! Check if items appear now.');
+  };
+
   // Determine if any major overlay is active (Combat UI should NOT hide main UI)
   const isOverlayActive = useMemo(() => {
     const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || !!gameData.event.shopMode;
@@ -714,6 +789,14 @@ Format example:
       <InGameWarnMsgs />
       <MessageWindows />
       {death && <DeathUI onRestart={handleBackToHome} />}
+      
+      {/* Debug button for testing loot system - Remove in production */}
+      <button
+        onClick={debugLootSystem}
+        className="fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 z-50"
+      >
+        🧪 Test Loot UI
+      </button>
     </div>
   );
 }
