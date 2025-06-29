@@ -10,8 +10,6 @@ import {
   Heart, 
   Zap, 
   Coins, 
-  Backpack, 
-  Sparkles, 
   Store, 
   Settings, 
   Menu, 
@@ -30,12 +28,10 @@ interface UiButtonsProps {
 
 export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps) {
   const [showStats, setShowStats] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
-  const [showSpells, setShowSpells] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  const { stats, inventory, spells } = useCharacterStore();
+  const { stats } = useCharacterStore();
   const { gameData, setCurrentShop, gold } = useGameStore();  const { loading, toggleShopWindow, toggleSettingsWindow, setStarted, reset: resetUI, started } = useUIStore();
   
   const handleMusicToggle = async () => {
@@ -252,86 +248,6 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
     </Card>
   );
 
-  const InventoryCard = () => (
-    <Card className="absolute bottom-16 md:bottom-20 left-2 md:left-64 bg-slate-900/95 border-slate-700 text-white z-50 max-w-sm backdrop-blur-sm shadow-2xl w-[calc(100vw-1rem)] md:w-auto">      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
-          <Backpack className="h-4 w-4" />
-          Inventory
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto">
-          {inventory.length === 0 ? (
-            <div className="text-slate-400 text-sm italic">Empty inventory</div>
-          ) : (
-            inventory.map((item, index) => (
-              <div key={index} className="p-2 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium text-slate-200 text-sm">{item.name}</div>
-                  {item.quantity && item.quantity > 1 && (
-                    <span className="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">
-                      x{item.quantity}
-                    </span>
-                  )}
-                </div>
-                {item.damage && (
-                  <div className="text-xs text-red-400 mt-1">{getWeaponIcon(item.weaponClass)} {item.damage} damage</div>
-                )}
-                {item.armor && (
-                  <div className="text-xs text-blue-400 mt-1">🛡️ {item.armor} armor</div>
-                )}
-                {item.healing && (
-                  <div className="text-xs text-green-400 mt-1">❤️ +{item.healing} HP</div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const SpellsCard = () => (
-    <Card className="absolute bottom-16 md:bottom-20 right-2 md:right-4 bg-slate-900/95 border-slate-700 text-white z-50 max-w-sm backdrop-blur-sm shadow-2xl w-[calc(100vw-1rem)] md:w-auto">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
-          <Sparkles className="h-4 w-4" />
-          Spells
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto">
-          {spells.length === 0 ? (
-            <div className="text-slate-400 text-sm italic">No spells learned</div>
-          ) : (
-            spells.map((spell, index) => (
-              <div key={index} className="p-2 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                <div className="font-medium text-slate-200 text-sm">{spell.name}</div>
-                <div className="flex flex-wrap gap-1 md:gap-2 mt-2">
-                  {spell.damage && (
-                    <span className="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">
-                      💥 {spell.damage}
-                    </span>
-                  )}
-                  {spell.manaCost && (
-                    <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">
-                      ⚡ {spell.manaCost} MP
-                    </span>
-                  )}
-                  {spell.element && (
-                    <span className="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded">
-                      {getElementIcon(spell.element)} {spell.element}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   const MapCard = () => (
     <Card className="absolute bottom-16 md:bottom-20 left-1/2 transform -translate-x-1/2 bg-slate-900/95 border-slate-700 text-white z-50 backdrop-blur-sm shadow-2xl max-w-md w-[calc(100vw-2rem)] md:w-auto">
       <CardHeader className="pb-3">
@@ -497,25 +413,6 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowInventory(!showInventory)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                >
-                  <Backpack className="h-4 w-4 mr-2" />
-                  Inventory
-                </Button>
-                  <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSpells(!showSpells)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Spells
-                </Button>
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setShowMap(!showMap)}
                   disabled={loading || gameData.event?.inCombat}
                   className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:opacity-50"
@@ -580,26 +477,6 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                     <User className="h-4 w-4 mr-2" />
                     Character Stats
                   </button>
-                  <button 
-                    onClick={() => {
-                      setShowInventory(!showInventory);
-                      document.getElementById('simple-menu')!.style.display = 'none';
-                    }}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center transition-colors"
-                  >
-                    <Backpack className="h-4 w-4 mr-2" />
-                    Inventory
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowSpells(!showSpells);
-                      document.getElementById('simple-menu')!.style.display = 'none';
-                    }}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center transition-colors"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Spells
-                  </button>
                   <div className="h-px bg-slate-700"></div>
                 </div>
                 
@@ -648,10 +525,8 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
             </div>
           </div>
         </div>
-      </div>      {/* Stat overlays */}
+      </div>      {/* Stat overlays - Only Stats and Map, no duplicates */}
       {showStats && <StatCard />}
-      {showInventory && <InventoryCard />}
-      {showSpells && <SpellsCard />}
       {showMap && <MapCard />}
       
       {/* Music and Fullscreen buttons - floating position like Svelte version */}

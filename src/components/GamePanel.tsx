@@ -68,14 +68,15 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const getItemIcon = (item: CharacterItem): string => {
+    // Match Svelte logic exactly
     if (item.type === 'weapon') {
-      return `/images/${item.weaponClass || 'sword'}.svg`;
-    }
-    if (item.type === 'spell' && item.element) {
-      return `/images/${item.element}.svg`;
+      return `/images/${item.weaponClass}.svg`;
     }
     if (item.type === 'potion') {
-      return '/images/potion.svg';
+      return `/images/${item.type}.svg`; // This will be /images/potion.svg
+    }
+    if (item.element) {
+      return `/images/${item.element}.svg`;
     }
     return '/images/item.svg';
   };
