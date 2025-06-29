@@ -19,8 +19,19 @@ export default function CombatUI() {
   } = useSelectedItemStore();
   const { diceNumber, setDiceNumber, setDeath } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
-    const [diceThrown, setDiceThrown] = useState(false);
+  const [diceThrown, setDiceThrown] = useState(false);
   const { enemy, event } = gameData;
+
+  // 🎯 Debug logging for selectedItem state
+  console.log('🎲 CombatUI: Current selectedItem state:', {
+    selectedName,
+    selectedDamage, 
+    selectedManaCost,
+    selectedCombatScore,
+    diceNumber,
+    hasPrompt: !!selectedPrompt,
+    diceButtonEnabled: !!selectedName && !diceThrown
+  });
 
   // Don't render if not in combat
   if (!event.inCombat || !enemy?.enemyName) {
@@ -32,7 +43,7 @@ export default function CombatUI() {
       selectedItem: { name: selectedName, damage: selectedDamage, manaCost: selectedManaCost },
       enemy: { name: enemy?.enemyName, hp: enemy?.enemyHp },
       playerStats: { hp: stats.hp, mp: stats.mp },
-      currentDice: diceNumber
+      preDiceNumber: diceNumber // 🎯 Use pre-calculated dice from GamePanel
     });
     
     if (!selectedName) {
@@ -45,20 +56,11 @@ export default function CombatUI() {
       return;
     }
 
-    console.log('🎲 CombatUI: Starting dice animation and combat calculation');
+    console.log('🎲 CombatUI: Starting dice animation with pre-calculated dice:', diceNumber);
 
-    // Generate dice number first - always generate a new one for this throw
-    const isSpell = selectedManaCost && selectedManaCost > 0;
-    const maxDice = isSpell ? 23 : 20;
-    const newDiceNumber = Math.floor(Math.random() * maxDice) + 1;
-    console.log('🎲 CombatUI: Generated dice number:', { 
-      diceNumber: newDiceNumber, 
-      maxDice, 
-      isSpell,
-      selectedItem: selectedName 
-    });
-    setDiceNumber(newDiceNumber);
-
+    // 🎯 CRITICAL FIX: Don't generate new dice - use the pre-calculated one from GamePanel (like Svelte)
+    // This matches the Svelte behavior where dice is calculated during item selection, not during throw
+    
     // Clear cooldown for the used spell (matches Svelte logic)
     if (cooldowns[selectedName]) {
       setCooldown(selectedName, 0);
@@ -84,18 +86,25 @@ export default function CombatUI() {
         } else {
           damageToPlayer = 5; // Default damage when no weapon damage
         }
+        console.log('🎲 CombatUI: Player taking damage:', damageToPlayer);
         takeDamage(damageToPlayer);
       }
 
-      // Enemy takes damage from player using combatScore
+      // 🎯 CRITICAL FIX: Use pre-calculated combatScore from selectedItem (like Svelte)
       if (enemy?.enemyHp && selectedCombatScore) {
         const newEnemyHp = Math.max(0, enemy.enemyHp - selectedCombatScore);
+        console.log('🎲 CombatUI: Enemy taking damage:', {
+          previousHp: enemy.enemyHp,
+          combatScore: selectedCombatScore,
+          newHp: newEnemyHp
+        });
         setEnemy({ ...enemy, enemyHp: newEnemyHp });
       }
     }
 
     // Check if player died after taking damage
     if (stats.hp <= 0) {
+      console.log('🎲 CombatUI: Player died, sending death prompt');
       addChatMessage({
         content: 'give a sad gameData.story, because player dies in the last combat event.',
         type: 'user',
@@ -108,8 +117,9 @@ export default function CombatUI() {
       return;
     }
 
-    // Continue story with the pre-generated prompt from selectedItem
+    // 🎯 CRITICAL FIX: Use pre-calculated prompt from selectedItem (like Svelte)
     if (selectedPrompt) {
+      console.log('🎲 CombatUI: Sending pre-calculated combat prompt:', selectedPrompt);
       addChatMessage({
         content: selectedPrompt,
         type: 'user', 

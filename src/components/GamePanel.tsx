@@ -30,9 +30,18 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const diceNumber = Math.floor(Math.random() * maxDice) + 1;
     const combatScore = baseValue * diceNumber;
     
-    // Store dice number in UI store like Svelte does with $misc.diceNumber
+    // 🎯 CRITICAL FIX: Store dice number in UI store immediately like Svelte does with $misc.diceNumber
     const { setDiceNumber } = useUIStore.getState();
     setDiceNumber(diceNumber);
+    
+    console.log('🎯 GamePanel: Combat score calculated:', {
+      baseValue,
+      type,
+      diceNumber,
+      maxDice,
+      combatScore,
+      calculation: `${baseValue} × ${diceNumber} = ${combatScore}`
+    });
     
     return { combatScore, diceNumber };
   };
@@ -162,11 +171,18 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         return;
       }
       
-      const { combatScore } = calculateCombatScore(damage, type);
+      const { combatScore, diceNumber } = calculateCombatScore(damage, type);
       const enemyHp = gameData.enemy?.enemyHp || 0;
       const prompt = generateCombatPrompt(name, combatScore, enemyHp);
       
       // Set selectedItem exactly like Svelte
+      console.log('🔥 GamePanel: Setting weapon selection:', {
+        name,
+        damage,
+        combatScore,
+        prompt: prompt.substring(0, 100) + '...',
+        calculatedDice: diceNumber
+      });
       setSelectedItem({
         name,
         damage,
@@ -202,11 +218,19 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         setCooldown(name, cooldown);
       }
       
-      const { combatScore } = calculateCombatScore(damage, type);
+      const { combatScore, diceNumber } = calculateCombatScore(damage, type);
       const enemyHp = gameData.enemy?.enemyHp || 0;
       const prompt = generateCombatPrompt(name, combatScore, enemyHp, true);
       
       // Set selectedItem exactly like Svelte  
+      console.log('🔥 GamePanel: Setting spell selection:', {
+        name,
+        damage,
+        combatScore,
+        manaCost,
+        prompt: prompt.substring(0, 100) + '...',
+        calculatedDice: diceNumber
+      });
       setSelectedItem({
         name,
         damage,

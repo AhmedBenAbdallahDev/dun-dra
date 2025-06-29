@@ -19,17 +19,29 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
 
   const choices = gameData.choices || [];
   
+  // 🎯 CRITICAL: Hide choices during combat like Svelte version
+  const inCombat = gameData.event?.inCombat;
+  const hasEnemy = gameData.enemy?.enemyName;
+  
   // Debug logging for choices
   useEffect(() => {
-    console.log('🎯 Choices updated:', {
+    console.log('🎯 Choices component state:', {
       choicesCount: choices.length,
-      choices: choices,
       hasStory: !!gameData.story,
       loading: loading,
       isProcessing: isProcessing,
-      interactivePoints: interactivePoints
+      interactivePoints: interactivePoints,
+      inCombat: inCombat,
+      hasEnemy: hasEnemy,
+      shouldShowChoices: !inCombat || !hasEnemy
     });
-  }, [choices, gameData.story, loading, isProcessing, interactivePoints]);
+  }, [choices, gameData.story, loading, isProcessing, interactivePoints, inCombat, hasEnemy]);
+
+  // 🎯 CRITICAL FIX: Don't render choices during combat (matches Svelte behavior)
+  if (inCombat && hasEnemy) {
+    console.log('🎯 Choices hidden - in combat with enemy');
+    return null;
+  }
 
   const handleChoiceClick = async (choice: string, index: number) => {
     if (loading || isProcessing || !choice) {
