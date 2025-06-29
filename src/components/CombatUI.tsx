@@ -166,7 +166,7 @@ export default function CombatUI() {
             {selectedName && selectedDamage && (
               <div className="text-right text-xs text-gray-300">
                 <div>Damage: x{selectedDamage}</div>
-                {selectedManaCost > 0 && <div>Mana: {selectedManaCost}</div>}
+                {selectedManaCost && selectedManaCost > 0 && <div>Mana: {selectedManaCost}</div>}
               </div>
             )}
             
