@@ -35,6 +35,11 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
   const { gameData, setCurrentShop, gold } = useGameStore();  const { loading, toggleShopWindow, toggleSettingsWindow, setStarted, reset: resetUI, started } = useUIStore();
   
   const handleMusicToggle = async () => {
+    console.log('🎵 UiButtons: Music toggle clicked:', { 
+      currentlyPlaying: audioPlaying, 
+      hasAudioElement: !!audioElement 
+    });
+    
     try {
       if (!audioElement) {
         // Create audio element with placeholder/example audio
@@ -47,7 +52,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         // This can be extended later when audio files are available
         setAudioElement(audio);
         setAudioPlaying(true);
-        console.log('Music started (placeholder - no audio file available)');
+        console.log('🎵 Music started (placeholder - no audio file available)');
       } else {
         if (audioPlaying) {
           audioElement.pause();
@@ -337,17 +342,28 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                 Mythic Conjurer
               </h1>
               
-              {/* Quick Stats Bar */}
+              {/* Enhanced Quick Stats Bar with animations */}
               <div className="hidden md:flex items-center space-x-3">
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                  <Heart className="h-4 w-4 text-red-400" />
-                  <span className="text-sm">
-                    <span className="text-red-400 font-medium">{stats.hp}</span>
-                    <span className="text-slate-500">/</span>
-                    <span className="text-slate-300">{stats.maxHp}</span>
-                  </span>
+                {/* Health with progress bar */}
+                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-red-600/30 hover:border-red-500/50 transition-all group">
+                  <Heart className="h-4 w-4 text-red-400 group-hover:animate-pulse" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm">
+                      <span className="text-red-400 font-medium">{stats.hp}</span>
+                      <span className="text-slate-500">/</span>
+                      <span className="text-slate-300">{stats.maxHp}</span>
+                    </span>
+                    <div className="w-16 h-1 bg-red-900/50 rounded-full overflow-hidden mt-0.5">
+                      <div 
+                        className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100))}%` }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+                
+                {/* Mana with progress bar */}
+                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-blue-600/30 hover:border-blue-500/50 transition-all group">
                   <Zap className="h-4 w-4 text-blue-400" />
                   <span className="text-sm">
                     <span className="text-blue-400 font-medium">{stats.mp}</span>

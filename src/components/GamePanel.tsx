@@ -132,6 +132,16 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleItemUsage = (item: CharacterItem) => {
+    console.log('🔥 Item clicked:', {
+      name: item.name,
+      type: item.type,
+      damage: item.damage,
+      manaCost: item.manaCost,
+      inCombat: gameData.event?.inCombat,
+      currentHP: stats.hp,
+      currentMP: stats.mp
+    });
+    
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
@@ -416,24 +426,82 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
             return (
               <button
                 key={index}
-                className={`action-button ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
-                  selectedName === item.name ? 'ring-2 ring-green-400 bg-green-900/30' : ''
-                } ${gameData.event.inCombat ? 'combat-mode' : ''}`}
+                className={`action-button relative group transition-all duration-200 ${
+                  disabled 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:scale-105 hover:shadow-lg'
+                } ${
+                  selectedName === item.name 
+                    ? 'ring-2 ring-green-400 bg-green-900/30 shadow-green-400/20 shadow-lg' 
+                    : 'hover:ring-1 hover:ring-amber-400/50'
+                } ${
+                  gameData.event.inCombat 
+                    ? 'combat-mode border-red-500/30' 
+                    : ''
+                }`}
                 disabled={disabled}
                 onClick={() => handleItemUsage(item)}
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
                 title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
               >
+                {/* Item icon */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={getItemIcon(item)}
                   alt={item.name}
-                  className="pointer-events-none"
+                  className="pointer-events-none transition-transform group-hover:scale-110"
                 />
+                
+                {/* Selection indicator */}
+                {selectedName === item.name && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse">
+                    <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
+                  </div>
+                )}
+                
+                {/* Combat mode indicator */}
+                {gameData.event.inCombat && !disabled && (
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                )}
+                
+                {/* Cooldown display */}
                 {cooldownText && (
-                  <div className="absolute top-1 right-1 text-xs bg-red-600 text-white px-1 rounded">
+                  <div className="absolute top-1 right-1 text-xs bg-red-600 text-white px-1 rounded border border-red-400">
                     {cooldownText}
+                  </div>
+                )}
+                
+                {/* Damage/healing indicator */}
+                {item.damage && (
+                  <div className="absolute bottom-0 left-0 text-xs bg-orange-600 text-white px-1 rounded-tr border border-orange-400">
+                    ⚔{item.damage}
+                  </div>
+                )}
+                {item.healing && (
+                  <div className="absolute bottom-0 left-0 text-xs bg-green-600 text-white px-1 rounded-tr border border-green-400">
+                    ❤{item.healing}
+                  </div>
+                )}
+                
+                {/* Mana cost indicator */}
+                {item.manaCost && item.manaCost > 0 && (
+                  <div className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded-tl border border-blue-400">
+                    🔮{item.manaCost}
+                  </div>
+                )}
+                
+                {/* Disabled overlay */}
+                {disabled && (
+                  <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center">
+                    <span className="text-red-400 text-xs">❌</span>
+                  </div>
+                )}
+                
+                {/* Hover hint for combat */}
+                {gameData.event.inCombat && !disabled && selectedName !== item.name && (
+                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    Click to select for combat
                   </div>
                 )}
               </button>

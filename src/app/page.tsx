@@ -448,23 +448,37 @@ Current game state: ${JSON.stringify(gameData)}`
   }, [setDeath]);
 
   const handleChoiceSelection = useCallback(async (choice: string) => {
+    console.log('🎯 Page: Choice selection initiated:', {
+      choice: choice.substring(0, 50) + '...',
+      choiceLength: choice.length,
+      currentGameState: {
+        hasStory: !!gameData.story,
+        choicesCount: gameData.choices?.length || 0,
+        inCombat: gameData.event?.inCombat,
+        shopMode: gameData.event?.shopMode
+      }
+    });
+    
     try {
       // Add user's choice to chat/story
-      console.log('User selected choice:', choice);
+      console.log('🎯 Page: User selected choice:', choice.substring(0, 100));
       
       // Check for inappropriate content
       if (choice.includes('sex') || choice.includes('kill')) {
         if (!choice.includes('skill')) {
+          console.log('🎯 Page: Inappropriate content detected');
           toast.error("There's a flawed word in your answer.");
           return;
         }
       }
       
+      console.log('🎯 Page: Processing valid choice, decrementing cooldowns');
       // Decrement all spell cooldowns when a choice is made
       decrementCooldowns();
       
       // Clear previous choices and shop data (but keep the story until new one arrives)
       const currentGameData = useGameStore.getState().gameData;
+      console.log('🎯 Page: Clearing choices and updating game state');
       setGameData({
         ...currentGameData,
         choices: [],
@@ -530,13 +544,27 @@ Current game state: ${JSON.stringify(gameData)}`
             config: aiConfig
           }),
         });
-        
+
+        console.log('🎯 Page: API response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok
+        });
+
         if (!response.ok) {
+          console.error('🎯 Page: API request failed:', {
+            status: response.status,
+            statusText: response.statusText
+          });
           throw new Error(`AI request failed: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
-        console.log('AI Response:', data);
+        console.log('🎯 Page: AI Response received successfully:', {
+          hasContent: !!data.content,
+          contentLength: data.content?.length || 0,
+          contentPreview: data.content?.substring(0, 100) + '...'
+        });
         
         // Parse the AI response
         const aiContent = data.content;
@@ -544,21 +572,38 @@ Current game state: ${JSON.stringify(gameData)}`
         
         try {
           // Try to parse JSON from the response
-          console.log('Raw AI content:', aiContent);
+          console.log('🎯 Page: Attempting to parse AI response');
           const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-          console.log('JSON match found:', !!jsonMatch);
+          console.log('🎯 Page: JSON extraction result:', {
+            foundMatch: !!jsonMatch,
+            matchLength: jsonMatch?.[0]?.length || 0
+          });
+          
           if (jsonMatch) {
-            console.log('Matched JSON string:', jsonMatch[0]);
             const parsedData = JSON.parse(jsonMatch[0]);
-            console.log('Parsed data:', parsedData);
+            console.log('🎯 Page: JSON parsed successfully:', {
+              hasGameData: !!parsedData.gameData,
+              hasDirectData: !!parsedData.story || !!parsedData.choices,
+              keys: Object.keys(parsedData)
+            });
             gameDataUpdate = parsedData.gameData || parsedData;
-            console.log('Game data update extracted:', gameDataUpdate);
+            console.log('🎯 Page: Game data update extracted:', {
+              hasStory: !!gameDataUpdate.story,
+              hasChoices: Array.isArray(gameDataUpdate.choices),
+              choicesCount: gameDataUpdate.choices?.length || 0,
+              hasEvent: !!gameDataUpdate.event
+            });
           } else {
+            console.warn('🎯 Page: No JSON found in AI response, using fallback');
             throw new Error('No JSON found in response');
           }
         } catch (parseError) {
-          console.error('Failed to parse AI response:', parseError);
+          console.error('🎯 Page: Failed to parse AI response:', {
+            error: parseError instanceof Error ? parseError.message : String(parseError),
+            contentPreview: aiContent?.substring(0, 200)
+          });
           // Fallback: create a basic response
+          console.log('🎯 Page: Creating fallback response');
           gameDataUpdate = {
             story: aiContent,
             choices: [
@@ -575,9 +620,15 @@ Current game state: ${JSON.stringify(gameData)}`
         }
         
         // Update the game state
-        console.log('About to update game data with:', gameDataUpdate);
+        console.log('🎯 Page: Preparing to update game state');
         const currentGameData = useGameStore.getState().gameData;
-        console.log('Current game data before update:', currentGameData);
+        console.log('🎯 Page: Current game data before update:', {
+          hasStory: !!currentGameData.story,
+          hasChoices: !!currentGameData.choices?.length,
+          heroClass: currentGameData.heroClass,
+          inCombat: currentGameData.event?.inCombat,
+          shopMode: currentGameData.event?.shopMode
+        });
         
         const newGameData = {
           ...currentGameData,
@@ -586,33 +637,55 @@ Current game state: ${JSON.stringify(gameData)}`
           heroClass: currentGameData.heroClass,
           placeAndTime: gameDataUpdate.placeAndTime || currentGameData.placeAndTime
         };
-        console.log('New game data to set:', newGameData);
+        
+        console.log('🎯 Page: New game data prepared:', {
+          hasNewStory: !!newGameData.story,
+          hasNewChoices: !!newGameData.choices?.length,
+          newChoicesCount: newGameData.choices?.length || 0,
+          heroClassPreserved: newGameData.heroClass === currentGameData.heroClass,
+          hasEvent: !!newGameData.event,
+          inCombat: newGameData.event?.inCombat,
+          shopMode: newGameData.event?.shopMode,
+          lootMode: newGameData.event?.lootMode
+        });
         
         setGameData(newGameData);
-        console.log('Game data updated with:', gameDataUpdate);
+        console.log('🎯 Page: Game data updated successfully');
         
         // Verify the update took effect
         setTimeout(() => {
           const updatedGameData = useGameStore.getState().gameData;
-          console.log('Game data after update (async check):', updatedGameData);
+          console.log('🎯 Page: Verification - Game data after update:', {
+            storyUpdated: updatedGameData.story === newGameData.story,
+            choicesUpdated: updatedGameData.choices?.length === newGameData.choices?.length,
+            eventUpdated: JSON.stringify(updatedGameData.event) === JSON.stringify(newGameData.event)
+          });
         }, 100);
         
         // Update adventure in store
         if (currentAdventure) {
+          console.log('🎯 Page: Updating adventure in store:', currentAdventure.id);
           updateAdventure(currentAdventure.id, gameDataUpdate);
         }
         
-        console.log('Game data updated after choice selection');
+        console.log('🎯 Page: Choice selection processing completed successfully');
         
       } catch (aiError) {
-        console.error('AI request failed:', aiError);
+        console.error('🎯 Page: AI request failed:', {
+          error: aiError instanceof Error ? aiError.message : String(aiError),
+          stack: aiError instanceof Error ? aiError.stack : undefined
+        });
         toast.error('Failed to process your choice. Please try again.');
       } finally {
+        console.log('🎯 Page: Setting loading state to false');
         setLoading(false);
       }
       
     } catch (error) {
-      console.error('Error handling choice selection:', error);
+      console.error('🎯 Page: Critical error in choice selection:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       toast.error('Failed to process your choice');
     }
   }, [decrementCooldowns, setGameData, currentAdventure, updateAdventure, gameData]);

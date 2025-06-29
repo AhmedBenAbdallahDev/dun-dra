@@ -28,7 +28,15 @@ export default function CombatUI() {
   }
 
   const throwDice = async () => {
+    console.log('🎲 CombatUI: Dice throw initiated:', {
+      selectedItem: { name: selectedName, damage: selectedDamage, manaCost: selectedManaCost },
+      enemy: { name: enemy?.enemyName, hp: enemy?.enemyHp },
+      playerStats: { hp: stats.hp, mp: stats.mp },
+      currentDice: diceNumber
+    });
+    
     if (!selectedName) {
+      console.log('🎲 CombatUI: No item selected, showing warning');
       addChatMessage({
         content: 'You need to choose a weapon or spell first.',
         type: 'system',
@@ -37,10 +45,18 @@ export default function CombatUI() {
       return;
     }
 
+    console.log('🎲 CombatUI: Starting dice animation and combat calculation');
+
     // Generate dice number first - always generate a new one for this throw
     const isSpell = selectedManaCost && selectedManaCost > 0;
     const maxDice = isSpell ? 23 : 20;
     const newDiceNumber = Math.floor(Math.random() * maxDice) + 1;
+    console.log('🎲 CombatUI: Generated dice number:', { 
+      diceNumber: newDiceNumber, 
+      maxDice, 
+      isSpell,
+      selectedItem: selectedName 
+    });
     setDiceNumber(newDiceNumber);
 
     // Clear cooldown for the used spell (matches Svelte logic)
@@ -149,15 +165,34 @@ export default function CombatUI() {
           </div>
 
           {/* Combat Instructions - Center */}
-          <div className="text-center text-white">
+          <div className="text-center text-white min-w-0 flex-1 px-4">
             {!selectedName ? (
-              <span className="text-yellow-300 text-sm font-medium">
-                👈 Choose a weapon or spell from your inventory, then press dice →
-              </span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-yellow-300 text-sm font-medium animate-pulse">
+                  � Step 1: Choose a weapon or spell
+                </span>
+                <span className="text-gray-400 text-xs">
+                  👈 Click any item in your inventory or spells panel
+                </span>
+              </div>
+            ) : !diceThrown ? (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-green-300 text-sm font-medium">
+                  ✅ {selectedName} selected!
+                </span>
+                <span className="text-yellow-300 text-xs animate-pulse">
+                  📋 Step 2: Press dice to attack →
+                </span>
+              </div>
             ) : (
-              <span className="text-green-300 text-sm font-medium">
-                ⚔️ {selectedName} selected! Press dice to attack →
-              </span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-blue-300 text-sm font-medium">
+                  🎲 Rolling dice...
+                </span>
+                <span className="text-gray-400 text-xs">
+                  Combat resolving...
+                </span>
+              </div>
             )}
           </div>
 
