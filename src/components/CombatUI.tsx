@@ -30,27 +30,30 @@ export default function CombatUI() {
   }
 
   const throwDice = async () => {
+    console.log('🎲 Dice clicked! Selected item:', { selectedName, selectedDamage, selectedManaCost });
+    
     if (!selectedName) {
+      console.log('🎲 No item selected, showing warning');
       addChatMessage({
-        content: 'You need to choose a weapon or spell.',
+        content: 'You need to choose a weapon or spell first.',
         type: 'system',
         timestamp: Date.now()
       });
       return;
     }
 
+    console.log('🎲 Item selected, throwing dice...');
+
+    // Generate dice number first - always generate a new one for this throw
+    const isSpell = selectedManaCost && selectedManaCost > 0;
+    const maxDice = isSpell ? 23 : 20;
+    const newDiceNumber = Math.floor(Math.random() * maxDice) + 1;
+    console.log('🎲 Generated dice number:', newDiceNumber, 'Max:', maxDice);
+    setDiceNumber(newDiceNumber);
+
     // Clear cooldown for the used spell (matches Svelte logic)
     if (cooldowns[selectedName]) {
       setCooldown(selectedName, 0);
-    }
-
-    // Generate dice number first - this should already be done by GamePanel calculateCombatScore
-    // But if not set, generate it here with correct range
-    if (!diceNumber || diceNumber === 0) {
-      const isSpell = selectedManaCost && selectedManaCost > 0;
-      const maxDice = isSpell ? 23 : 20;
-      const newDiceNumber = Math.floor(Math.random() * maxDice) + 1;
-      setDiceNumber(newDiceNumber);
     }
 
     // Show dice animation first
@@ -155,8 +158,15 @@ export default function CombatUI() {
             </div>
           )}
 
-          {/* Combat Info */}
+            {/* Combat Info */}
           <div className="combat-info space-y-3">
+            {/* Debug Info - Remove this after testing */}
+            <div className="text-xs text-yellow-400 bg-yellow-900/30 p-2 rounded">
+              DEBUG: Selected: {selectedName || 'None'} | 
+              Combat: {enemy?.enemyName ? 'Yes' : 'No'} | 
+              Dice: {diceNumber}
+            </div>
+            
             <ul className="space-y-2 text-gray-300">
               {!selectedName ? (
                 <li className="flex items-center gap-2">

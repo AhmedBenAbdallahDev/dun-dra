@@ -131,10 +131,16 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleItemUsage = (item: CharacterItem) => {
+    console.log('🔥 Item clicked:', item);
+    console.log('🔥 Combat state:', gameData.event);
+    console.log('🔥 Stats:', stats);
+    
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
     const { setSelectedItem, clearSelectedItem } = useSelectedItemStore.getState();
+
+    console.log('🔥 Processing item:', { name, type, damage, inCombat, shopMode });
 
     // Clear previous selection
     clearSelectedItem();
