@@ -22,14 +22,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   const { diceNumber, setDiceNumber, interactivePoints, setInteractivePoints } = useMiscStore();
   const { setDescription } = useDescriptionStore();
 
-export default function GamePanel({ title, actions }: GamePanelProps) {
-  const { stats, heal, restoreMp, removeInventoryItem, takeDamage, spendMp, gold } = useCharacterStore();
-  const { setSelectedItem, name: selectedItemName, setSelectedItemData, selectedItem } = useSelectedItemStore();
-  const { setErrorMessage, setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
-  const { gameData } = useGameStore();
-  const { diceNumber, setDiceNumber, interactivePoints, setInteractivePoints } = useMiscStore();
-
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
 
