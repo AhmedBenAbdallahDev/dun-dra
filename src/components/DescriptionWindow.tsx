@@ -22,10 +22,19 @@ const DescriptionWindow = () => {
   
   const { showDescription, x, y } = useUIStore();
 
-  // Only show if there's something to describe and showDescription is not 'none'
-  if (!name || showDescription === 'none') {
+  // Only show if there's something to describe and showDescription is true
+  if (!name || !showDescription) {
     return null;
   }
+
+  const style: React.CSSProperties = {
+    position: 'fixed',
+    left: `${x + 10}px`,
+    top: `${y - 40}px`,
+    zIndex: 1000,
+    pointerEvents: 'none',
+    transform: 'translateZ(0)' // Force hardware acceleration
+  };
 
   const getElementIcon = (element?: string) => {
     if (!element) return null;

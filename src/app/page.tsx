@@ -668,42 +668,43 @@ Format example:
   }
 
   return (
-    <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden flex flex-col">
+    <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
       {/* Background Images */}
       <BackgroundImgs />
       
-      {/* Main Game UI - Render if no major overlay is active AND not dead */}
+      {/* Main Game UI - Fixed Layout Like Svelte */}
       {!death && !isOverlayActive && (
-        // Flex container for the three main columns
-        <div className="flex flex-1 p-4 gap-4 overflow-hidden">
-          {/* Left Column: Game Story and Choices (Flex-grow) */}
-          <div className="flex flex-col flex-grow gap-4 overflow-y-auto p-2 bg-black/30 rounded-lg">
+        <div className="main-game">
+          {/* Story Display Area - 25% height, centered */}
+          <div className="game-master">
             <StoryDisplay />
-            <div className="mt-auto"> {/* Push choices to the bottom */} 
-              <Choices onChoiceSelect={handleChoiceSelection} />
-            </div>
           </div>
 
-          {/* Right Column: Panels and Buttons (Fixed Width) */}
-          <div className="flex flex-col gap-4 w-[300px] md:w-[350px] overflow-y-auto p-2 bg-black/30 rounded-lg">
-            {/* Inventory Panel */}
-            <div className="h-1/2 overflow-y-auto">
+          {/* Game Controls - 30% height, 3 columns */}
+          <div className="game-controls">
+            {/* Inventory Panel - 25% width */}
+            <div className="panel-container">
               <GamePanel title="Inventory" actions={inventory} />
             </div>
             
-            {/* Spells Panel */}
-            <div className="h-1/2 overflow-y-auto">
-              <GamePanel title="Spells" actions={spells} />
+            {/* Choices - 100% width of middle area */}
+            <div className="choices">
+              <Choices onChoiceSelect={handleChoiceSelection} />
             </div>
             
-            {/* UI Buttons and Description Window (Potentially stack or manage space) */}
-            <div className="mt-auto"> {/* Push buttons to bottom of this column */} 
-              <UiButtons onMapTravel={handleMapTravel} onBackToHome={handleBackToHome} />
-              <DescriptionWindow />
+            {/* Spells Panel - 25% width */}
+            <div className="panel-container">
+              <GamePanel title="Spells" actions={spells} />
             </div>
           </div>
         </div>
       )}
+      
+      {/* Overlay UI Components */}
+      <div className="ui-buttons-overlay">
+        <UiButtons onMapTravel={handleMapTravel} onBackToHome={handleBackToHome} />
+      </div>
+      <DescriptionWindow />
       
       {/* Modal/Overlay Components - Render based on their specific states */}
       {gameData.event.inCombat && <CombatUI />}

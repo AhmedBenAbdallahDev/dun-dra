@@ -35,9 +35,8 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleMouseMove = (event: React.MouseEvent, item: CharacterItem) => {
-    const { setMousePosition } = useUIStore.getState();
     setShowDescription(true);
-    setMousePosition(event.clientX, event.clientY);
+    // You can add position logic here for tooltip
     
     // Set description data
     setDescription({
