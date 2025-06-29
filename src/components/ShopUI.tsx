@@ -29,7 +29,8 @@ interface ShopItem {
   [key: string]: unknown;
 }
 
-export default function ShopUI() {  const { 
+export default function ShopUI() {
+  const { 
     shopWindow, 
     toggleShopWindow, 
     toggleInventoryWindow,

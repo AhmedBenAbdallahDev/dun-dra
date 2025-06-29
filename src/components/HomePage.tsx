@@ -48,7 +48,8 @@ interface HomePageProps {
   onStartGame: () => void
 }
 
-export default function HomePage({ onStartGame }: HomePageProps) {  const { 
+export default function HomePage({ onStartGame }: HomePageProps) {
+  const { 
     adventures, 
     setCurrentAdventure, 
     getLatestAdventure,
