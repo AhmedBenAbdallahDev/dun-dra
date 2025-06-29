@@ -14,12 +14,12 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const { stats, inventory, spells, heal, restoreMp, removeInventoryItem, takeDamage, spendMp, gold } = useCharacterStore();
-  const { setSelectedItem, name: selectedItemName, setSelectedItemData, selectedItem } = useSelectedItemStore();
-  const { setErrorMessage, setShowDescription, showDescription, x, y } = useUIStore();
+  const { stats, inventory, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
+  const { name: selectedItemName, setSelectedItemData } = useSelectedItemStore();
+  const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
   const { gameData } = useGameStore();
-  const { diceNumber, setDiceNumber, interactivePoints, setInteractivePoints } = useMiscStore();
+  const { interactivePoints, setInteractivePoints } = useMiscStore();
   const { setDescription } = useDescriptionStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
@@ -74,7 +74,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   // Main item usage function - completely matches Svelte ActionBox.svelte useItem logic
-  const useItem = (item: CharacterItem) => {
+  const handleItemUsage = (item: CharacterItem) => {
     const { type, name, damage, manaCost, healing, cooldown, point } = item;
     const { hp, maxHp, mp, maxMp } = stats;
     const { inCombat, shopMode } = gameData.event;
@@ -322,7 +322,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     incrementAllCooldowns();
     
     // Use the item
-    useItem(item);
+    handleItemUsage(item);
     
     // Always show item description
     if (setShowDescription) {

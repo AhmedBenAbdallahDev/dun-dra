@@ -44,7 +44,6 @@ export default function ShopUI() {  const {
   const { 
     character,
     gold,
-    inventory,
     addGold,
     subtractGold,
     addInventoryItem,
@@ -83,46 +82,46 @@ export default function ShopUI() {  const {
   }, [gameData.shop]);
 
   // Buy item function - matches Svelte shop logic
-  const buyItem = (item: ShopItem) => {
-    if (gold < item.price) {
-      setBuyWarnMsg("You don't have enough gold!");
-      return;
-    }
+  // const buyItem = (item: ShopItem) => {
+  //   if (gold < item.price) {
+  //     setBuyWarnMsg("You don't have enough gold!");
+  //     return;
+  //   }
 
-    // Deduct gold and add item to inventory
-    subtractGold(item.price);
+  //   // Deduct gold and add item to inventory
+  //   subtractGold(item.price);
     
-    // Convert shop item to character item format
-    const characterItem: CharacterItem = {
-      name: item.name,
-      type: item.type as any,
-      damage: item.damage,
-      healing: item.healing,
-      mana: item.mana,
-      armor: item.armor,
-      element: item.element,
-      weaponClass: item.weaponClass,
-      manaCost: item.manaCost,
-      price: Math.floor(item.price * 0.7), // Sell price is 70% of buy price
-      rarity: item.rarity
-    };
+  //   // Convert shop item to character item format
+  //   const characterItem: CharacterItem = {
+  //     name: item.name,
+  //     type: item.type as any,
+  //     damage: item.damage,
+  //     healing: item.healing,
+  //     mana: item.mana,
+  //     armor: item.armor,
+  //     element: item.element,
+  //     weaponClass: item.weaponClass,
+  //     manaCost: item.manaCost,
+  //     price: Math.floor(item.price * 0.7), // Sell price is 70% of buy price
+  //     rarity: item.rarity
+  //   };
     
-    addInventoryItem(characterItem);
-    setBuyWarnMsg(`You bought ${item.name} for ${item.price} gold!`);
-  };
+  //   addInventoryItem(characterItem);
+  //   setBuyWarnMsg(`You bought ${item.name} for ${item.price} gold!`);
+  // };
 
   // Sell item function - matches Svelte shop logic  
-  const sellItem = (item: CharacterItem) => {
-    if (!item.price) {
-      setSellWarnMsg("This item cannot be sold!");
-      return;
-    }
+  // const sellItem = (item: CharacterItem) => {
+  //   if (!item.price) {
+  //     setSellWarnMsg("This item cannot be sold!");
+  //     return;
+  //   }
 
-    // Add gold and remove from inventory
-    addGold(item.price);
-    removeInventoryItem(item.name);
-    setSellWarnMsg(`You sold ${item.name} for ${item.price} gold!`);
-  };
+  //   // Add gold and remove from inventory
+  //   addGold(item.price);
+  //   removeInventoryItem(item.name);
+  //   setSellWarnMsg(`You sold ${item.name} for ${item.price} gold!`);
+  // };
 
   // Handle buy click - set up warning message like Svelte version
   const handleBuyClick = (item: ShopItem) => {
