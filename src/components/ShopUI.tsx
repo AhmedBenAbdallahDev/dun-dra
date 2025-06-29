@@ -44,11 +44,7 @@ export default function ShopUI() {
   
   const { 
     character,
-    gold,
-    addGold,
-    subtractGold,
-    addInventoryItem,
-    removeInventoryItem
+    gold
   } = useCharacterStore();
   
   const { setSelectedItem } = useSelectedItemStore();

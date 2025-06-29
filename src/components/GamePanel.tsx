@@ -14,7 +14,7 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const { stats, inventory, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
+  const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { name: selectedItemName, setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
