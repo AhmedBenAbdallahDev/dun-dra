@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useCharacterStore } from '@/stores/characterStore';
-import { useSelectedItemStore } from '@/stores/selectedItemStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { useGameStore } from '@/stores/gameStore';
@@ -16,7 +15,6 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
   const { gameData } = useGameStore();

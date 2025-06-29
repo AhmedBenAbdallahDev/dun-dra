@@ -27,15 +27,6 @@ const DescriptionWindow = () => {
     return null;
   }
 
-  const style: React.CSSProperties = {
-    position: 'fixed',
-    left: `${x + 10}px`,
-    top: `${y - 40}px`,
-    zIndex: 1000,
-    pointerEvents: 'none',
-    transform: 'translateZ(0)' // Force hardware acceleration
-  };
-
   const getElementIcon = (element?: string) => {
     if (!element) return null;
     

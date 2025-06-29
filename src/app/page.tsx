@@ -647,7 +647,7 @@ Current state: ${JSON.stringify(gameData)}`
       console.error('Error handling choice selection:', error);
       toast.error('Failed to process your choice');
     }
-  }, [decrementCooldowns, setGameData, currentAdventure, updateAdventure]);
+  }, [decrementCooldowns, setGameData, currentAdventure, updateAdventure, gameData]);
 
   const handleLootAnswer = useCallback(async (answer: string) => {
     try {
