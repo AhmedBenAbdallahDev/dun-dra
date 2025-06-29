@@ -3,7 +3,7 @@
 import React from 'react';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useUIStore } from '@/stores/uiStore';
-import { useCooldownsStore } from '@/stores/selectedItemStore';
+import { useCooldownsStore, useSelectedItemStore } from '@/stores/selectedItemStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useDescriptionStore } from '@/stores/miscStore';
 import { CharacterItem } from '@/stores/characterStore';
@@ -17,17 +17,56 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
-  const { gameData } = useGameStore();
+  const { gameData, addChatMessage } = useGameStore();
   const { setDescription } = useDescriptionStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
 
   // Combat score calculation - EXACTLY MATCHES SVELTE calculateCombatScore  
-  const calculateCombatScore = (baseValue: number, type: string): number => {
+  const calculateCombatScore = (baseValue: number, type: string): { combatScore: number, diceNumber: number } => {
     const maxDice = type === 'weapon' ? 20 : 23;
-    const diceRoll = Math.floor(Math.random() * maxDice) + 1;
-    return baseValue * diceRoll;
+    const diceNumber = Math.floor(Math.random() * maxDice) + 1;
+    const combatScore = baseValue * diceNumber;
+    
+    // Store dice number in UI store like Svelte does with $misc.diceNumber
+    const { setDiceNumber } = useUIStore.getState();
+    setDiceNumber(diceNumber);
+    
+    return { combatScore, diceNumber };
+  };
+
+  // Generate combat prompt based on combat score - EXACTLY MATCHES SVELTE
+  const generateCombatPrompt = (name: string, combatScore: number, enemyHp: number, isSpell: boolean = false): string => {
+    const attackType = isSpell ? 'spell' : '';
+    const exclamation = isSpell ? '!' : '!';
+    
+    if (combatScore >= 1 && combatScore < 20) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give hard times to player in gameData.story, where player lands the worst possible attack, which leads to player receiving damage but giving a little damage back at least. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 20 && combatScore < 50) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give a medi-ocre gameData.story, where player lands a decent attack, which leads to player giving some damage to enemy but taking some damage back. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 50 && combatScore < 85) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give a great gameData.story where player lands a powerful attack, giving great damage but receiving some little damage back. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 85) {
+      return `Attack with ${name}${attackType}${exclamation} (Create an epic gameData.story where player unleashes a devastating attack, wiping out the enemy end winning the combat.)`;
+    }
+    
+    return `Attack with ${name}${attackType}${exclamation}`;
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>, item: CharacterItem) => {
@@ -95,6 +134,10 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
+    const { setSelectedItem, clearSelectedItem } = useSelectedItemStore();
+
+    // Clear previous selection
+    clearSelectedItem();
 
     // Handle different item types like in Svelte version
     if (type === 'weapon') {
@@ -108,9 +151,20 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         return;
       }
       
-      const combatScore = calculateCombatScore(damage, type);
-      // Handle weapon usage logic here
-      console.log('Using weapon:', name, 'Combat score:', combatScore);
+      const { combatScore } = calculateCombatScore(damage, type);
+      const enemyHp = gameData.enemy?.enemyHp || 0;
+      const prompt = generateCombatPrompt(name, combatScore, enemyHp);
+      
+      // Set selectedItem exactly like Svelte
+      setSelectedItem({
+        name,
+        damage,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: 0
+      });
+      return;
     }
 
     if (type === 'destruction spell') {
@@ -132,14 +186,25 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         return;
       }
       
-      // Set cooldown
+      // Set cooldown first like Svelte
       if (cooldown) {
         setCooldown(name, cooldown);
       }
       
-      const combatScore = calculateCombatScore(damage, type);
-      // Handle spell usage logic here
-      console.log('Using spell:', name, 'Combat score:', combatScore);
+      const { combatScore } = calculateCombatScore(damage, type);
+      const enemyHp = gameData.enemy?.enemyHp || 0;
+      const prompt = generateCombatPrompt(name, combatScore, enemyHp, true);
+      
+      // Set selectedItem exactly like Svelte  
+      setSelectedItem({
+        name,
+        damage,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: manaCost || 0
+      });
+      return;
     }
 
     if (type === 'healing spell') {
@@ -158,20 +223,86 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       }
 
       if (!inCombat) {
-        // Direct healing outside combat
-        const healAmount = calculateCombatScore(healing || 0, type);
-        heal(healAmount);
+        // Direct healing outside combat like Svelte
+        const { combatScore } = calculateCombatScore(healing || 0, type);
+        addChatMessage({
+          content: `Heal myself with ${name} spell by ${combatScore} amount.`,
+          type: 'user',
+          timestamp: Date.now()
+        });
+        heal(combatScore);
         if (manaCost) spendMp(manaCost);
         return;
       }
 
-      // Set cooldown for combat healing
+      // Set cooldown for combat healing like Svelte
       if (cooldown) {
         setCooldown(name, cooldown);
       }
       
-      const combatScore = calculateCombatScore(healing || 0, type);
-      console.log('Using healing spell:', name, 'Heal amount:', combatScore);
+      const { combatScore } = calculateCombatScore(healing || 0, type);
+      
+      // Set selectedItem for combat healing
+      setSelectedItem({
+        name,
+        damage: undefined,
+        healing,
+        combatScore,
+        prompt: `Heal myself with ${name} spell by ${combatScore} amount.`,
+        manaCost: manaCost || 0
+      });
+      return;
+    }
+
+    if (type === 'unique spell') {
+      if (shopMode) return;
+      if (!inCombat) {
+        setErrorMessage('You are not in a combat.');
+        return;
+      }
+      if (mp < (manaCost || 0)) {
+        setErrorMessage('You have not enough mana.');
+        return;
+      }
+      if (cooldown && cooldowns[name] && cooldowns[name] < cooldown) {
+        setErrorMessage(`This spell is on cooldown. ${cooldowns[name]}/${cooldown}`);
+        return;
+      }
+      
+      // Set cooldown like Svelte
+      if (cooldown) {
+        setCooldown(name, cooldown);
+      }
+      
+      const { combatScore } = calculateCombatScore(1, type);
+      let prompt = '';
+      
+      // Generate unique spell prompts exactly like Svelte
+      if (name === 'Summon') {
+        if (combatScore >= 1 && combatScore < 5) {
+          prompt = 'Use my Summon spell and summon a little bird to help me in this combat.';
+        } else if (combatScore >= 5 && combatScore < 10) {
+          prompt = 'Use my Summon spell and summon a powerful tiger to help me in this combat.';
+        } else if (combatScore >= 10 && combatScore < 15) {
+          prompt = 'Use my Summon spell and summon a storm spirit (which is a magician) to help me in this combat.';
+        } else if (combatScore >= 15 && combatScore <= 20) {
+          prompt = 'Use my Summon spell and summon an ultimate demon to help me in this combat. (combat immedietaly ends with the power of the demon)';
+        }
+      } else if (name === 'Teleportation') {
+        prompt = 'Use my Teleportation spell and teleport myself to a secure place away from combat.';
+      }
+      
+      // Set selectedItem for unique spell
+      setSelectedItem({
+        name,
+        damage: 0,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: manaCost || 0,
+        other: false
+      });
+      return;
     }
 
     if (type === 'potion') {
@@ -201,6 +332,53 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         restoreMp(parseInt(mana.toString()));
         removeInventoryItem(name);
         hideWindow();
+        return;
+      }
+    }
+
+    // For items that are not specifically implemented (like consumable foods etc) - exactly like Svelte
+    if (
+      type !== 'potion' &&
+      type !== 'weapon' &&
+      type !== 'destruction spell' &&
+      type !== 'healing spell' &&
+      type !== 'unique spell'
+    ) {
+      if (shopMode) return;
+      if (healing && hp >= maxHp) {
+        setErrorMessage("You're at full health.");
+        return;
+      }
+      if (mana && mp >= maxMp) {
+        setErrorMessage("You're at full mana.");
+        return;
+      }
+      if (healing || (mana && inCombat)) {
+        setErrorMessage("You can't consume in combat.");
+        return;
+      }
+      
+      if (damage) {
+        const { combatScore } = calculateCombatScore(damage, type);
+        const enemyHp = gameData.enemy?.enemyHp || 0;
+        const prompt = generateCombatPrompt(name, combatScore, enemyHp);
+        
+        // Set selectedItem for other items
+        setSelectedItem({
+          name,
+          damage,
+          healing: undefined,
+          combatScore,
+          prompt,
+          other: true
+        });
+        
+        // Remove item from inventory like Svelte
+        removeInventoryItem(name);
+        hideWindow();
+        return;
+      } else {
+        setErrorMessage('You can only sell this item.');
         return;
       }
     }

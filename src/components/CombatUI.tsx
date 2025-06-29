@@ -16,6 +16,7 @@ export default function CombatUI() {
     manaCost: selectedManaCost, 
     combatScore: selectedCombatScore,
     prompt: selectedPrompt,
+    other: selectedOther,
     clearSelectedItem 
   } = useSelectedItemStore();
   const { diceNumber, setDiceNumber, setDeath } = useUIStore();
@@ -43,17 +44,46 @@ export default function CombatUI() {
       setCooldown(selectedName, 0);
     }
 
-    // Generate dice number first (1-20, exactly matching Svelte)
-    const newDiceNumber = Math.floor(Math.random() * 20) + 1;
-    setDiceNumber(newDiceNumber);
-    
+    // Generate dice number first - this should already be done by GamePanel calculateCombatScore
+    // But if not set, generate it here with correct range
+    if (!diceNumber || diceNumber === 0) {
+      const isSpell = selectedManaCost && selectedManaCost > 0;
+      const maxDice = isSpell ? 23 : 20;
+      const newDiceNumber = Math.floor(Math.random() * maxDice) + 1;
+      setDiceNumber(newDiceNumber);
+    }
+
     // Show dice animation first
     setDiceThrown(true);
     
-    // Wait for animation (matches Svelte timing)
+    // Wait for animation exactly like Svelte (1000ms) 
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Check if player died before continuing
+    // Apply damage effects exactly like Svelte AFTER animation
+    if (selectedDamage) {
+      // Player takes damage from enemy (matches Svelte calculation exactly)
+      if (enemy?.enemyHp) {
+        let damageToPlayer: number;
+        if (selectedDamage !== 0 && !selectedOther) {
+          if (diceNumber === 1) {
+            damageToPlayer = Math.floor(enemy.enemyHp / 2);
+          } else {
+            damageToPlayer = Math.floor(enemy.enemyHp / diceNumber);
+          }
+        } else {
+          damageToPlayer = 5; // Default damage when no weapon damage
+        }
+        takeDamage(damageToPlayer);
+      }
+
+      // Enemy takes damage from player using combatScore
+      if (enemy?.enemyHp && selectedCombatScore) {
+        const newEnemyHp = Math.max(0, enemy.enemyHp - selectedCombatScore);
+        setEnemy({ ...enemy, enemyHp: newEnemyHp });
+      }
+    }
+
+    // Check if player died after taking damage
     if (stats.hp <= 0) {
       addChatMessage({
         content: 'give a sad gameData.story, because player dies in the last combat event.',
@@ -61,43 +91,20 @@ export default function CombatUI() {
         timestamp: Date.now()
       });
       setDeath(true);
+      setDiceNumber(0);
+      clearSelectedItem();
+      setDiceThrown(false);
       return;
     }
 
-    // Calculate combat effects
-    if (selectedDamage) {
-      // Player takes damage from enemy (matches Svelte calculation)
-      if (enemy?.enemyHp) {
-        if (selectedDamage !== 0) {
-          let damageToPlayer: number;
-          if (newDiceNumber === 1) {
-            damageToPlayer = Math.floor(enemy.enemyHp / 2);
-          } else {
-            damageToPlayer = Math.floor(enemy.enemyHp / newDiceNumber);
-          }
-          takeDamage(damageToPlayer);
-        } else {
-          takeDamage(5); // Default damage
-        }
-      }
-
-      // Enemy takes damage from player
-      if (enemy?.enemyHp && selectedCombatScore) {
-        const newEnemyHp = Math.max(0, enemy.enemyHp - selectedCombatScore);
-        setEnemy({ ...enemy, enemyHp: newEnemyHp });
-      }
+    // Continue story with the pre-generated prompt from selectedItem
+    if (selectedPrompt) {
+      addChatMessage({
+        content: selectedPrompt,
+        type: 'user', 
+        timestamp: Date.now()
+      });
     }
-
-    // Use the sophisticated prompt from selected item (generated in GamePanel useItem)
-    const finalPrompt = selectedPrompt || (selectedName ? 
-      `I used ${selectedName} in combat. Continue the battle based on the dice roll (${newDiceNumber}) and combat effectiveness.` :
-      'Continue combat without action');
-      
-    addChatMessage({
-      content: finalPrompt,
-      type: 'user', 
-      timestamp: Date.now()
-    });
 
     // Spend mana if applicable
     if (selectedManaCost) {
@@ -109,7 +116,7 @@ export default function CombatUI() {
       heal(selectedCombatScore);
     }
 
-    // Reset dice and clear selection
+    // Reset dice and clear selection exactly like Svelte
     setDiceNumber(0);
     clearSelectedItem();
     setDiceThrown(false);
@@ -187,20 +194,30 @@ export default function CombatUI() {
             <div className="flex justify-center">
               <Button
                 onClick={throwDice}
-                className="combat-button w-18 h-18 p-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-600 rounded-lg transition-transform hover:scale-105"
+                className="combat-button w-18 h-18 p-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-600 rounded-lg transition-transform hover:scale-105 relative"
                 disabled={diceThrown}
-              >                {!diceThrown ? (
+              >
+                {!diceThrown ? (
                   <Image 
                     src="/images/dice.webp" 
                     alt="throw dice button" 
                     width={56}
                     height={56}
-                    className="w-14 h-14" 
+                    className="w-14 h-14 transition-transform hover:rotate-12" 
                   />
                 ) : (
-                  <div className="dice-number text-2xl font-bold text-green-400 flex flex-col items-center">
-                    <span>{diceNumber}</span>
-                    <span className="text-xs text-gray-400">/23</span>
+                  <div className="dice-number-container">
+                    <div className="dice-number text-2xl font-bold text-green-400 flex flex-col items-center animate-pulse">
+                      <span className="animate-bounce">{diceNumber}</span>
+                      <span className="text-xs text-gray-400">/{selectedManaCost && selectedManaCost > 0 ? '23' : '20'}</span>
+                    </div>
+                    {/* Animated particles around dice result */}
+                    <div className="dice-particles">
+                      <div className="particle particle-1"></div>
+                      <div className="particle particle-2"></div>
+                      <div className="particle particle-3"></div>
+                      <div className="particle particle-4"></div>
+                    </div>
                   </div>
                 )}
               </Button>
@@ -208,6 +225,91 @@ export default function CombatUI() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Dice Animation Styles */}
+      <style jsx>{`
+        .dice-number-container {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .dice-particles {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+        }
+        
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: #3fcf8e;
+          border-radius: 50%;
+          animation: sparkle 1s ease-out infinite;
+        }
+        
+        .particle-1 {
+          top: 10%;
+          left: 10%;
+          animation-delay: 0s;
+        }
+        
+        .particle-2 {
+          top: 10%;
+          right: 10%;
+          animation-delay: 0.25s;
+        }
+        
+        .particle-3 {
+          bottom: 10%;
+          left: 10%;
+          animation-delay: 0.5s;
+        }
+        
+        .particle-4 {
+          bottom: 10%;
+          right: 10%;
+          animation-delay: 0.75s;
+        }
+        
+        @keyframes sparkle {
+          0% {
+            opacity: 0;
+            transform: scale(0.5) translateY(0);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1) translateY(-10px);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.5) translateY(-20px);
+          }
+        }
+        
+        .combat-button:hover {
+          transform: scale(1.1);
+          box-shadow: 0 0 20px rgba(63, 207, 142, 0.3);
+        }
+        
+        .animate-bounce {
+          animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
