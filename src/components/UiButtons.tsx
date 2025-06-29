@@ -104,43 +104,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
     };
   });
   
-  // Get element icon function
-  const getElementIcon = (element?: string) => {
-    if (!element) return '🔮';
-    
-    const elementIcons: Record<string, string> = {
-      fire: '🔥',
-      ice: '❄️',
-      lightning: '⚡',
-      earth: '🌍',
-      wind: '💨',
-      water: '💧',
-      dark: '🌑',
-      light: '☀️',
-      arcane: '✨',
-      toxic: '☠️'
-    };
-    
-    return elementIcons[element.toLowerCase()] || '🔮';
-  };
-
-  // Get weapon icon function
-  const getWeaponIcon = (weaponClass?: string) => {
-    if (!weaponClass) return '⚔️';
-    
-    const weaponIcons: Record<string, string> = {
-      sword: '⚔️',
-      dagger: '🗡️',
-      bow: '🏹',
-      mace: '🔨',
-      spear: '🔱',
-      axe: '🪓',
-      flail: '⛓️',
-      staff: '🔮'
-    };
-    
-    return weaponIcons[weaponClass.toLowerCase()] || '⚔️';
-  };    const handleOpenShop = () => {
+  const handleOpenShop = () => {
     const testShop = generateShop('general');
     setCurrentShop(testShop);
     toggleShopWindow();

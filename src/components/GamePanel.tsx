@@ -134,7 +134,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
-    const { setSelectedItem, clearSelectedItem } = useSelectedItemStore();
+    const { setSelectedItem, clearSelectedItem } = useSelectedItemStore.getState();
 
     // Clear previous selection
     clearSelectedItem();
@@ -421,6 +421,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={getItemIcon(item)}
                   alt={item.name}

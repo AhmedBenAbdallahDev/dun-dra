@@ -60,45 +60,13 @@ export default function ActionBox() {
     const maxRetries = 3;
     
     try {
-      // Prepare messages for AI
+      // Prepare messages for AI with comprehensive system prompt
+      const { getSystemPrompt } = await import('@/lib/aiPrompts');
+      
       const messages = [
         {
           role: 'system',
-          content: `This is a role-playing game where you'll be the 1st person character and storyteller. You'll describe the world from a 3rd person perspective but when it's time for a conversation, interact with the player from a 1st person npc perspective.
-
-All of your responses MUST include a valid json object, with this exact properties:
-
-"gameData": {
-  "placeAndTime": {
-    "place": "Location Name",
-    "time": "HH:MM"
-  },
-  "story": "Your narrative content here",
-  "event": {
-    "inCombat": false,
-    "shopMode": null,
-    "lootMode": false
-  },
-  "choices": [
-    "Choice 1",
-    "Choice 2", 
-    "Choice 3"
-  ],
-  "enemy": {},
-  "lootBox": []
-}
-
-Important rules:
-- Always provide at least 3 unique choices
-- inCombat, shopMode, and lootMode must be null/false if not in use
-- Use these races for enemies: bandit, golem, kobold, satyr, skritt, ghoul, goblin, wolf, ogre, harpy, gargoyle, gnoll, jinn, arachne, demon, giant, undead
-- Use these weapon classes: sword, dagger, bow, mace, spear, axe, flail
-- Use these spell elements: light, fire, dark, ice, lightning, toxic
-- Maximum damage for weapons: 9
-- Maximum gold in lootBox: 200
-- Available potions: Health Potion, Mana Potion, Interactive Chat Potion
-
-Current game state: ${JSON.stringify(gameData)}`
+          content: getSystemPrompt(gameData)
         },
         {
           role: 'user',

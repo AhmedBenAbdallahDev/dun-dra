@@ -506,45 +506,13 @@ Current game state: ${JSON.stringify(gameData)}`
           return;
         }
         
-        // Prepare the prompt for continuing the story
+        // Prepare the prompt for continuing the story using the comprehensive system
+        const { getSystemPrompt } = await import('@/lib/aiPrompts');
+        
         const messages = [
           {
             role: 'system',
-            content: `You are the game master for "Mythic Conjurer", an interactive fantasy RPG. Continue the story based on the player's choice: "${choice}".
-
-RESPOND ONLY WITH A VALID JSON OBJECT containing the complete game state:
-
-{
-  "gameData": {
-    "story": "Your narrative content here",
-    "choices": ["Choice 1", "Choice 2", "Choice 3"],
-    "event": { "inCombat": false, "shopMode": null, "lootMode": false },
-    "enemy": {},
-    "lootBox": [],
-    "shop": []
-  }
-}
-
-🎁 CRITICAL LOOT SYSTEM RULES:
-- After defeating enemies, ALWAYS offer loot-checking choices like "Search the fallen enemy" or "Check for loot"
-- If player chooses to check loot: populate gameData.lootBox with 1-3 items AND set lootMode: true
-- If gameData.lootBox has items: set lootMode to true ALWAYS!
-- NPCs giving items: add to lootBox and set lootMode: true
-
-📦 LOOT EXAMPLES:
-- Weapon: {"name": "Iron Sword", "damage": 5, "price": 85, "type": "weapon", "weaponClass": "sword"}
-- Spell: {"name": "Lightning Bolt", "damage": 7, "manaCost": 20, "type": "destruction spell", "element": "lightning", "cooldown": 3}
-- Potion: {"name": "Health Potion", "healing": 50, "type": "potion"}
-- Gold: {"name": "gold", "type": "currency", "amount": 50}
-
-⚔️ GAME RULES:
-- Enemies: bandit, golem, kobold, satyr, skritt, ghoul, goblin, wolf, ogre, harpy
-- Weapons: sword, dagger, bow, mace, spear, axe, flail
-- Elements: light, fire, dark, ice, lightning, toxic
-- Max weapon damage: 9, Max gold: 200
-- Always give 3+ unique choices
-
-Current state: ${JSON.stringify(gameData)}`
+            content: getSystemPrompt(gameData)
           },
           {
             role: 'user',
