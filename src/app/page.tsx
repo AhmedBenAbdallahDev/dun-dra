@@ -667,12 +667,15 @@ Current game state: ${JSON.stringify(gameData)}`
 
   return (
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      {/* Combat Banner - Fixed at top */}
+      {gameData.event.inCombat && <CombatUI />}
+      
       {/* Background Images */}
       <BackgroundImgs />
       
       {/* Main Game UI - Fixed Layout Like Svelte */}
       {!death && !isOverlayActive && (
-        <div className="main-game">
+        <div className={`main-game ${gameData.event.inCombat ? 'pt-16' : ''}`}>
           {/* Story Display Area - 25% height, centered */}
           <div className="game-master">
             <StoryDisplay />
@@ -705,7 +708,6 @@ Current game state: ${JSON.stringify(gameData)}`
       <DescriptionWindow />
       
       {/* Modal/Overlay Components - Render based on their specific states */}
-      {gameData.event.inCombat && <CombatUI />}
       {(shopWindow || gameData.event.shopMode) && <ShopUI />}
       {gameData.event.lootMode && <LootUI onAnswer={handleLootAnswer} />}
       {settingsWindow && <SettingsUI />}

@@ -17,6 +17,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
+  const { name: selectedName } = useSelectedItemStore();
   const { gameData, addChatMessage } = useGameStore();
   const { setDescription } = useDescriptionStore();
 
@@ -131,16 +132,10 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleItemUsage = (item: CharacterItem) => {
-    console.log('🔥 Item clicked:', item);
-    console.log('🔥 Combat state:', gameData.event);
-    console.log('🔥 Stats:', stats);
-    
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
     const { setSelectedItem, clearSelectedItem } = useSelectedItemStore.getState();
-
-    console.log('🔥 Processing item:', { name, type, damage, inCombat, shopMode });
 
     // Clear previous selection
     clearSelectedItem();
@@ -421,11 +416,14 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
             return (
               <button
                 key={index}
-                className={`action-button ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`action-button ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
+                  selectedName === item.name ? 'ring-2 ring-green-400 bg-green-900/30' : ''
+                } ${gameData.event.inCombat ? 'combat-mode' : ''}`}
                 disabled={disabled}
                 onClick={() => handleItemUsage(item)}
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
+                title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
