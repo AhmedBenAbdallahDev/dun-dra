@@ -32,7 +32,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>, item: CharacterItem) => {
     const { setMousePosition } = useUIStore.getState();
-    setShowDescription(true);
+    setShowDescription('block');
     setMousePosition(event.clientX, event.clientY);
     
     // Set description data
@@ -51,7 +51,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const hideWindow = () => {
-    setShowDescription(false);
+    setShowDescription('none');
   };
 
   const isDisabled = (item: CharacterItem): boolean => {
