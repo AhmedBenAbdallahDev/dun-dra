@@ -15,6 +15,7 @@ export default function CombatUI() {
     healing: selectedHealing, 
     manaCost: selectedManaCost, 
     combatScore: selectedCombatScore,
+    prompt: selectedPrompt,
     clearSelectedItem 
   } = useSelectedItemStore();
   const { diceNumber, setDiceNumber, setDeath } = useUIStore();
@@ -37,74 +38,79 @@ export default function CombatUI() {
       return;
     }
 
-    // Generate dice number (1-23)
-    const diceRoll = Math.floor(Math.random() * 23) + 1;
-    setDiceNumber(diceRoll);
-
-    // Set cooldown for spells
-    if (cooldowns[selectedName] !== undefined) {
+    // Clear cooldown for the used spell (matches Svelte logic)
+    if (cooldowns[selectedName]) {
       setCooldown(selectedName, 0);
     }
 
-    // Calculate combat damage
+    // Generate dice number first (1-20, exactly matching Svelte)
+    const newDiceNumber = Math.floor(Math.random() * 20) + 1;
+    setDiceNumber(newDiceNumber);
+    
+    // Show dice animation first
+    setDiceThrown(true);
+    
+    // Wait for animation (matches Svelte timing)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Check if player died before continuing
+    if (stats.hp <= 0) {
+      addChatMessage({
+        content: 'give a sad gameData.story, because player dies in the last combat event.',
+        type: 'user',
+        timestamp: Date.now()
+      });
+      setDeath(true);
+      return;
+    }
+
+    // Calculate combat effects
     if (selectedDamage) {
-      // Enemy damage to player
+      // Player takes damage from enemy (matches Svelte calculation)
       if (enemy?.enemyHp) {
         if (selectedDamage !== 0) {
-          let damageToPlayer = Math.floor(enemy.enemyHp / (diceRoll === 1 ? 2 : diceRoll));
-          if (diceRoll === 1) {
-            damageToPlayer = Math.floor(enemy.enemyHp / 2); // Buff for rolling 1
+          let damageToPlayer: number;
+          if (newDiceNumber === 1) {
+            damageToPlayer = Math.floor(enemy.enemyHp / 2);
+          } else {
+            damageToPlayer = Math.floor(enemy.enemyHp / newDiceNumber);
           }
           takeDamage(damageToPlayer);
         } else {
           takeDamage(5); // Default damage
         }
-      }      // Player damage to enemy
+      }
+
+      // Enemy takes damage from player
       if (enemy?.enemyHp && selectedCombatScore) {
         const newEnemyHp = Math.max(0, enemy.enemyHp - selectedCombatScore);
-        // Update enemy HP in game store
-        setEnemy({ enemyHp: newEnemyHp });
+        setEnemy({ ...enemy, enemyHp: newEnemyHp });
       }
     }
 
-    // Show dice animation
-    setDiceThrown(true);
-    
-    // Wait for animation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if player died
-    if (stats.hp <= 0) {
-      addChatMessage({
-        content: 'You have fallen in combat...',
-        type: 'system',
-        timestamp: Date.now()
-      });
-      setDeath(true);    } else {
-      // Continue combat or end it based on enemy HP
-      const combatPrompt = (enemy.enemyHp ?? 0) <= 0 
-        ? `I defeated the ${enemy.enemyName}! What happens next?`
-        : `I used ${selectedName} against ${enemy.enemyName}. Combat continues.`;
+    // Use the sophisticated prompt from selected item (generated in GamePanel useItem)
+    const finalPrompt = selectedPrompt || (selectedName ? 
+      `I used ${selectedName} in combat. Continue the battle based on the dice roll (${newDiceNumber}) and combat effectiveness.` :
+      'Continue combat without action');
       
-      // This would trigger AI response in parent component
-      addChatMessage({
-        content: combatPrompt,
-        type: 'user',
-        timestamp: Date.now()
-      });
-    }
+    addChatMessage({
+      content: finalPrompt,
+      type: 'user', 
+      timestamp: Date.now()
+    });
 
     // Spend mana if applicable
     if (selectedManaCost) {
       spendMp(selectedManaCost);
     }
 
-    setDiceNumber(0);    // If heal skill used, heal player
+    // If heal skill used, heal player (matches Svelte logic)
     if (selectedHealing && selectedCombatScore) {
       heal(selectedCombatScore);
     }
 
-    // Clear selected item
+    // Reset dice and clear selection
+    setDiceNumber(0);
     clearSelectedItem();
     setDiceThrown(false);
   };

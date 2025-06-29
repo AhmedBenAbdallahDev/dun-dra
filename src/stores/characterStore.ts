@@ -135,11 +135,7 @@ export const useCharacterStore = create<CharacterState>()(
       })),
       
       removeInventoryItem: (itemName) => set((state) => ({
-        inventory: state.inventory.filter(item => item.name !== itemName),
-        character: {
-          ...state.character,
-          inventory: state.character.inventory.filter(item => item.name !== itemName)
-        }
+        inventory: state.inventory.filter(item => item.name !== itemName)
       })),
       
       removeItemFromInventory: (itemId) => set((state) => ({

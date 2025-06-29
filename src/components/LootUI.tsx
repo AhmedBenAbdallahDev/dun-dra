@@ -4,7 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { useGameStore, type LootItem } from '@/stores/gameStore';
 import { useCharacterStore } from '@/stores/characterStore';
-import { useMiscStore } from '@/stores/miscStore';
+import { useMiscStore, useDescriptionStore } from '@/stores/miscStore';
+import { useUIStore } from '@/stores/uiStore';
 
 interface LootUIProps {
   onAnswer: (answer: string) => void;
@@ -14,15 +15,29 @@ export default function LootUI({ onAnswer }: LootUIProps) {
   const { gameData, clearLootBox, setEvent } = useGameStore();
   const { addInventoryItem, addSpell, addGold } = useCharacterStore();
   const { loading } = useMiscStore();
+  const { setDescription } = useDescriptionStore();
+  const { setShowDescription } = useUIStore();
 
   const handleMouseMove = (event: React.MouseEvent, item: LootItem) => {
-    // For now, we'll implement basic tooltip logic
-    // In the future, this could be enhanced with a proper tooltip system
-    console.log('Item hovered:', item.name);
+    setDescription({
+      name: item.name || '',
+      type: item.type || '',
+      damage: item.damage || 0,
+      healing: item.healing || 0,
+      mana: item.mana || 0,
+      armor: item.armor || 0,
+      element: item.element || '',
+      weaponClass: item.weaponClass || '',
+      manaCost: item.manaCost || 0,
+      price: item.price || 0,
+      amount: item.amount || 1,
+      point: item.point || 0
+    });
+    setShowDescription('block');
   };
 
   const handleMouseLeave = () => {
-    // Hide tooltip logic would go here
+    setShowDescription('none');
   };
 
   const lootItem = (item: LootItem) => {

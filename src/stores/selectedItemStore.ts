@@ -18,13 +18,17 @@ interface SelectedItemState {
   
   // Actions
   setSelectedItem: (item: Partial<SelectedItemState>) => void
+  setSelectedItemData: (item: Partial<SelectedItemState>) => void
   clearSelectedItem: () => void
   setCombatScore: (score: number) => void
   setPrompt: (prompt: string) => void
+  
+  // Complete selected item object for external access
+  selectedItem: SelectedItemState
 }
 
 export const useSelectedItemStore = create<SelectedItemState>()(
-  subscribeWithSelector((set) => ({
+  subscribeWithSelector((set, get) => ({
     name: undefined,
     damage: undefined,
     healing: undefined,
@@ -38,7 +42,33 @@ export const useSelectedItemStore = create<SelectedItemState>()(
     other: undefined,
     showDescription: 'none',
     
+    get selectedItem() {
+      const state = get();
+      return {
+        name: state.name,
+        damage: state.damage,
+        healing: state.healing,
+        manaCost: state.manaCost,
+        price: state.price,
+        type: state.type,
+        weaponClass: state.weaponClass,
+        element: state.element,
+        combatScore: state.combatScore,
+        prompt: state.prompt,
+        other: state.other,
+        showDescription: state.showDescription,
+        setSelectedItem: state.setSelectedItem,
+        setSelectedItemData: state.setSelectedItemData,
+        clearSelectedItem: state.clearSelectedItem,
+        setCombatScore: state.setCombatScore,
+        setPrompt: state.setPrompt,
+        selectedItem: state.selectedItem
+      };
+    },
+    
     setSelectedItem: (item) => set((state) => ({ ...state, ...item })),
+    
+    setSelectedItemData: (item) => set((state) => ({ ...state, ...item })),
     
     clearSelectedItem: () => set({
       name: undefined,
@@ -68,6 +98,7 @@ interface CooldownsState {
   // Actions
   setCooldown: (spellName: string, cooldown: number) => void
   decrementCooldowns: () => void
+  incrementAllCooldowns: () => void
   getCooldown: (spellName: string) => number
   isCooldownActive: (spellName: string, requiredCooldown: number) => boolean
   clearCooldowns: () => void
@@ -80,12 +111,21 @@ export const useCooldownsStore = create<CooldownsState>()(
     setCooldown: (spellName, cooldown) => set((state) => ({
       cooldowns: { ...state.cooldowns, [spellName]: cooldown }
     })),
-      decrementCooldowns: () => set((state) => {
+    
+    decrementCooldowns: () => set((state) => {
       const newCooldowns = { ...state.cooldowns }
       Object.keys(newCooldowns).forEach(key => {
         if (newCooldowns[key] > 0) {
           newCooldowns[key] -= 1
         }
+      })
+      return { cooldowns: newCooldowns }
+    }),
+    
+    incrementAllCooldowns: () => set((state) => {
+      const newCooldowns = { ...state.cooldowns }
+      Object.keys(newCooldowns).forEach(key => {
+        newCooldowns[key] = (newCooldowns[key] || 0) + 1
       })
       return { cooldowns: newCooldowns }
     }),

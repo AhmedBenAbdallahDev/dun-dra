@@ -121,12 +121,14 @@ interface MiscState {
   loading: boolean
   interactivePoints: number
   started: boolean
+  diceNumber: number
   
   // Actions
   setLoading: (loading: boolean) => void
   setInteractivePoints: (points: number) => void
   addInteractivePoints: (points: number) => void
   setStarted: (started: boolean) => void
+  setDiceNumber: (dice: number) => void
 }
 
 export const useMiscStore = create<MiscState>()(
@@ -134,12 +136,14 @@ export const useMiscStore = create<MiscState>()(
     loading: false,
     interactivePoints: 3, // Start with 3 interactive points
     started: false,
+    diceNumber: 0,
     
     setLoading: (loading) => set({ loading }),
     setInteractivePoints: (points) => set({ interactivePoints: points }),
     addInteractivePoints: (points) => set((state) => ({ 
       interactivePoints: state.interactivePoints + points 
     })),
-    setStarted: (started) => set({ started })
+    setStarted: (started) => set({ started }),
+    setDiceNumber: (dice) => set({ diceNumber: dice })
   }))
 )
