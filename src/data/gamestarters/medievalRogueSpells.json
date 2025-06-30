@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Stealth",
+    "damage": 0,
+    "price": 100,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Backstab",
+    "damage": 8,
+    "price": 150,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Lockpicking",
+    "damage": 0,
+    "price": 75,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Poison Blade",
+    "damage": 6,
+    "price": 200,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Shadow Step",
+    "damage": 0,
+    "price": 120,
+    "type": "skill",
+    "weaponClass": "skill"
+  }
+]

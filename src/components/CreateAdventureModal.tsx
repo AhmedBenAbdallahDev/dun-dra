@@ -27,6 +27,18 @@ const characterClasses = [
     icon: '🏹',
     description: 'Precise ranged combat specialist',
     stats: { hp: 90, mana: 90, damage: 'Ranged', armor: 'Light' }
+  },
+  {
+    name: 'Barbarian',
+    icon: '🪓',
+    description: 'Fierce warrior from the wild lands',
+    stats: { hp: 140, mana: 40, damage: 'Brutal Melee', armor: 'Medium' }
+  },
+  {
+    name: 'Cleric',
+    icon: '✨',
+    description: 'Divine healer and holy warrior',
+    stats: { hp: 110, mana: 100, damage: 'Divine Magic', armor: 'Medium' }
   }
 ]
 
@@ -88,7 +100,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-600/60">
           <div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
               Create New Adventure
             </h2>
             <p className="text-slate-300 mt-1">Choose your hero and begin your journey</p>

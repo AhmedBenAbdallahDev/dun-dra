@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Eagle Eye",
+    "damage": 0,
+    "price": 100,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Multi-Shot",
+    "damage": 6,
+    "price": 150,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Hunter's Mark",
+    "damage": 4,
+    "price": 120,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Piercing Shot",
+    "damage": 7,
+    "price": 180,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Trap Detection",
+    "damage": 0,
+    "price": 75,
+    "type": "skill",
+    "weaponClass": "skill"
+  }
+]

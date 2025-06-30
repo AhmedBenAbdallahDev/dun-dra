@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Rage",
+    "damage": 8,
+    "price": 200,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Intimidate",
+    "damage": 0,
+    "price": 100,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Berserker Strike",
+    "damage": 10,
+    "price": 250,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Tribal Blessing",
+    "damage": 0,
+    "price": 150,
+    "type": "skill",
+    "weaponClass": "skill"
+  },
+  {
+    "name": "Cleave",
+    "damage": 7,
+    "price": 180,
+    "type": "skill",
+    "weaponClass": "skill"
+  }
+]

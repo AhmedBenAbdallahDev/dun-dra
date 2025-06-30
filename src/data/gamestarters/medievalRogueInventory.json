@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Bronze Dagger",
+    "damage": 5,
+    "price": 85,
+    "type": "weapon",
+    "weaponClass": "dagger"
+  },
+  {
+    "name": "Lockpick Set",
+    "damage": 0,
+    "price": 150,
+    "type": "tool",
+    "weaponClass": "tool"
+  },
+  {
+    "name": "Smoke Bomb",
+    "damage": 0,
+    "price": 75,
+    "type": "consumable",
+    "weaponClass": "throwable"
+  },
+  {
+    "name": "Healing Potion",
+    "damage": 0,
+    "price": 200,
+    "type": "potion",
+    "weaponClass": "potion"
+  },
+  {
+    "name": "Throwing Knives",
+    "damage": 3,
+    "price": 90,
+    "type": "weapon",
+    "weaponClass": "thrown"
+  },
+  {
+    "name": "Caltrops",
+    "damage": 2,
+    "price": 60,
+    "type": "consumable",
+    "weaponClass": "trap"
+  }
+]

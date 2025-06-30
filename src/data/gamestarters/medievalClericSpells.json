@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Heal",
+    "damage": 0,
+    "price": 100,
+    "type": "spell",
+    "weaponClass": "divine"
+  },
+  {
+    "name": "Bless",
+    "damage": 0,
+    "price": 75,
+    "type": "spell",
+    "weaponClass": "divine"
+  },
+  {
+    "name": "Turn Undead",
+    "damage": 6,
+    "price": 150,
+    "type": "spell",
+    "weaponClass": "divine"
+  },
+  {
+    "name": "Divine Light",
+    "damage": 5,
+    "price": 120,
+    "type": "spell",
+    "weaponClass": "divine"
+  },
+  {
+    "name": "Protection",
+    "damage": 0,
+    "price": 100,
+    "type": "spell",
+    "weaponClass": "divine"
+  }
+]
