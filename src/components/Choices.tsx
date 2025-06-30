@@ -224,9 +224,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Write your own creative answer..."
-              className="flex-1 bg-transparent border border-gray-600/30 rounded px-3 py-2 outline-none 
-                         text-gray-200 placeholder-gray-400 text-sm md:text-base
-                         focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 transition-all"
+              className="flex-1 bg-transparent border border-gray-600/30 rounded px-3 py-2 outline-none text-gray-200 placeholder-gray-400 text-sm md:text-base focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 transition-all"
               disabled={loading || isProcessing}
             />
             <button
