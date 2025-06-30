@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useSelectedItemStore } from '@/stores/selectedItemStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { useGameStore } from '@/stores/gameStore';
-import { useMiscStore } from '@/stores/miscStore';
 import { useDescriptionStore } from '@/stores/miscStore';
 import { CharacterItem } from '@/stores/characterStore';
 
@@ -17,7 +17,6 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
   const { gameData } = useGameStore();
@@ -244,9 +243,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
               >
-                <img
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <Image
                   src={getItemIcon(item)}
                   alt={item.name}
+                  width={32}
+                  height={32}
                   className="pointer-events-none"
                 />
                 {cooldownText && (

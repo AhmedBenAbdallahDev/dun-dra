@@ -1,11 +1,16 @@
 'use client';
 
 import React from 'react';
-import { useCharacterStore, useSelectedItemStore, useUIStore } from '@/stores';
-import { useCooldownsStore } from '@/stores/selectedItemStore';
-import { useGameStore } from '@/stores/gameStore';
-import { useMiscStore } from '@/stores/miscStore';
-import { useDescriptionStore } from '@/stores/miscStore';
+import Image from 'next/image';
+import {
+  useCharacterStore,
+  useSelectedItemStore,
+  useUIStore,
+  useCooldownsStore,
+  useGameStore,
+  useMiscStore,
+  useDescriptionStore
+} from '@/stores';
 import { CharacterItem } from '@/stores/characterStore';
 
 interface GamePanelProps {
@@ -15,11 +20,12 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { setSelectedItemData } = useSelectedItemStore();
+  const { setSelectedItemData, name: selectedItemName } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown } = useCooldownsStore();
+  const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
   const { gameData } = useGameStore();
   const { setDescription } = useDescriptionStore();
+  const { interactivePoints, setInteractivePoints } = useMiscStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
@@ -50,7 +56,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   // Mouse handlers for tooltips
-  const handleMouseMove = (event: React.MouseEvent, item: CharacterItem) => {
+  const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>, item: CharacterItem) => {
     setDescription({
       name: item.name || '',
       type: item.type || '',
@@ -413,9 +419,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
               >
-                <img
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <Image
                   src={getItemIcon(item)}
                   alt={item.name}
+                  width={32}
+                  height={32}
                   className="pointer-events-none"
                 />
                 {cooldownText && (
@@ -429,68 +438,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         ) : (
           <div className="col-span-3 text-center text-gray-400 text-sm">
             No {title.toLowerCase()} available
-          </div>
-        )}
-      </div>
-    </div>
-  );
-          <div className="space-y-1 md:space-y-2">            {actions.map((item, index) => {
-              const cooldownText = getItemCooldownText(item);
-              const disabled = isItemDisabled(item);
-              
-              return (
-                <div
-                  key={index}
-                  className={`action-item border rounded-md md:rounded-lg p-2 md:p-3 transition-all duration-200 group ${
-                    disabled
-                      ? 'bg-gray-900/60 border-gray-700 cursor-not-allowed opacity-50'
-                      : isItemSelected(item) 
-                        ? 'bg-amber-800/60 border-amber-500 hover:bg-amber-700/60 cursor-pointer' 
-                        : 'bg-gray-800/60 hover:bg-gray-700/60 border-gray-600/50 hover:border-amber-500/50 cursor-pointer'
-                  }`}
-                  onClick={() => !disabled && handleItemClick(item)}
-                  onMouseMove={(event) => handleMouseMove(event, item)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                <div className="flex items-center gap-2 md:gap-3">
-                  {/* Item Icon */}
-                  <div className="item-icon w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-amber-600 to-amber-800 rounded border border-amber-500/50 flex items-center justify-center">
-                    <span className="text-xs font-bold text-amber-200">
-                      {getItemIcon(item)}
-                    </span>
-                  </div>
-                  
-                  {/* Item Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-200 group-hover:text-white transition-colors text-sm md:text-base">
-                      {item.name}
-                    </div>
-                    <div className="text-xs text-gray-400 space-x-1 md:space-x-2">
-                      {item.damage && <span className="text-red-400">⚔ {item.damage}</span>}
-                      {item.healing && <span className="text-green-400">💚 {item.healing}</span>}
-                      {item.manaCost && <span className="text-blue-400">🔮 {item.manaCost}</span>}
-                      {item.element && <span className="text-purple-400">{getElementIcon(item.element)} {item.element}</span>}
-                    </div>
-                  </div>
-                    {/* Item Count/Price/Cooldown */}
-                  {item.quantity && item.quantity > 1 && (
-                    <div className="text-xs bg-amber-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
-                      {item.quantity}
-                    </div>
-                  )}
-                  {cooldownText && (
-                    <div className="text-xs bg-red-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
-                      {cooldownText}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-gray-500 py-4 md:py-8">
-            <div className="text-2xl md:text-4xl mb-2">📦</div>
-            <p className="text-sm md:text-base">No {title.toLowerCase()} available</p>
           </div>
         )}
       </div>

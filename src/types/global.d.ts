@@ -4,37 +4,37 @@
 /// <reference types="react-dom" />
 
 declare module '*.svg' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.webp' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.png' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.jpg' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.jpeg' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.gif' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
 declare module '*.ico' {
-  const content: any;
+  const content: string;
   export default content;
 }
 
@@ -42,7 +42,7 @@ declare module '*.ico' {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      [elemName: string]: any;
+      [elemName: string]: React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
     }
   }
 }

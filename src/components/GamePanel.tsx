@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useCooldownsStore, useSelectedItemStore } from '@/stores/selectedItemStore';
@@ -470,10 +471,11 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
               >
                 {/* Item icon */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={getItemIcon(item)}
                   alt={item.name}
+                  width={32}
+                  height={32}
                   className="pointer-events-none transition-transform group-hover:scale-110"
                 />
                 
