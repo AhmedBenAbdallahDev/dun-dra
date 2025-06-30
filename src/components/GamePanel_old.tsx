@@ -20,9 +20,9 @@ interface GamePanelProps {
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { setSelectedItemData, name: selectedItemName } = useSelectedItemStore();
+  const { setSelectedItemData } = useSelectedItemStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown, isCooldownActive, incrementAllCooldowns } = useCooldownsStore();
+  const { cooldowns, setCooldown, isCooldownActive } = useCooldownsStore();
   const { gameData } = useGameStore();
   const { setDescription } = useDescriptionStore();
   const { interactivePoints, setInteractivePoints } = useMiscStore();
@@ -418,26 +418,4 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       </div>
     </div>
   );
-}
-
-// Helper function to get item icon
-function getItemIcon(item: CharacterItem): string {
-  if (item.type === 'weapon') {
-    switch (item.weaponClass) {
-      case 'sword': return '⚔️';
-      case 'bow': return '🏹';
-      case 'axe': return '🪓';
-      case 'dagger': return '🗡️';
-      case 'mace': return '🔨';
-      case 'spear': return '🗳️';
-      default: return '⚔️';
-    }
-  }
-  if (item.type === 'spell') {
-    return '🔮';
-  }
-  if (item.type === 'potion') {
-    return '🧪';
-  }
-  return '📦';
 }
