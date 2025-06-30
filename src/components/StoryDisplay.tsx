@@ -60,7 +60,7 @@ export default function StoryDisplay() {
               
               {/* Fantasy border decoration */}
               <div className="absolute -left-1 top-0 w-1 h-full bg-gradient-to-b from-amber-400 via-orange-500 to-red-600 rounded-full opacity-40"></div>
-              <div className="absolute -right-1 top-0 w-1 h-full bg-gradient-to-b from-blue-400 via-purple-500 to-indigo-600 rounded-full opacity-40"></div>
+              <div className="absolute -right-1 top-0 w-1 h-full bg-gradient-to-b from-blue-400 via-cyan-500 to-teal-600 rounded-full opacity-40"></div>
             </div>
           </div>
           

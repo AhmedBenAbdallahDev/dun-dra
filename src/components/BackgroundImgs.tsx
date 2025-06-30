@@ -16,14 +16,14 @@ export default function BackgroundImgs() {
     } else if (place?.includes('mountain')) {
       return 'bg-gradient-to-br from-gray-900 via-slate-800 to-gray-700';
     } else if (place?.includes('shop')) {
-      return 'bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900';
+      return 'bg-gradient-to-br from-amber-900 via-orange-900 to-red-800';
     } else if (place?.includes('town')) {
       return 'bg-gradient-to-br from-stone-800 via-slate-700 to-gray-600';
     } else if (place?.includes('dock')) {
       return 'bg-gradient-to-br from-blue-900 via-cyan-900 to-teal-800';
     } else {
-      // Default mystical background
-      return 'bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900';
+      // Default neutral mystical background
+      return 'bg-gradient-to-br from-slate-900 via-gray-800 to-slate-800';
     }
   };
 
@@ -41,7 +41,7 @@ export default function BackgroundImgs() {
       />
       
       {/* Subtle animated overlay for magical effect */}
-      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-purple-500/5 to-transparent animate-pulse" />
+      <div className="absolute inset-0 bg-gradient-to-t from-transparent via-amber-500/5 to-transparent animate-pulse" />
       
       {/* Time-based lighting effects */}
       {gameData.placeAndTime?.time && (

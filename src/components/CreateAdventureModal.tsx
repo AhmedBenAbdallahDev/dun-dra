@@ -126,7 +126,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
               placeholder="Enter your adventure name..."
               className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/60 rounded-xl 
                          text-white placeholder-slate-400 focus:outline-none focus:ring-2 
-                         focus:ring-purple-500 focus:border-transparent transition-all"
+                         focus:ring-amber-500 focus:border-transparent transition-all"
               maxLength={50}
             />
             <p className="text-sm text-slate-400 mt-2">
@@ -146,7 +146,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
                   onClick={() => setSelectedClass(characterClass.name)}
                   className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 
                     ${selectedClass === characterClass.name
-                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/25'
+                      ? 'border-amber-500 bg-amber-500/20 shadow-lg shadow-amber-500/25'
                       : 'border-slate-600/60 bg-slate-700/30 hover:border-slate-500 hover:bg-slate-700/50'
                     }`}
                 >
@@ -186,7 +186,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
           {selectedClass && (
             <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600/40">
               <h3 className="text-lg font-semibold text-slate-200 mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-400" />
+                <Sparkles className="w-5 h-5 text-amber-400" />
                 Starting Equipment
               </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -195,7 +195,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
                   <span className="text-slate-300">100 Gold Coins</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-purple-400">📍</span>
+                  <span className="text-amber-400">📍</span>
                   <span className="text-slate-300">Starting Village</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
             disabled={!isFormValid || isCreating}
             className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 
               ${isFormValid && !isCreating
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:shadow-xl'
                 : 'bg-slate-600/50 text-slate-400 cursor-not-allowed'
               }`}
           >

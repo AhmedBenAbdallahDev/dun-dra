@@ -152,7 +152,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
               <p className="text-slate-400 mb-6">Create your first adventure to begin your journey!</p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 
+                className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 
                            px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl 
                            transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
               >
@@ -177,7 +177,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
                       <div className="flex items-center gap-3">
                         <span className="text-3xl">{getClassIcon(adventure.class)}</span>
                         <div>
-                          <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+                          <h3 className="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
                             {adventure.name}
                           </h3>
                           <p className="text-sm text-slate-400">Level {adventure.level} {adventure.class}</p>

@@ -210,7 +210,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
           <span className="text-sm text-yellow-400 font-medium">{gold}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Sword className="h-4 w-4 text-purple-500" />
+          <Sword className="h-4 w-4 text-amber-500" />
           <span className="text-sm text-slate-300">{gameData.heroClass || 'Unknown'}</span>
         </div>
       </CardContent>
@@ -338,7 +338,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
           <div className="flex items-center justify-between">
             {/* Brand */}
             <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
                 Mythic Conjurer
               </h1>
               
@@ -543,7 +543,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900/95 border border-slate-700 rounded-lg p-4 md:p-6 shadow-2xl backdrop-blur-sm max-w-sm w-full">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400"></div>
               <span className="text-slate-300 text-sm md:text-base">Loading...</span>
             </div>
           </div>

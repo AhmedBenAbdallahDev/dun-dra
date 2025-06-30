@@ -143,7 +143,7 @@ export default function SettingsUI() {
       onClick={() => setActiveTab(id)}
       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
         activeTab === id 
-          ? 'bg-purple-600 text-white' 
+          ? 'bg-amber-600 text-white' 
           : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
       }`}
     >
@@ -159,7 +159,7 @@ export default function SettingsUI() {
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-slate-700">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-600/20 rounded-lg">
+              <div className="p-2 bg-amber-600/20 rounded-lg">
                 <Image src="/images/info.svg" alt="Settings" width={16} height={16} className="opacity-80" />
               </div>
               <h2 className="text-lg font-semibold text-slate-100">AI Configuration</h2>
@@ -224,7 +224,7 @@ export default function SettingsUI() {
                       value={aiConfig.apiKey}
                       onChange={(e) => setAIConfig({ ...aiConfig, apiKey: e.target.value })}
                       placeholder={aiConfig.provider === 'openrouter' ? 'sk-or-v1-...' : 'Enter API key'}
-                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                     />
                     <p className="text-xs text-slate-400">
                       {aiConfig.provider === 'openrouter' && (
