@@ -74,10 +74,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     setShowDescription('block');
   };
 
-  const handleMouseLeave = () => {
-    setShowDescription('none');
-  };
-
   // Main item usage function - completely matches Svelte ActionBox.svelte useItem logic
   const handleItemUsage = (item: CharacterItem) => {
     const { type, name, damage, manaCost, healing, cooldown, point } = item;
@@ -322,26 +318,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     }
   };
 
-  const handleItemClick = (item: CharacterItem) => {
-    // Increment all cooldowns with every choice (matches Svelte logic)
-    incrementAllCooldowns();
-    
-    // Use the item
-    handleItemUsage(item);
-    
-    // Always show item description
-    if (setShowDescription) {
-      setShowDescription(item.name);
-    }
-  };
-  const isItemSelected = (item: CharacterItem) => {
-    return selectedItemName === item.name;
-  };
-
-  const isItemDisabled = (item: CharacterItem) => {
-    return item.type === 'spell' && item.cooldown && isCooldownActive(item.name, item.cooldown);
-  };
-
   const isDisabled = (item: CharacterItem): boolean => {
     if (item.type === 'spell' && item.manaCost && stats.mp < item.manaCost) {
       return true;
@@ -419,7 +395,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <Image
                   src={getItemIcon(item)}
                   alt={item.name}
@@ -465,17 +440,4 @@ function getItemIcon(item: CharacterItem): string {
     return '🧪';
   }
   return '📦';
-}
-
-// Helper function to get element icon
-function getElementIcon(element: string): string {
-  switch (element) {
-    case 'fire': return '🔥';
-    case 'ice': return '❄️';
-    case 'lightning': return '⚡';
-    case 'light': return '✨';
-    case 'dark': return '🌑';
-    case 'toxic': return '☠️';
-    default: return '💫';
-  }
 }

@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { useCharacterStore } from '@/stores/characterStore';
-import { useSelectedItemStore } from '@/stores/selectedItemStore';
 import { useUIStore } from '@/stores/uiStore';
 import { useCooldownsStore } from '@/stores/selectedItemStore';
 import { useGameStore } from '@/stores/gameStore';
@@ -243,7 +242,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <Image
                   src={getItemIcon(item)}
                   alt={item.name}

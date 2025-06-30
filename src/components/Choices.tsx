@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useGameStore, useMiscStore } from '@/stores';
 import { useUIStore } from '@/stores/uiStore';
 
@@ -17,7 +17,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   const { loading, interactivePoints, setInteractivePoints } = useMiscStore();
   const { setErrorWarnMsg } = useUIStore();
 
-  const choices = gameData.choices || [];
+  const choices = useMemo(() => gameData.choices || [], [gameData.choices]);
   
   // 🎯 CRITICAL: Hide choices during combat like Svelte version
   const inCombat = gameData.event?.inCombat;
