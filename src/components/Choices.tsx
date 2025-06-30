@@ -230,9 +230,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
             <button
               onClick={handleCustomAnswer}
               disabled={loading || isProcessing || !customInput.trim() || interactivePoints <= 0}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded 
-                         text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed
-                         hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               {isProcessing ? (
                 <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
