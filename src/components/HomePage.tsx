@@ -94,7 +94,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
       <SettingsUI />
       <div className="max-w-6xl mx-auto">
         {/* Header */}        <div className="text-center mb-12 relative">
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent mb-4 drop-shadow-lg">
             Mythic Conjurer
           </h1>
           <p className="text-slate-300 text-xl">
