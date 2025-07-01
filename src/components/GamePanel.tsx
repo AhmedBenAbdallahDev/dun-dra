@@ -15,16 +15,23 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed
   const [isMobile, setIsMobile] = useState(false);
   
   // Check if mobile on mount and resize
   React.useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 767);
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 767;
+      setIsMobile(mobile);
+      // Auto-collapse on mobile
+      if (mobile && isExpanded) {
+        setIsExpanded(false);
+      }
+    };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [isExpanded]);
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
