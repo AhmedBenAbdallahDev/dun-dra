@@ -90,41 +90,54 @@ export default function HomePage({ onStartGame }: HomePageProps) {
     onStartGame()
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-3 md:p-6">
       <SettingsUI />
       <div className="max-w-5xl mx-auto h-screen flex flex-col">
-        {/* Header */}        <div className="text-center mb-6 md:mb-8 relative">
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent mb-2 md:mb-4 drop-shadow-lg">
-            Mythic Conjurer
-          </h1>
-          <p className="text-slate-300 text-lg md:text-xl">
-            Embark on magical adventures
+        {/* Header */}
+        <div className="text-center mb-6 md:mb-8 relative">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
+              <span className="text-2xl md:text-3xl">🏰</span>
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 bg-clip-text text-transparent drop-shadow-lg">
+              Mythic Conjurer
+            </h1>
+          </div>
+          <p className="text-slate-300 text-lg md:text-xl mb-2">
+            Embark on magical adventures powered by AI
           </p>
+          <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span>AI-Powered Storytelling</span>
+          </div>
           <button 
             onClick={() => toggleSettingsWindow()}
-            className="absolute top-0 right-0 md:right-8 bg-slate-700/80 hover:bg-slate-600/80 p-2 rounded-full text-white shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200"
+            className="absolute top-0 right-0 md:right-8 bg-slate-800/80 hover:bg-slate-700/80 p-3 rounded-xl text-white shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 border border-slate-600/50 hover:border-amber-500/50"
             aria-label="Settings"
           >
-            <Settings className="w-6 h-6" />
+            <Settings className="w-5 h-5" />
           </button>
         </div>        {/* Quick Actions */}
-        <div className="flex flex-col md:flex-row gap-2 justify-center mb-4">
-          {latestAdventure && (            <button
+        <div className="flex flex-col md:flex-row gap-3 justify-center mb-6">
+          {latestAdventure && (
+            <button
               onClick={handleResumeLatest}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
-                         px-4 py-2.5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl 
-                         transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 
+                         px-6 py-3 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl 
+                         transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2
+                         border border-emerald-500/20 hover:border-emerald-400/30"
             >
               <Play className="w-4 h-4" />
-              Resume Latest
+              Resume Latest Adventure
             </button>
           )}
           
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 
-                       px-4 py-2.5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl 
-                       transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                       px-6 py-3 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl 
+                       transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2
+                       border border-amber-500/20 hover:border-amber-400/30"
           >
             <Plus className="w-4 h-4" />
             New Adventure
@@ -132,9 +145,10 @@ export default function HomePage({ onStartGame }: HomePageProps) {
           
           <button
             onClick={() => toggleSettingsWindow()}
-            className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 
-                       px-4 py-2.5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl 
-                       transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+            className="bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 
+                       px-6 py-3 rounded-xl font-semibold text-sm shadow-lg hover:shadow-xl 
+                       transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2
+                       border border-slate-600/30 hover:border-slate-500/50"
           >
             <Settings className="w-4 h-4" />
             AI Settings
@@ -146,18 +160,23 @@ export default function HomePage({ onStartGame }: HomePageProps) {
           <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">Your Adventures</h2>
           
           {adventures.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-3">🎲</div>
-              <h3 className="text-xl font-semibold text-slate-300 mb-2">No Adventures Yet</h3>
-              <p className="text-slate-400 mb-4 text-sm">Create your first adventure to begin!</p>
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-amber-500/20">
+                <span className="text-4xl">🎲</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-200 mb-3">Ready for Adventure?</h3>
+              <p className="text-slate-400 mb-6 text-base max-w-md mx-auto">
+                Create your first magical adventure and let AI craft an epic tale just for you!
+              </p>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 
-                           px-5 py-2.5 rounded-lg font-semibold shadow-lg hover:shadow-xl 
-                           transform hover:scale-105 transition-all duration-200 flex items-center gap-2 mx-auto"
+                           px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl 
+                           transform hover:scale-105 transition-all duration-200 flex items-center gap-3 mx-auto
+                           border border-amber-500/20 hover:border-amber-400/30 text-base"
               >
-                <Plus className="w-4 h-4" />
-                Create Adventure
+                <Plus className="w-5 h-5" />
+                Start Your Journey
               </button>
             </div>
           ) : (
@@ -174,9 +193,9 @@ export default function HomePage({ onStartGame }: HomePageProps) {
                   <div
                     key={adventure.id}
                     onClick={() => handleResumeAdventure(adventure.id)}
-                    className="bg-slate-800/90 backdrop-blur-sm border border-slate-600/60 rounded-xl p-4 
-                               shadow-lg hover:shadow-xl cursor-pointer transform hover:scale-105 
-                               transition-all duration-200 group h-fit"
+                    className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm border border-slate-600/60 rounded-2xl p-5 
+                               shadow-xl hover:shadow-2xl cursor-pointer transform hover:scale-105 
+                               transition-all duration-300 group h-fit hover:border-amber-500/30"
                   >
                     {/* Adventure Header */}
                     <div className="flex items-center justify-between mb-3">

@@ -141,10 +141,10 @@ export default function SettingsUI() {
   const TabButton = ({ id, label, icon }: { id: 'basic' | 'advanced' | 'test', label: string, icon: string }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+      className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
         activeTab === id 
-          ? 'bg-amber-600 text-white' 
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+          ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg' 
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
       }`}
     >
       <span>{icon}</span>
@@ -153,22 +153,25 @@ export default function SettingsUI() {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-3xl bg-slate-900/95 border-slate-700 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px]">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl bg-gradient-to-br from-slate-900/95 to-slate-950/95 border-slate-700/70 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px] rounded-2xl">
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-slate-700">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-600/20 rounded-lg">
-                <Image src="/images/info.svg" alt="Settings" width={16} height={16} className="opacity-80" />
+          <div className="flex justify-between items-center p-6 border-b border-slate-700/70">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-xl">⚙️</span>
               </div>
-              <h2 className="text-lg font-semibold text-slate-100">AI Configuration</h2>
+              <div>
+                <h2 className="text-xl font-bold text-slate-100">AI Configuration</h2>
+                <p className="text-sm text-slate-400">Configure your AI models and settings</p>
+              </div>
             </div>
             <Button
               onClick={toggleSettingsWindow}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl p-2"
             >
               ✕
             </Button>
@@ -228,16 +231,16 @@ export default function SettingsUI() {
                     />
                     <p className="text-xs text-slate-400">
                       {aiConfig.provider === 'openrouter' && (
-                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">OpenRouter.ai</a></>
+                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a></>
                       )}
                       {aiConfig.provider === 'openai' && (
-                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">OpenAI</a></>
+                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a></>
                       )}
                       {aiConfig.provider === 'groq' && (
-                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">Groq Console</a></>
+                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a></>
                       )}
                       {aiConfig.provider === 'gemini' && (
-                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">Google AI Studio</a></>
+                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a></>
                       )}
                       {aiConfig.provider === 'custom' && 'API key for your endpoint'}
                     </p>
@@ -252,7 +255,7 @@ export default function SettingsUI() {
                         value={aiConfig.customEndpoint || ''}
                         onChange={(e) => setAIConfig({ ...aiConfig, customEndpoint: e.target.value })}
                         placeholder="https://your-proxy.com/v1/chat/completions"
-                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                       />
                     </div>
                   )}
@@ -320,7 +323,7 @@ export default function SettingsUI() {
                           : setAIConfig({ ...aiConfig, model: e.target.value })
                         }
                         placeholder={aiConfig.provider === 'openai' ? 'gpt-4' : 'Model name'}
-                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                       />
                     )}
                     
@@ -336,7 +339,7 @@ export default function SettingsUI() {
                             useCustomModel: e.target.checked,
                             model: e.target.checked ? aiConfig.customModelName : aiConfig.model
                           })}
-                          className="w-3 h-3 accent-purple-600"
+                          className="w-3 h-3 accent-amber-600"
                         />
                         <Label htmlFor="useCustomModel" className="text-xs text-slate-300 cursor-pointer">
                           Use custom model name
@@ -349,7 +352,7 @@ export default function SettingsUI() {
                   <div className="space-y-3 pt-4">                    <Button
                       onClick={handleSaveSettings}
                       disabled={isSaving}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white h-9 disabled:opacity-50"
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white h-10 disabled:opacity-50 rounded-xl font-medium"
                     >
                       {isSaving ? (
                         <div className="flex items-center gap-2">
@@ -381,7 +384,7 @@ export default function SettingsUI() {
                       step="0.1"
                       value={aiConfig.temperature}
                       onChange={(e) => setAIConfig({ ...aiConfig, temperature: parseFloat(e.target.value) })}
-                      className="w-full accent-purple-500"
+                      className="w-full accent-amber-500"
                     />
                     <p className="text-xs text-slate-400">Controls creativity (0 = focused, 2 = creative)</p>
                   </div>
@@ -392,7 +395,7 @@ export default function SettingsUI() {
                       type="number"
                       value={aiConfig.maxTokens}
                       onChange={(e) => setAIConfig({ ...aiConfig, maxTokens: parseInt(e.target.value) })}
-                      className="bg-slate-800/60 border-slate-700 text-slate-200 focus:border-purple-500 h-9"
+                      className="bg-slate-800/60 border-slate-700 text-slate-200 focus:border-amber-500 h-9"
                     />
                     <p className="text-xs text-slate-400">Maximum response length</p>
                   </div>
@@ -402,15 +405,15 @@ export default function SettingsUI() {
                   <h3 className="text-slate-200 font-medium">Performance Tips</h3>
                   <div className="space-y-3 text-sm text-slate-300">
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-purple-400">🚀 DeepSeek Models</p>
+                      <p className="font-medium text-amber-400">🚀 DeepSeek Models</p>
                       <p className="text-xs mt-1">Free models with good performance for RPG scenarios</p>
                     </div>
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-blue-400">⚡ Temperature Guide</p>
+                      <p className="font-medium text-emerald-400">⚡ Temperature Guide</p>
                       <p className="text-xs mt-1">0.7 = balanced, 1.0+ = creative stories</p>
                     </div>
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-green-400">🎯 Token Limit</p>
+                      <p className="font-medium text-orange-400">🎯 Token Limit</p>
                       <p className="text-xs mt-1">2000-4000 for detailed responses</p>
                     </div>
                   </div>
@@ -426,7 +429,7 @@ export default function SettingsUI() {
                   <Button
                     onClick={handleTestConnection}
                     disabled={isTestingConnection || !aiConfig.apiKey}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 h-12"
+                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white disabled:opacity-50 h-12 rounded-xl font-medium"
                   >
                     {isTestingConnection ? (
                       <div className="flex items-center gap-2">

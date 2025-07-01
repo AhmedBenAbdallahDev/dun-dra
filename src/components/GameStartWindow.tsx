@@ -98,14 +98,20 @@ export default function GameStartWindow() {
   };
   return (
     <Dialog open={true}>
-      <DialogContent className="sm:max-w-2xl bg-slate-900/95 backdrop-blur-sm text-white border-purple-500/40 shadow-2xl">
+      <DialogContent className="sm:max-w-2xl bg-gradient-to-br from-slate-900/95 to-slate-950/95 backdrop-blur-md text-white border-amber-500/40 shadow-2xl rounded-2xl">
         <div className="space-y-6">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 mb-2 flex items-center justify-center gap-3">
-              <Sparkles className="w-8 h-8 text-purple-400" />
-              Mythic Conjurer
-              <Sparkles className="w-8 h-8 text-pink-400" />
-            </h1>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl">🏰</span>
+              </div>
+              <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-red-500">
+                Mythic Conjurer
+              </h1>
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+            </div>
             <p className="text-slate-300 text-lg">Choose your character class to begin your adventure</p>
           </div>
 
@@ -113,10 +119,10 @@ export default function GameStartWindow() {
             {characterClasses.map((charClass) => (
               <Card 
                 key={charClass.id}
-                className={`cursor-pointer transition-all duration-200 transform hover:scale-[1.02] ${
+                className={`cursor-pointer transition-all duration-300 transform hover:scale-[1.02] rounded-xl ${
                   selectedClass === charClass.id 
-                    ? 'bg-gradient-to-r from-purple-600/80 to-pink-600/80 border-purple-400 shadow-2xl scale-[1.02]' 
-                    : 'bg-slate-800/60 border-slate-600/60 hover:bg-slate-700/80 hover:border-purple-500/60 shadow-lg hover:shadow-xl'
+                    ? 'bg-gradient-to-r from-amber-600/80 to-orange-600/80 border-amber-400 shadow-2xl scale-[1.02]' 
+                    : 'bg-slate-800/60 border-slate-600/60 hover:bg-slate-700/80 hover:border-amber-500/60 shadow-lg hover:shadow-xl'
                 }`}
                 onClick={() => setSelectedClass(charClass.id)}
               >
@@ -168,7 +174,7 @@ export default function GameStartWindow() {
             <Button 
               onClick={handleStartGame}
               disabled={!selectedClass}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-none"
+              className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border-none rounded-xl"
             >
               <Sparkles className="w-5 h-5 mr-2" />
               Start Adventure

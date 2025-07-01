@@ -338,9 +338,20 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
           <div className="flex items-center justify-between">
             {/* Brand */}
             <div className="flex items-center space-x-2 md:space-x-4">
-              <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                Mythic Conjurer
-              </h1>
+              {/* Mobile: Badge/Logo only */}
+              <div className="md:hidden w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-sm font-bold text-white">🏰</span>
+              </div>
+              
+              {/* Desktop: Full brand with logo */}
+              <div className="hidden md:flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <span className="text-sm font-bold text-white">🏰</span>
+                </div>
+                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                  Mythic Conjurer
+                </h1>
+              </div>
               
               {/* Quick Stats Bar - Compact mobile version */}
               <div className="flex items-center space-x-1 md:space-x-3">
