@@ -100,7 +100,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
               <span className="text-2xl md:text-3xl">🏰</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold pixel-title">
-              MYSTIC CONJURER
+              Mystic Conjurer
             </h1>
           </div>
           <p className="text-slate-300 text-lg md:text-xl mb-2">
