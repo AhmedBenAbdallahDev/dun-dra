@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useUIStore } from '@/stores/uiStore';
@@ -15,6 +15,16 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check if mobile on mount and resize
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 767);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
@@ -441,7 +451,16 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       )}
       
       {/* Game Panel Box */}
-      <div className="game-panel-box">
+      <div 
+        className={`game-panel-box ${isExpanded ? 'expanded' : ''}`}
+        onClick={() => {
+          // Only toggle on mobile
+          if (isMobile) {
+            setIsExpanded(!isExpanded);
+          }
+        }}
+        style={{ cursor: isMobile ? 'pointer' : 'default' }}
+      >
         <h3>{title}</h3>
         {actions && actions.length > 0 ? (
           actions.map((item, index) => {
@@ -465,7 +484,10 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                     : ''
                 }`}
                 disabled={disabled}
-                onClick={() => handleItemUsage(item)}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent panel toggle
+                  handleItemUsage(item);
+                }}
                 onMouseMove={(event) => handleMouseMove(event, item)}
                 onMouseLeave={hideWindow}
                 title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
