@@ -124,9 +124,10 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
               value={adventureName}
               onChange={(e) => setAdventureName(e.target.value)}
               placeholder="Enter your adventure name..."
-              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-700/70 border border-slate-600/80 rounded-xl 
+              className="w-full px-4 py-4 bg-slate-700/70 border border-slate-600/80 rounded-xl 
                          text-white placeholder-slate-300 focus:outline-none focus:ring-2 
-                         focus:ring-amber-500 focus:border-transparent transition-all text-sm sm:text-base"
+                         focus:ring-amber-500 focus:border-transparent transition-all text-base
+                         leading-relaxed min-h-[3rem]"
               maxLength={50}
             />
             <p className="text-xs sm:text-sm text-slate-300 mt-1 sm:mt-2 font-medium">
@@ -155,8 +156,8 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{characterClass.icon}</span>
                       <div>
-                        <h3 className="text-lg font-bold text-white">{characterClass.name}</h3>
-                        <p className="text-xs text-slate-200">{characterClass.description}</p>
+                        <h3 className="text-lg font-bold text-white leading-tight">{characterClass.name}</h3>
+                        <p className="text-xs text-slate-200 leading-relaxed">{characterClass.description}</p>
                       </div>
                     </div>
                     
