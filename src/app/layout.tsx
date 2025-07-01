@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, MedievalSharp, Cinzel } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -13,15 +13,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Add medieval fonts - Note: Next.js doesn't have MedievalSharp, so we'll use alternatives
-// We'll add these via Google Fonts link in the head instead
+const medievalSharp = MedievalSharp({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-medieval",
+});
+
+const cinzel = Cinzel({
+  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+});
 
 export const metadata: Metadata = {
   title: "Mythic Conjurer",
   description: "An AI-powered RPG adventure game",
-  other: {
-    'font-link': 'https://fonts.googleapis.com/css2?family=MedievalSharp&family=Signika+Negative:wght@300;400;500&display=swap'
-  }
 };
 
 export default function RootLayout({
@@ -31,8 +37,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link 
+          href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;500;600&display=swap" 
+          rel="stylesheet" 
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${medievalSharp.variable} ${cinzel.variable} antialiased`}
       >
         {children}
         <Toaster />
