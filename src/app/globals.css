@@ -164,11 +164,39 @@
   flex: 1;
 }
 
+/* Mobile layout - show all panels in vertical stack */
+@media (max-width: 767px) {
+  .game-controls {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 8px !important;
+    height: 45% !important;
+    padding: 8px !important;
+  }
+  
+  .panel-container:first-child {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 / 2 !important;
+  }
+  
+  .choices {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 / 3 !important;
+    min-height: 160px !important;
+  }
+  
+  .panel-container:last-child {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 / 2 !important;
+  }
+}
+
 .panel-container {
   width: 100%;
   height: auto;
   min-height: 120px;
-  display: none; /* Hide panels on mobile for space */
+  display: block; /* Always show panels - critical for combat! */
 }
 
 .choices {
@@ -493,6 +521,17 @@
     min-width: 44px !important;
     touch-action: manipulation !important;
   }
+  
+  .combat-dice-btn {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 8px !important;
+  }
+  
+  /* Ensure combat banner doesn't block touch areas */
+  .combat-banner * {
+    pointer-events: auto !important;
+  }
 }
 
 /* Choice buttons mobile grid - CRITICAL FIX */
@@ -579,6 +618,12 @@
     gap: 0 !important;
   }
   
+  /* When in combat, account for combat banner height */
+  .main-game.pt-16 {
+    padding-top: 70px !important;
+    height: calc(100vh - 70px) !important;
+  }
+  
   .game-master {
     height: 55% !important;
     padding: 1rem !important;
@@ -636,5 +681,61 @@
     visibility: visible !important;
     pointer-events: auto !important;
     opacity: 1 !important;
+  }
+}
+
+/* FINAL MOBILE SAFETY CHECKS - Combat & UI Interaction */
+@media (max-width: 767px) {
+  /* Ensure combat doesn't break layout */
+  .main-game.pt-16 .game-controls {
+    height: 40% !important; /* Adjust for combat banner */
+  }
+  
+  .main-game.pt-16 .game-master {
+    height: 50% !important; /* Slightly smaller story area when in combat */
+  }
+  
+  /* Prevent any UI overlap issues */
+  .combat-banner ~ * {
+    margin-top: 0 !important;
+  }
+  
+  /* Ensure panels remain accessible during combat */
+  .panel-container {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    z-index: 1 !important;
+  }
+  
+  /* Combat dice button must be clearly accessible */
+  .combat-dice-btn {
+    z-index: 51 !important;
+    position: relative !important;
+  }
+  
+  /* Prevent layout shifts during combat transitions */
+  .main-game,
+  .game-controls,
+  .panel-container,
+  .choices {
+    transition: all 0.3s ease !important;
+  }
+  
+  /* Critical: Ensure text remains readable in all states */
+  .combat-banner *,
+  .panel-container *,
+  .choices *,
+  .action-button * {
+    font-size: inherit !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Emergency failsafe: if anything becomes invisible, show it */
+  .game-controls > *,
+  .panel-container > *,
+  .choices > * {
+    display: block !important;
+    visibility: visible !important;
   }
 }
