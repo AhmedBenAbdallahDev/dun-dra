@@ -136,6 +136,7 @@
   height: 100vh;
   width: 100%;
   padding: 0.5rem;
+  overflow: auto; /* Enable scrolling */
 }
 
 .game-master {
@@ -164,49 +165,66 @@
   flex: 1;
 }
 
-/* Mobile layout - show all panels in vertical stack */
+/* Mobile layout - Clean and organized */
 @media (max-width: 767px) {
+  /* Reset all fixed heights and overlapping styles */
   .game-controls {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    gap: 8px !important;
-    height: 45% !important;
-    padding: 8px !important;
-  }
-  
-  /* Choices take center stage - ALWAYS VISIBLE */
-  .choices {
-    order: 1 !important;
-    min-height: 180px !important;
-    flex: 1 !important;
-    width: 100% !important;
-    margin-bottom: 8px !important;
-  }
-  
-  /* Panels become toggleable horizontal strips */
-  .panel-container {
-    order: 2 !important;
+    gap: 12px !important;
     height: auto !important;
-    min-height: 60px !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 12px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Choices - Priority #1 */
+  .choices {
+    order: 2 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    flex: none !important;
     width: 100% !important;
-    transition: all 0.3s ease !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    border-radius: 12px !important;
   }
   
+  /* Inventory Panel */
   .panel-container:first-child {
-    order: 0 !important; /* Inventory above choices */
+    order: 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
   }
   
+  /* Spells Panel */
   .panel-container:last-child {
-    order: 3 !important; /* Spells below choices */
+    order: 3 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
   }
   
+  /* Panel boxes - Clean toggleable design */
   .game-panel-box {
-    min-height: 60px !important;
-    max-height: 60px !important;
-    overflow: hidden !important;
-    transition: max-height 0.3s ease !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    transition: all 0.3s ease !important;
     cursor: pointer !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
   }
   
   .game-panel-box.expanded {
@@ -229,103 +247,100 @@
     transition: transform 0.3s ease !important;
   }
   
-  .game-panel-box.expanded h3::after {
-    transform: rotate(180deg) !important;
+/* ================================
+   CLEAN MOBILE LAYOUT - NO CONFLICTS
+   ================================ */
+@media (max-width: 767px) {
+  /* Game controls container */
+  .game-controls {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 16px !important;
+    height: auto !important;
+    padding: 16px !important;
+    overflow: visible !important;
   }
   
-  /* Hide action buttons when collapsed */
+  /* Inventory panel - Order 1 */
+  .panel-container:first-child {
+    order: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Choices - Order 2 (Center priority) */
+  .choices {
+    order: 2 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex: none !important;
+    padding: 16px !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    border-radius: 12px !important;
+    margin: 0 !important;
+  }
+  
+  /* Spells panel - Order 3 */
+  .panel-container:last-child {
+    order: 3 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Clean panel boxes */
+  .game-panel-box {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    background: rgba(15, 23, 42, 0.95) !important;
+    border: 1px solid rgba(100, 116, 139, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    transition: all 0.3s ease !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+  }
+  
+  /* Expanded state */
+  .game-panel-box.expanded {
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2) !important;
+  }
+  
+  /* Hide content when collapsed */
   .game-panel-box:not(.expanded) .action-button {
     display: none !important;
   }
   
-  /* Show compact indicator when collapsed */
-  .game-panel-box:not(.expanded)::after {
-    content: "Tap to expand" !important;
-    position: absolute !important;
-    bottom: 8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    font-size: 0.7rem !important;
-    color: #888 !important;
-  }
-}
-
-/* MOBILE PANELS - ULTRA COMPACT DESIGN */
-@media (max-width: 767px) {
-  .game-panel-box {
-    height: 50px !important;
-    min-height: 50px !important;
-    max-height: 250px !important;
-    overflow: hidden !important;
-    transition: max-height 0.4s ease !important;
-    cursor: pointer !important;
-    background: rgba(30, 41, 59, 0.6) !important;
-    border: 1px solid rgba(100, 116, 139, 0.4) !important;
-    border-radius: 8px !important;
-    padding: 8px !important;
-    position: relative !important;
-  }
-  
-  .game-panel-box.expanded {
-    max-height: 250px !important;
-    overflow-y: auto !important;
-    z-index: 10 !important;
-    background: rgba(30, 41, 59, 0.95) !important;
-    border-color: rgba(59, 130, 246, 0.6) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
-  }
-  
-  .game-panel-box h3 {
-    font-size: 0.85rem !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    line-height: 1 !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-  
-  .game-panel-box h3::after {
-    content: "▲" !important;
-    font-size: 0.7rem !important;
-    color: rgba(156, 163, 175, 0.8) !important;
-    transition: transform 0.3s ease !important;
-    transform: rotate(180deg) !important;
-  }
-  
-  .game-panel-box.expanded h3::after {
-    transform: rotate(0deg) !important;
-    color: rgba(59, 130, 246, 1) !important;
-  }
-  
-  /* Hide all content when collapsed except title */
-  .game-panel-box:not(.expanded) .action-button,
-  .game-panel-box:not(.expanded) .hp-bar,
-  .game-panel-box:not(.expanded) .mp-bar {
-    display: none !important;
-  }
-  
-  /* When expanded, show everything */
+  /* Show content when expanded */
   .game-panel-box.expanded .action-button {
     display: flex !important;
-    min-height: 40px !important;
-    margin: 4px 0 !important;
   }
   
-  /* Tap hint when collapsed */
-  .game-panel-box:not(.expanded)::before {
-    content: "Tap to open" !important;
-    position: absolute !important;
-    right: 8px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    font-size: 0.65rem !important;
-    color: rgba(156, 163, 175, 0.6) !important;
-    pointer-events: none !important;
+  /* Panel headers */
+  .game-panel-box h3 {
+    font-size: 1rem !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
   }
   
-  .game-panel-box.expanded::before {
-    display: none !important;
+  /* Action buttons in panels */
+  .action-button {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 48px !important;
+    margin: 6px 0 !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
   }
 }
 
@@ -952,52 +967,25 @@
   }
 }
 
-/* Debug helper - remove after testing */
-@media (max-width: 767px) {
-  .choices {
-    /* border: 3px solid red !important; */
-    /* background: rgba(255, 0, 0, 0.1) !important; */
-  }
-}
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
 
-/* EMERGENCY MOBILE FIXES - ENSURE CHOICES ARE NEVER HIDDEN */
+/* Ensure mobile layout is clean and organized */
 @media (max-width: 767px) {
-  /* Force choices to be visible above everything */
-  .choices {
-    z-index: 5 !important;
-    position: relative !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    overflow: visible !important;
-  }
-  
-  /* Prevent any element from hiding choices */
-  .game-controls > *:not(.choices) {
-    z-index: 1 !important;
-  }
-  
-  /* Force proper height distribution */
   .main-game {
-    overflow: hidden !important;
+    overflow: auto !important;
+    height: 100vh !important;
   }
   
   .game-controls {
-    overflow-y: visible !important;
-    min-height: 400px !important;
+    overflow: visible !important;
+    min-height: auto !important;
   }
   
-  /* Ensure panels don't overflow and hide choices */
+  /* Ensure panels don't conflict */
   .panel-container {
     overflow: visible !important;
     position: relative !important;
-  }
-  
-  .game-panel-box.expanded {
-    position: absolute !important;
-    width: calc(100% - 16px) !important;
-    z-index: 20 !important;
-    left: 8px !important;
-    top: 0 !important;
   }
 }

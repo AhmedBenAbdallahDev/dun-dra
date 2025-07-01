@@ -135,16 +135,111 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const getItemIcon = (item: CharacterItem): string => {
-    // Match Svelte logic exactly
+    // 🎯 Enhanced icon mapping with fallbacks and unique combinations
+    
+    // Weapons - specific weapon class icons
     if (item.type === 'weapon') {
-      return `/images/${item.weaponClass}.svg`;
+      const weaponIcons: Record<string, string> = {
+        'sword': '/images/sword.svg',
+        'axe': '/images/axe.svg',
+        'bow': '/images/bow.svg',
+        'dagger': '/images/dagger.svg',
+        'mace': '/images/mace.svg',
+        'spear': '/images/spear.svg',
+        'flail': '/images/flail.svg',
+        'staff': '/images/sword.svg', // fallback
+        'wand': '/images/sword.svg',  // fallback
+        'club': '/images/mace.svg',   // fallback
+        'hammer': '/images/mace.svg', // fallback
+        'longsword': '/images/sword.svg',
+        'shortsword': '/images/sword.svg',
+        'crossbow': '/images/bow.svg',
+        'longbow': '/images/bow.svg',
+      };
+      return weaponIcons[item.weaponClass || 'sword'] || '/images/sword.svg';
     }
-    if (item.type === 'potion') {
-      return `/images/${item.type}.svg`; // This will be /images/potion.svg
+    
+    // Potions - specific potion types with name-based detection
+    if (item.type === 'potion' || item.name?.toLowerCase().includes('potion')) {
+      return '/images/potion.svg';
     }
+    
+    // Spells - element-based icons with enhanced mapping
+    if (item.type === 'spell' || item.type === 'healing spell') {
+      const spellIcons: Record<string, string> = {
+        'fire': '/images/fire.svg',
+        'ice': '/images/ice.svg',
+        'lightning': '/images/lightning.svg',
+        'arcane': '/images/arcane.svg',
+        'toxic': '/images/toxic.svg',
+        'light': '/images/light.svg',
+        'dark': '/images/dark.svg',
+        'earth': '/images/toxic.svg',     // earth = green like toxic
+        'water': '/images/ice.svg',       // water = blue like ice
+        'wind': '/images/lightning.svg',  // wind = yellow like lightning
+        'air': '/images/lightning.svg',   // air = yellow like lightning
+        'spirit': '/images/light.svg',    // spirit = light
+        'shadow': '/images/dark.svg',     // shadow = dark
+        'nature': '/images/toxic.svg',    // nature = green like toxic
+        'divine': '/images/light.svg',    // divine = light
+        'unholy': '/images/dark.svg',     // unholy = dark
+      };
+      return spellIcons[item.element || 'arcane'] || '/images/arcane.svg';
+    }
+    
+    // Special items - unique icons based on name patterns
+    const itemName = item.name?.toLowerCase() || '';
+    
+    // Currency and valuables
+    if (itemName.includes('gold') || itemName.includes('coin') || itemName.includes('currency')) {
+      return '/images/gold.svg';
+    }
+    
+    // Keys and tools
+    if (itemName.includes('key') || itemName.includes('lockpick')) {
+      return '/images/item.svg';
+    }
+    
+    // Magical items
+    if (itemName.includes('gem') || itemName.includes('crystal') || itemName.includes('orb')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Books and scrolls
+    if (itemName.includes('scroll') || itemName.includes('book') || itemName.includes('tome') || itemName.includes('grimoire')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Jewelry and accessories
+    if (itemName.includes('ring') || itemName.includes('amulet') || itemName.includes('necklace') || itemName.includes('pendant')) {
+      return '/images/unique.svg';
+    }
+    
+    // Food and consumables
+    if (itemName.includes('bread') || itemName.includes('food') || itemName.includes('meal') || itemName.includes('ration')) {
+      return '/images/potion.svg'; // Use potion icon for consumables
+    }
+    
+    // Special artifacts
+    if (itemName.includes('artifact') || itemName.includes('relic') || itemName.includes('legendary') || itemName.includes('epic')) {
+      return '/images/unique.svg';
+    }
+    
+    // Element-based fallback for items with element property
     if (item.element) {
-      return `/images/${item.element}.svg`;
+      const elementIcons: Record<string, string> = {
+        'fire': '/images/fire.svg',
+        'ice': '/images/ice.svg',
+        'lightning': '/images/lightning.svg',
+        'arcane': '/images/arcane.svg',
+        'toxic': '/images/toxic.svg',
+        'light': '/images/light.svg',
+        'dark': '/images/dark.svg',
+      };
+      return elementIcons[item.element] || '/images/arcane.svg';
     }
+    
+    // Ultimate fallback
     return '/images/item.svg';
   };
 
@@ -468,7 +563,14 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         }}
         style={{ cursor: isMobile ? 'pointer' : 'default' }}
       >
-        <h3>{title}</h3>
+        <h3>
+          {title}
+          {isMobile && (
+            <span className="text-xs opacity-70 ml-2">
+              {isExpanded ? '▼ Tap to collapse' : '▶ Tap to expand'}
+            </span>
+          )}
+        </h3>
         {actions && actions.length > 0 ? (
           actions.map((item, index) => {
             const disabled = isDisabled(item);
