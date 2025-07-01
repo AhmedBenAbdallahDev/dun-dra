@@ -17,7 +17,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   const { gameData } = useGameStore();
   const { loading, interactivePoints, setInteractivePoints } = useMiscStore();
   const { setErrorWarnMsg } = useUIStore();
-  const { selectedName } = useSelectedItemStore();
+  const { name: selectedName } = useSelectedItemStore();
 
   const choices = useMemo(() => gameData.choices || [], [gameData.choices]);
   
