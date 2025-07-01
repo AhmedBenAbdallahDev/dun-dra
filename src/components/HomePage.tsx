@@ -96,12 +96,16 @@ export default function HomePage({ onStartGame }: HomePageProps) {
         {/* Header */}
         <div className="text-center mb-6 md:mb-8 relative">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
-              <span className="text-2xl md:text-3xl">🏰</span>
+            {/* Mobile only castle icon */}
+            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-2xl shadow-amber-500/20 md:hidden">
+              <span className="text-2xl">🏰</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold pixel-title">
-              Mystic Conjurer
-            </h1>
+            <div className="text-center">
+              <h1 className="text-4xl md:text-6xl font-bold modern-title">
+                Mystic Conjurer
+              </h1>
+              <p className="japanese-subtitle">魔法の冒険者</p>
+            </div>
           </div>
           <p className="text-slate-300 text-lg md:text-xl mb-2">
             Embark on magical adventures powered by AI
