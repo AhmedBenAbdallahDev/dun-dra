@@ -474,3 +474,167 @@
     display: none;
   }
 }
+
+/* CRITICAL MOBILE FIXES - Production Ready */
+
+/* Combat banner mobile optimizations */
+@media (max-width: 640px) {
+  .combat-banner {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 50 !important;
+    padding: 8px 12px !important;
+  }
+  
+  .combat-banner button {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    touch-action: manipulation !important;
+  }
+}
+
+/* Choice buttons mobile grid - CRITICAL FIX */
+@media (max-width: 767px) {
+  .choices-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+  
+  .choice-button {
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    border-radius: 8px !important;
+    background: #2a2a2a !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+    touch-action: manipulation !important;
+    cursor: pointer !important;
+  }
+  
+  .choice-button:hover,
+  .choice-button:active {
+    background: #3a3a3a !important;
+    border-color: #666 !important;
+    transform: scale(0.98) !important;
+  }
+}
+
+/* Game panel mobile safety */
+@media (max-width: 767px) {
+  .panel-container {
+    display: block !important;
+    visibility: visible !important;
+    min-height: 140px !important;
+    width: 100% !important;
+  }
+  
+  .game-panel-box {
+    min-height: 140px !important;
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+  
+  .action-button {
+    min-height: 48px !important;
+    min-width: 48px !important;
+    touch-action: manipulation !important;
+  }
+  
+  .action-button.selected {
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.8) 0%, rgba(0, 136, 255, 0.6) 100%) !important;
+    border: 2px solid #0088ff !important;
+    box-shadow: 0 0 12px rgba(0, 102, 204, 0.6) !important;
+    transform: scale(1.05) !important;
+  }
+  
+  .action-button.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #00ff00;
+    color: #000;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+}
+
+/* Mobile layout improvements */
+@media (max-width: 767px) {
+  .main-game {
+    height: 100vh !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+  
+  .game-master {
+    height: 55% !important;
+    padding: 1rem !important;
+    font-size: 1rem !important;
+    border-radius: 0 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .game-controls {
+    height: 40% !important;
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+  
+  .choices {
+    min-height: 200px !important;
+    margin-bottom: 60px !important; /* Space for bottom UI */
+  }
+}
+
+/* Touch feedback enhancements */
+@media (max-width: 767px) {
+  button:active,
+  .action-button:active,
+  .choice-button:active {
+    transform: scale(0.95) !important;
+    transition: transform 0.1s ease !important;
+  }
+  
+  /* Ensure text is readable */
+  * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+  
+  /* Prevent zoom on double tap */
+  button, input, select, textarea {
+    touch-action: manipulation !important;
+  }
+}
+
+/* Emergency mobile fixes for any stuck states */
+@media (max-width: 767px) {
+  .combat-ui,
+  .combat-banner {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  
+  .combat-ui button,
+  .combat-banner button {
+    display: inline-block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+  }
+}

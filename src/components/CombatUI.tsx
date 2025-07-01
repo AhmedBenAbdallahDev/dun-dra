@@ -58,6 +58,15 @@ export default function CombatUI() {
 
     console.log('🎲 CombatUI: Starting dice animation with pre-calculated dice:', diceNumber);
 
+    // 🚨 MOBILE SAFETY: Ensure we have a valid dice number - fallback generation
+    let currentDiceNumber = diceNumber;
+    if (!currentDiceNumber || currentDiceNumber === 0 || isNaN(currentDiceNumber)) {
+      const maxDice = (selectedManaCost && selectedManaCost > 0) ? 23 : 20;
+      currentDiceNumber = Math.floor(Math.random() * maxDice) + 1;
+      setDiceNumber(currentDiceNumber);
+      console.log('🎲 CombatUI: Generated fallback dice number:', currentDiceNumber);
+    }
+
     // 🎯 CRITICAL FIX: Don't generate new dice - use the pre-calculated one from GamePanel (like Svelte)
     // This matches the Svelte behavior where dice is calculated during item selection, not during throw
     
@@ -142,7 +151,22 @@ export default function CombatUI() {
     clearSelectedItem();
     setDiceThrown(false);
   };
-  const enemyHpPercentage = enemy.enemyHp && enemy.enemyMaxHp 
+  
+  // 🚨 MOBILE EMERGENCY: Force exit combat function
+  const emergencyExitCombat = () => {
+    console.log('🚨 Emergency combat exit triggered');
+    addChatMessage({
+      content: 'Combat ended by player.',
+      type: 'system',
+      timestamp: Date.now()
+    });
+    setEnemy(null);
+    clearSelectedItem();
+    setDiceNumber(0);
+    setDiceThrown(false);
+  };
+
+  const enemyHpPercentage = enemy.enemyHp && enemy.enemyMaxHp
     ? (enemy.enemyHp / enemy.enemyMaxHp) * 100 
     : 100;
   return (
@@ -235,6 +259,17 @@ export default function CombatUI() {
                   <span className="text-xs text-gray-400">/{selectedManaCost && selectedManaCost > 0 ? '23' : '20'}</span>
                 </div>
               )}
+            </button>
+          </div>
+
+          {/* Mobile Emergency Exit - Only show on small screens */}
+          <div className="sm:hidden">
+            <button
+              onClick={emergencyExitCombat}
+              className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded border border-red-400"
+              title="Emergency exit combat"
+            >
+              🚨 Exit
             </button>
           </div>
         </div>

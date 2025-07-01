@@ -149,8 +149,9 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
         💡 <span className="text-slate-300">Choose an option</span> to continue
       </div>
 
-      {/* Choice buttons - Compact mobile design */}
-      {choices.map((choice, index) => {
+      {/* Choice buttons - Mobile grid layout for better visibility */}
+      <div className="choices-grid space-y-2 md:space-y-2">
+        {choices.map((choice, index) => {
         const isSelected = selectedChoice === index;
         const isDisabled = loading || isProcessing;
         
@@ -199,6 +200,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
           </button>
         );
       })}
+      </div>
       
       {/* Custom input - Compact */}
       {choices.length >= 1 && (
