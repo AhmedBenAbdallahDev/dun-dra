@@ -145,8 +145,8 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   return (
     <div className="choices w-full space-y-2">
       {/* Instruction hint for new players - Compact */}
-      <div className="text-center text-slate-400 text-xs bg-slate-900/40 rounded-lg p-2 border border-amber-500/20">
-        💡 <span className="text-amber-400">Choose an option</span> to continue
+      <div className="text-center text-slate-400 text-xs bg-slate-900/40 rounded-lg p-2 border border-slate-600/30">
+        💡 <span className="text-slate-300">Choose an option</span> to continue
       </div>
 
       {/* Choice buttons - Compact mobile design */}
@@ -162,18 +162,18 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                        border rounded-lg p-3 md:p-4 text-left transition-all duration-300
                        disabled:cursor-not-allowed text-sm group relative overflow-hidden min-h-[44px]
                        ${isSelected 
-                         ? 'border-emerald-500 bg-emerald-900/30 text-emerald-200 transform scale-[1.02] shadow-lg' 
+                         ? 'border-slate-500 bg-slate-700/50 text-slate-200 transform scale-[1.02] shadow-lg' 
                          : isDisabled 
                            ? 'border-slate-600/30 text-slate-400 opacity-50'
-                           : 'border-slate-600/50 text-slate-200 hover:text-white hover:border-amber-500/70 hover:bg-amber-900/20'
+                           : 'border-slate-600/50 text-slate-200 hover:text-white hover:border-slate-500/70 hover:bg-slate-700/30'
                        }`}
             onClick={() => handleChoiceClick(choice, index)}
           >
             {/* Choice number indicator - Smaller */}
             <div className={`absolute left-2 top-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
                            ${isSelected 
-                             ? 'bg-emerald-500 text-white' 
-                             : 'bg-slate-700 text-slate-300 group-hover:bg-amber-500 group-hover:text-white'
+                             ? 'bg-slate-600 text-white' 
+                             : 'bg-slate-700 text-slate-300 group-hover:bg-slate-500 group-hover:text-white'
                            }`}>
               {index + 1}
             </div>
@@ -186,14 +186,14 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
             {/* Loading indicator for selected choice */}
             {isSelected && isProcessing && (
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <div className="w-3 h-3 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full animate-spin"></div>
+                <div className="w-3 h-3 border-2 border-slate-300/30 border-t-slate-300 rounded-full animate-spin"></div>
               </div>
             )}
             
             {/* Hover arrow indicator */}
             {!isSelected && !isDisabled && (
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-amber-400 text-sm">→</span>
+                <span className="text-slate-400 text-sm">→</span>
               </div>
             )}
           </button>

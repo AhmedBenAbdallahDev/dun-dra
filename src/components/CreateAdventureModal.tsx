@@ -95,16 +95,16 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center overflow-y-auto">
       <div className="h-screen w-screen md:h-auto md:w-full bg-slate-900 md:bg-slate-800/95 
-                      md:border md:border-slate-600/50 md:rounded-xl md:shadow-2xl md:max-w-3xl 
+                      md:border md:border-slate-600/30 md:rounded-xl md:shadow-2xl md:max-w-3xl 
                       md:my-4 md:mx-4 flex flex-col">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-3 md:p-4 border-b border-slate-600/50">
+        <div className="flex items-center justify-between p-3 md:p-4 border-b border-slate-600/30">
           <div>
-            <h2 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+            <h2 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-slate-300 to-slate-100 bg-clip-text text-transparent">
               Create Adventure
             </h2>
-            <p className="text-slate-200 text-sm md:text-base">Choose your hero</p>
+            <p className="text-slate-300 text-sm md:text-base">Choose your hero</p>
           </div>
           <button
             onClick={onClose}
@@ -150,8 +150,8 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
                   onClick={() => setSelectedClass(characterClass.name)}
                   className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all duration-200 min-h-[50px]
                     ${selectedClass === characterClass.name
-                      ? 'border-amber-500 bg-amber-500/20 shadow-lg'
-                      : 'border-slate-600/80 bg-slate-700/40 hover:border-slate-500 active:scale-[0.98]'
+                      ? 'border-slate-400 bg-slate-700/40 shadow-lg'
+                      : 'border-slate-600/80 bg-slate-700/20 hover:border-slate-500 active:scale-[0.98]'
                     }`}
                 >
                   <span className="text-2xl mr-3 flex-shrink-0">{characterClass.icon}</span>
@@ -181,8 +181,8 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
                   onClick={() => setSelectedClass(characterClass.name)}
                   className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:scale-105
                     ${selectedClass === characterClass.name
-                      ? 'border-amber-500 bg-gradient-to-br from-amber-500/25 to-orange-500/25 shadow-xl'
-                      : 'border-slate-600/80 bg-slate-700/40 hover:border-slate-500'
+                      ? 'border-slate-400 bg-slate-700/50 shadow-xl'
+                      : 'border-slate-600/80 bg-slate-700/30 hover:border-slate-500'
                     }`}
                 >
                   <div className="flex items-center gap-3 mb-3">
@@ -216,9 +216,9 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
             </div>
           </div>          {/* Starting Equipment Preview */}
           {selectedClass && (
-            <div className="bg-slate-700/50 rounded-lg p-3 border border-slate-600/50">
+            <div className="bg-slate-700/30 rounded-lg p-3 border border-slate-600/30">
               <h3 className="text-base font-semibold text-slate-100 mb-2 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <Sparkles className="w-4 h-4 text-slate-400" />
                 Starting Equipment
               </h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
@@ -236,7 +236,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
         </div>
 
         {/* Footer - Compact */}
-        <div className="bg-slate-900/95 border-t border-slate-600/50 p-3">
+        <div className="bg-slate-900/95 border-t border-slate-600/30 p-3">
           <div className="flex flex-col md:flex-row justify-end gap-2 md:gap-3">
             <button
               onClick={onClose}
@@ -251,7 +251,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
               disabled={!isFormValid || isCreating}
               className={`px-6 py-3 md:py-2 rounded-lg font-semibold transition-all duration-200 order-1 md:order-2 min-h-[44px]
                 ${isFormValid && !isCreating
-                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white shadow-lg hover:scale-105'
+                  ? 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white shadow-lg hover:scale-105'
                   : 'bg-slate-600/50 text-slate-400 cursor-not-allowed'
                 }`}
             >
