@@ -51,7 +51,7 @@ export interface GameData {
   placeAndTime: PlaceAndTime
   shop: LootItem[]
   choices: string[]
-  enemy: Enemy
+  enemy: Enemy | null
   event: GameEvent
   story?: string
   heroClass?: string
@@ -71,7 +71,7 @@ interface GameState {
   setGameData: (data: Partial<GameData>) => void
   setStory: (story: string) => void
   setChoices: (choices: string[]) => void
-  setEnemy: (enemy: Enemy) => void
+  setEnemy: (enemy: Enemy | null) => void
   setEvent: (event: Partial<GameEvent>) => void
   setPlaceAndTime: (placeAndTime: Partial<PlaceAndTime>) => void
   setShop: (shop: LootItem[]) => void
@@ -118,7 +118,10 @@ export const useGameStore = create<GameState>()(
       })),
       
       setEnemy: (enemy) => set((state) => ({
-        gameData: { ...state.gameData, enemy: { ...state.gameData.enemy, ...enemy } }
+        gameData: { 
+          ...state.gameData, 
+          enemy: enemy ? { ...state.gameData.enemy, ...enemy } : null 
+        }
       })),
       
       setEvent: (event) => set((state) => ({
