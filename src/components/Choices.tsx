@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGameStore, useMiscStore } from '@/stores';
 import { useUIStore } from '@/stores/uiStore';
+import { useSelectedItemStore } from '@/stores/selectedItemStore';
 
 interface ChoicesProps {
   onChoiceSelect?: (choice: string) => void;
@@ -16,6 +17,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   const { gameData } = useGameStore();
   const { loading, interactivePoints, setInteractivePoints } = useMiscStore();
   const { setErrorWarnMsg } = useUIStore();
+  const { selectedName } = useSelectedItemStore();
 
   const choices = useMemo(() => gameData.choices || [], [gameData.choices]);
   
@@ -144,14 +146,33 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
 
   return (
     <div className="choices w-full space-y-2">
-      {/* Instruction hint for new players - Compact */}
-      <div className="text-center text-slate-400 text-xs bg-slate-900/40 rounded-lg p-2 border border-slate-600/30">
-        💡 <span className="text-slate-300">Choose an option</span> to continue
-      </div>
+      {/* Combat Mode - Show instructions instead of choices */}
+      {gameData?.event?.inCombat ? (
+        <div className="combat-instructions bg-red-900/20 border border-red-500/30 rounded-lg p-4 text-center">
+          <h3 className="text-red-400 font-semibold mb-3 flex items-center justify-center gap-2">
+            ⚔️ Combat Mode
+          </h3>
+          <div className="space-y-2 text-sm text-red-200">
+            <p>🎯 <strong>Step 1:</strong> Select a weapon or spell from the panels below</p>
+            <p>🎲 <strong>Step 2:</strong> Roll the dice in the red banner above</p>
+            <p>📖 <strong>Read:</strong> The story continues to show your combat narrative</p>
+          </div>
+          {selectedName && (
+            <div className="mt-3 bg-green-900/30 border border-green-500/30 rounded-lg p-2">
+              <span className="text-green-400 text-sm">✅ Selected: <strong>{selectedName}</strong></span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Normal Mode - Show instruction hint */}
+          <div className="text-center text-slate-400 text-xs bg-slate-900/40 rounded-lg p-2 border border-slate-600/30">
+            💡 <span className="text-slate-300">Choose an option</span> to continue
+          </div>
 
       {/* Choice buttons - Mobile grid layout for better visibility */}
       <div className="choices-grid space-y-2 md:space-y-2">
-        {choices.map((choice, index) => {
+        {choices.map((choice: string, index: number) => {
         const isSelected = selectedChoice === index;
         const isDisabled = loading || isProcessing;
         
@@ -238,6 +259,8 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
             💡 Creative answers cost 1 point
           </div>
         </div>
+      )}
+        </>
       )}
       
       {/* CSS Animation */}
