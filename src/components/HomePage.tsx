@@ -180,7 +180,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
                           <h3 className="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
                             {adventure.name}
                           </h3>
-                          <p className="text-sm text-slate-400">Level {adventure.level} {adventure.class}</p>
+                          <p className="text-sm text-slate-300 font-medium">Level {adventure.level} {adventure.class}</p>
                         </div>
                       </div>
                         <div className="flex gap-2">
@@ -196,36 +196,36 @@ export default function HomePage({ onStartGame }: HomePageProps) {
 
                     {/* Stats */}
                     <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-slate-700/40 p-3 rounded-lg">
                         <Heart className="w-4 h-4 text-red-400" />
-                        <span className="text-sm text-slate-300">
+                        <span className="text-sm text-slate-100 font-medium">
                           {adventure.hp}/{adventure.maxHp}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-slate-700/40 p-3 rounded-lg">
                         <Zap className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm text-slate-300">
+                        <span className="text-sm text-slate-100 font-medium">
                           {adventure.mana}/{adventure.maxMana}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-slate-700/40 p-3 rounded-lg">
                         <span className="text-yellow-400">💰</span>
-                        <span className="text-sm text-slate-300">{adventure.gold}</span>
+                        <span className="text-sm text-slate-100 font-medium">{adventure.gold}</span>
                       </div>
                     </div>
 
                     {/* Location & Time */}
-                    <div className="mb-4">
-                      <p className="text-sm text-slate-400">
+                    <div className="mb-4 bg-slate-700/30 p-3 rounded-lg">
+                      <p className="text-sm text-slate-200 font-medium mb-1">
                         📍 {adventure.place || 'Unknown Location'}
                       </p>
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-slate-200 font-medium">
                         🕐 {adventure.time || '00:00'}
                       </p>
                     </div>
 
                     {/* Last Played */}
-                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                       <Clock className="w-3 h-3" />
                       Last played {formatTimestamp(adventure.lastPlayed)}
                     </div>

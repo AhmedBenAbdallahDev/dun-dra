@@ -103,7 +103,7 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
             <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
               Create New Adventure
             </h2>
-            <p className="text-slate-300 mt-1">Choose your hero and begin your journey</p>
+            <p className="text-slate-200 mt-1">Choose your hero and begin your journey</p>
           </div>
           <button
             onClick={onClose}
@@ -124,12 +124,12 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
               value={adventureName}
               onChange={(e) => setAdventureName(e.target.value)}
               placeholder="Enter your adventure name..."
-              className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/60 rounded-xl 
-                         text-white placeholder-slate-400 focus:outline-none focus:ring-2 
-                         focus:ring-amber-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 bg-slate-700/70 border border-slate-600/80 rounded-xl 
+                         text-white placeholder-slate-300 focus:outline-none focus:ring-2 
+                         focus:ring-amber-500 focus:border-transparent transition-all text-base"
               maxLength={50}
             />
-            <p className="text-sm text-slate-400 mt-2">
+            <p className="text-sm text-slate-300 mt-2 font-medium">
               {adventureName.length}/50 characters
             </p>
           </div>
@@ -139,42 +139,42 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
             <label className="block text-lg font-semibold text-slate-200 mb-4">
               Choose Your Class
             </label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {characterClasses.map((characterClass) => (
                 <div
                   key={characterClass.name}
                   onClick={() => setSelectedClass(characterClass.name)}
-                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 min-h-[220px]
                     ${selectedClass === characterClass.name
-                      ? 'border-amber-500 bg-amber-500/20 shadow-lg shadow-amber-500/25'
-                      : 'border-slate-600/60 bg-slate-700/30 hover:border-slate-500 hover:bg-slate-700/50'
+                      ? 'border-amber-500 bg-amber-500/25 shadow-lg shadow-amber-500/30'
+                      : 'border-slate-600/80 bg-slate-700/40 hover:border-slate-500 hover:bg-slate-700/60'
                     }`}
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-4xl">{characterClass.icon}</span>
-                    <div>
-                      <h3 className="text-xl font-bold text-white">{characterClass.name}</h3>
-                      <p className="text-sm text-slate-300">{characterClass.description}</p>
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-5xl">{characterClass.icon}</span>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">{characterClass.name}</h3>
+                      <p className="text-sm text-slate-200 leading-relaxed">{characterClass.description}</p>
                     </div>
                   </div>
 
                   {/* Stats Display */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-2 bg-slate-800/50 p-3 rounded-lg">
                       <Heart className="w-4 h-4 text-red-400" />
-                      <span className="text-slate-300">HP: {characterClass.stats.hp}</span>
+                      <span className="text-slate-100 font-medium">HP: {characterClass.stats.hp}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-slate-800/50 p-3 rounded-lg">
                       <Zap className="w-4 h-4 text-blue-400" />
-                      <span className="text-slate-300">Mana: {characterClass.stats.mana}</span>
+                      <span className="text-slate-100 font-medium">Mana: {characterClass.stats.mana}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-slate-800/50 p-3 rounded-lg">
                       <Sword className="w-4 h-4 text-orange-400" />
-                      <span className="text-slate-300">{characterClass.stats.damage}</span>
+                      <span className="text-slate-100 font-medium">{characterClass.stats.damage}</span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 bg-slate-800/50 p-3 rounded-lg">
                       <Shield className="w-4 h-4 text-green-400" />
-                      <span className="text-slate-300">{characterClass.stats.armor}</span>
+                      <span className="text-slate-100 font-medium">{characterClass.stats.armor}</span>
                     </div>
                   </div>
                 </div>
@@ -184,27 +184,27 @@ export default function CreateAdventureModal({ onClose, onSuccess }: CreateAdven
 
           {/* Starting Equipment Preview */}
           {selectedClass && (
-            <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600/40">
-              <h3 className="text-lg font-semibold text-slate-200 mb-3 flex items-center gap-2">
+            <div className="bg-slate-700/50 rounded-xl p-6 border border-slate-600/60">
+              <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-amber-400" />
                 Starting Equipment
               </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 bg-slate-800/40 p-3 rounded-lg">
                   <Coins className="w-4 h-4 text-yellow-400" />
-                  <span className="text-slate-300">100 Gold Coins</span>
+                  <span className="text-slate-100 font-medium">100 Gold Coins</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 bg-slate-800/40 p-3 rounded-lg">
                   <span className="text-amber-400">📍</span>
-                  <span className="text-slate-300">Starting Village</span>
+                  <span className="text-slate-100 font-medium">Starting Village</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 bg-slate-800/40 p-3 rounded-lg">
                   <span className="text-blue-400">⚔️</span>
-                  <span className="text-slate-300">Basic {selectedClass} Equipment</span>
+                  <span className="text-slate-100 font-medium">Basic {selectedClass} Equipment</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 bg-slate-800/40 p-3 rounded-lg">
                   <span className="text-green-400">📚</span>
-                  <span className="text-slate-300">Starter Abilities</span>
+                  <span className="text-slate-100 font-medium">Starter Abilities</span>
                 </div>
               </div>
             </div>
