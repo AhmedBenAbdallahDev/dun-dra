@@ -872,15 +872,16 @@
   font-family: 'VT323', monospace;
   font-weight: 400;
   letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ef4444, #ec4899);
+  background: linear-gradient(135deg, #f59e0b 0%, #8b5cf6 30%, #f59e0b 60%, #8b5cf6 85%, #10b981 95%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  background-size: 200% 200%;
-  animation: gradient-shift 3s ease-in-out infinite;
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease-in-out infinite;
 }
 
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  33% { background-position: 50% 50%; }
+  66% { background-position: 100% 50%; }
 }
