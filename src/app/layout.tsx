@@ -39,7 +39,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link 
-          href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;500;600&display=swap" 
+          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@400;600;800&display=swap" 
           rel="stylesheet" 
         />
       </head>

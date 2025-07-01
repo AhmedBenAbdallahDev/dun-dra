@@ -99,7 +99,7 @@ export default function HomePage({ onStartGame }: HomePageProps) {
             <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-2xl shadow-amber-500/20">
               <span className="text-2xl md:text-3xl">🏰</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold medieval-title tracking-wider">
+            <h1 className="text-4xl md:text-6xl font-bold pixel-title">
               MYSTIC CONJURER
             </h1>
           </div>

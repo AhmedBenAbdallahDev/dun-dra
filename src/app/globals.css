@@ -867,29 +867,20 @@
   }
 }
 
-/* Medieval Font Styles */
-.font-medieval {
-  font-family: 'MedievalSharp', serif;
+/* Modern Pixel Font Styles */
+.pixel-title {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
   letter-spacing: 0.1em;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.font-cinzel {
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.05em;
-}
-
-/* Enhanced title styling */
-.medieval-title {
-  font-family: 'MedievalSharp', serif;
-  letter-spacing: 0.15em;
-  text-shadow: 
-    2px 2px 4px rgba(0, 0, 0, 0.8),
-    0 0 20px rgba(251, 191, 36, 0.3),
-    0 0 40px rgba(251, 191, 36, 0.2);
-  background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706, #92400e);
+  background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ef4444, #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
