@@ -167,7 +167,6 @@
 
 /* Mobile Layout */
 @media (max-width: 767px) {
-  /* Reset all fixed heights and overlapping styles */
   .game-controls {
     display: flex !important;
     flex-direction: column !important;
