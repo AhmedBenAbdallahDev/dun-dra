@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useAdventureStore } from '@/stores/adventureStore'
+import { useAdventureStore, type Adventure } from '@/stores/adventureStore'
 import { useUIStore } from '@/stores/uiStore'
 import { Plus, Play, Clock, Heart, Zap, Trash2, Settings } from 'lucide-react'
 import CreateAdventureModal from './CreateAdventureModal'
@@ -169,8 +169,8 @@ export default function HomePage({ onStartGame }: HomePageProps) {
                 : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
             }`}>
               {adventures
-                .sort((a: any, b: any) => b.lastPlayed - a.lastPlayed)
-                .map((adventure: any) => (
+                .sort((a: Adventure, b: Adventure) => b.lastPlayed - a.lastPlayed)
+                .map((adventure: Adventure) => (
                   <div
                     key={adventure.id}
                     onClick={() => handleResumeAdventure(adventure.id)}
