@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       provider = 'openrouter',
       apiKey = '',
       baseURL = 'https://openrouter.ai/api/v1',
-      model = 'meta-llama/llama-3.1-8b-instruct:free',
+      model = 'openrouter/cypher-alpha:free',
       useCustomModel = false,
       customModelName = ''
     } = config || {};

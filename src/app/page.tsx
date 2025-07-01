@@ -61,7 +61,7 @@ export default function Home() {
           provider: 'openrouter',
           apiKey: '',
           customEndpoint: '',
-          model: 'anthropic/claude-3.5-sonnet',
+          model: 'openrouter/cypher-alpha:free',
           useCustomModel: false,
           customModelName: '',
           temperature: 0.7,

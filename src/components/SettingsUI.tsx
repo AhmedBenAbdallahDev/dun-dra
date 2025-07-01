@@ -26,7 +26,7 @@ export default function SettingsUI() {
     provider: 'openrouter',
     apiKey: '',
     customEndpoint: '',
-    model: 'anthropic/claude-3.5-sonnet',
+    model: 'openrouter/cypher-alpha:free',
     useCustomModel: false,
     customModelName: '',
     temperature: 0.7,
@@ -52,7 +52,7 @@ export default function SettingsUI() {
   const getDefaultModel = (provider: string) => {
     switch (provider) {
       case 'openrouter':
-        return 'anthropic/claude-3.5-sonnet';
+        return 'openrouter/cypher-alpha:free';
       case 'openai':
         return 'gpt-4';
       case 'groq':
@@ -62,7 +62,7 @@ export default function SettingsUI() {
       case 'custom':
         return 'gpt-3.5-turbo';
       default:
-        return 'anthropic/claude-3.5-sonnet';
+        return 'openrouter/cypher-alpha:free';
     }
   };
 
@@ -141,17 +141,23 @@ export default function SettingsUI() {
       setIsTestingConnection(false);
     }
   };  const openRouterModels = [
-    'anthropic/claude-3.5-sonnet',
-    'anthropic/claude-3-haiku',
-    'openai/gpt-4',
-    'openai/gpt-4-turbo',
-    'openai/gpt-3.5-turbo',
-    'meta-llama/llama-3.1-8b-instruct',
-    'mistralai/mistral-7b-instruct',
-    'google/gemini-pro',
+    // Free models
+    'openrouter/cypher-alpha:free',
+    'meta-llama/llama-3.1-8b-instruct:free',
+    'meta-llama/llama-3.1-70b-instruct:free',
+    'meta-llama/llama-3-8b-instruct:free', 
+    'meta-llama/llama-3-70b-instruct:free',
+    'microsoft/wizardlm-2-8x22b:free',
     'deepseek-ai/deepseek-coder:free',
     'deepseek-ai/deepseek-llm:free',
-    'deepseek/deepseek-chat-v3-0324:free'
+    'deepseek/deepseek-chat-v3-0324:free',
+    'mistralai/mistral-7b-instruct:free',
+    'mistralai/mixtral-8x7b-instruct:free',
+    'huggingfaceh4/zephyr-7b-beta:free',
+    'openchat/openchat-7b:free',
+    'gryphe/mythomix-l2-13b:free',
+    'undi95/toppy-m-7b:free',
+    'koboldai/psyfighter-13b-2:free'
   ];
   if (!settingsWindow) return null;
 
