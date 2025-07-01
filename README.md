@@ -117,7 +117,7 @@ src/
 ## 🔧 Configuration
 
 ### AI Providers
-Configure in Settings panel:
+Configure in Settings panel or via environment variables:
 
 **OpenRouter (Recommended)**
 - Get API key from [OpenRouter](https://openrouter.ai)
@@ -129,15 +129,38 @@ Configure in Settings panel:
 - Requires OpenAI API key
 - Premium model access
 
+**Groq**
+- Ultra-fast inference speeds
+- Get API key from [Groq Console](https://console.groq.com/keys)
+- Supports Llama, Mixtral, and Gemma models
+
+**Google Gemini**
+- Google's latest AI models
+- Get API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+- Fast and capable responses
+
 **Custom/Local**
 - Bring your own API endpoint
 - Local model support (Ollama, etc.)
 - Complete control over AI backend
 
-### Environment Variables (Optional)
+### Environment Variables
+You can set API keys via environment variables (create `.env.local` file):
 ```bash
+# AI Provider API Keys (optional - will fallback to user input)
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+OPENAI_API_KEY=sk-your-openai-key-here
+GROQ_API_KEY=gsk_your-groq-key-here
+GEMINI_API_KEY=AIza-your-gemini-key-here
+CUSTOM_AI_API_KEY=your-custom-key-here
+
+# App configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Priority**: User-provided keys > Environment variables
+
+Copy `.env.example` to `.env.local` and add your keys.
 
 ## 📱 Platform Support
 

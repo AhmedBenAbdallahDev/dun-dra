@@ -15,12 +15,41 @@ export async function POST(request: NextRequest) {
     
     currentProvider = provider;
     
+    // Get API key - use user provided key if available, otherwise fallback to environment variables
+    const getAPIKey = () => {
+      if (apiKey && apiKey.trim() !== '') {
+        return apiKey; // Use user-provided key
+      }
+      
+      // Fallback to environment variables based on provider
+      switch (provider) {
+        case 'openrouter':
+          return process.env.OPENROUTER_API_KEY || '';
+        case 'openai':
+          return process.env.OPENAI_API_KEY || '';
+        case 'groq':
+          return process.env.GROQ_API_KEY || '';
+        case 'gemini':
+          return process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
+        case 'custom':
+          return process.env.CUSTOM_AI_API_KEY || '';
+        default:
+          return '';
+      }
+    };
+    
+    const finalApiKey = getAPIKey();
+    
     // Use custom model name if enabled
     const actualModel = useCustomModel && customModelName ? customModelName : model;
 
-    if (!apiKey && provider !== 'local') {
+    if (!finalApiKey && provider !== 'local') {
       return NextResponse.json(
-        { error: 'API key is required for external providers' },
+        { 
+          error: `API key is required for ${provider}. Please provide an API key or set the environment variable: ${provider.toUpperCase()}_API_KEY`,
+          provider,
+          envVar: `${provider.toUpperCase()}_API_KEY`
+        },
         { status: 400 }
       );
     }
@@ -33,24 +62,24 @@ export async function POST(request: NextRequest) {
     switch (provider) {
       case 'openrouter':
         url = `${baseURL}/chat/completions`;
-        headers['Authorization'] = `Bearer ${apiKey}`;
+        headers['Authorization'] = `Bearer ${finalApiKey}`;
         headers['HTTP-Referer'] = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         headers['X-Title'] = 'Mythic Conjurer';
         break;
       
       case 'openai':
         url = `${baseURL}/chat/completions`;
-        headers['Authorization'] = `Bearer ${apiKey}`;
+        headers['Authorization'] = `Bearer ${finalApiKey}`;
         break;
       
       case 'groq':
         url = `${baseURL}/chat/completions`;
-        headers['Authorization'] = `Bearer ${apiKey}`;
+        headers['Authorization'] = `Bearer ${finalApiKey}`;
         break;
       
       case 'gemini':
         // Gemini uses a different API structure
-        url = `${baseURL}/models/${actualModel}:generateContent?key=${apiKey}`;
+        url = `${baseURL}/models/${actualModel}:generateContent?key=${finalApiKey}`;
         delete headers['Authorization']; // Gemini uses key in URL
         break;
       
@@ -60,8 +89,8 @@ export async function POST(request: NextRequest) {
       
       case 'custom':
         url = `${baseURL}/chat/completions`;
-        if (apiKey) {
-          headers['Authorization'] = `Bearer ${apiKey}`;
+        if (finalApiKey) {
+          headers['Authorization'] = `Bearer ${finalApiKey}`;
         }
         break;
       
@@ -70,14 +99,28 @@ export async function POST(request: NextRequest) {
           { error: 'Unsupported AI provider' },
           { status: 400 }
         );
-    }    let body: any;
+    }    let body: {
+      model?: string;
+      messages?: any[];
+      temperature?: number;
+      max_tokens?: number;
+      contents?: Array<{
+        parts: Array<{
+          text: string;
+        }>;
+      }>;
+      generationConfig?: {
+        temperature: number;
+        maxOutputTokens: number;
+      };
+    };
     
     if (provider === 'gemini') {
       // Gemini API format
       body = {
         contents: [{
           parts: [{
-            text: messages.map(msg => `${msg.role}: ${msg.content}`).join('\n\n')
+            text: messages.map((msg: any) => `${msg.role}: ${msg.content}`).join('\n\n')
           }]
         }],
         generationConfig: {

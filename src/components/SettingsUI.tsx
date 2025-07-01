@@ -247,24 +247,33 @@ export default function SettingsUI() {
                       type="password"
                       value={aiConfig.apiKey}
                       onChange={(e) => setAIConfig({ ...aiConfig, apiKey: e.target.value })}
-                      placeholder={aiConfig.provider === 'openrouter' ? 'sk-or-v1-...' : 'Enter API key'}
+                      placeholder={
+                        aiConfig.provider === 'openrouter' ? 'sk-or-v1-... (optional if OPENROUTER_API_KEY set)' :
+                        aiConfig.provider === 'openai' ? 'sk-... (optional if OPENAI_API_KEY set)' :
+                        aiConfig.provider === 'groq' ? 'gsk_... (optional if GROQ_API_KEY set)' :
+                        aiConfig.provider === 'gemini' ? 'AIza... (optional if GEMINI_API_KEY set)' :
+                        'Enter API key'
+                      }
                       className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                     />
                     <p className="text-xs text-slate-400">
                       {aiConfig.provider === 'openrouter' && (
-                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a></>
+                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a> or set OPENROUTER_API_KEY env var</>
                       )}
                       {aiConfig.provider === 'openai' && (
-                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a></>
+                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a> or set OPENAI_API_KEY env var</>
                       )}
                       {aiConfig.provider === 'groq' && (
-                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a></>
+                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a> or set GROQ_API_KEY env var</>
                       )}
                       {aiConfig.provider === 'gemini' && (
-                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a></>
+                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a> or set GEMINI_API_KEY env var</>
                       )}
-                      {aiConfig.provider === 'custom' && 'API key for your endpoint'}
+                      {aiConfig.provider === 'custom' && 'API key for your endpoint or set CUSTOM_AI_API_KEY env var'}
                     </p>
+                    <div className="bg-slate-700/50 p-2 rounded text-xs text-slate-300">
+                      💡 <strong>Tip:</strong> Leave empty to use environment variables. User keys override env vars.
+                    </div>
                   </div>
 
                   {/* Custom Endpoint */}
