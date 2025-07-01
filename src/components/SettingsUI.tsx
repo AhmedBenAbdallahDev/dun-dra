@@ -48,6 +48,24 @@ export default function SettingsUI() {
     'gemini-1.5-flash',
   ];
 
+  // Function to get default model for each provider
+  const getDefaultModel = (provider: string) => {
+    switch (provider) {
+      case 'openrouter':
+        return 'anthropic/claude-3.5-sonnet';
+      case 'openai':
+        return 'gpt-4';
+      case 'groq':
+        return 'llama3-70b-8192';
+      case 'gemini':
+        return 'gemini-1.5-pro';
+      case 'custom':
+        return 'gpt-3.5-turbo';
+      default:
+        return 'anthropic/claude-3.5-sonnet';
+    }
+  };
+
   const [testResult, setTestResult] = useState<string>('');
   const [isTestingConnection, setIsTestingConnection] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -193,7 +211,11 @@ export default function SettingsUI() {
                   <div className="space-y-2">
                     <Label className="text-slate-200 text-sm font-medium">AI Provider</Label>                    <Select
                       value={aiConfig.provider}
-                      onValueChange={(value) => setAIConfig({ ...aiConfig, provider: value as typeof aiConfig.provider })}
+                      onValueChange={(value) => setAIConfig({ 
+                        ...aiConfig, 
+                        provider: value as typeof aiConfig.provider,
+                        model: getDefaultModel(value) // Set appropriate default model
+                      })}
                     >
                       <SelectTrigger className="bg-slate-800/60 border-slate-700 text-slate-200 h-9">
                         <SelectValue />

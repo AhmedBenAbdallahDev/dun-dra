@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  let currentProvider = 'unknown';
   try {
     const { messages, config } = await request.json();    // Get AI configuration
     const {
@@ -11,6 +12,8 @@ export async function POST(request: NextRequest) {
       useCustomModel = false,
       customModelName = ''
     } = config || {};
+    
+    currentProvider = provider;
     
     // Use custom model name if enabled
     const actualModel = useCustomModel && customModelName ? customModelName : model;
@@ -40,6 +43,17 @@ export async function POST(request: NextRequest) {
         headers['Authorization'] = `Bearer ${apiKey}`;
         break;
       
+      case 'groq':
+        url = `${baseURL}/chat/completions`;
+        headers['Authorization'] = `Bearer ${apiKey}`;
+        break;
+      
+      case 'gemini':
+        // Gemini uses a different API structure
+        url = `${baseURL}/models/${actualModel}:generateContent?key=${apiKey}`;
+        delete headers['Authorization']; // Gemini uses key in URL
+        break;
+      
       case 'local':
         url = `${baseURL}/api/chat`;
         break;
@@ -56,12 +70,30 @@ export async function POST(request: NextRequest) {
           { error: 'Unsupported AI provider' },
           { status: 400 }
         );
-    }    const body = {
-      model: actualModel,
-      messages,
-      temperature: 0.7,
-      max_tokens: 2000,
-    };
+    }    let body: any;
+    
+    if (provider === 'gemini') {
+      // Gemini API format
+      body = {
+        contents: [{
+          parts: [{
+            text: messages.map(msg => `${msg.role}: ${msg.content}`).join('\n\n')
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 2000,
+        }
+      };
+    } else {
+      // OpenAI-compatible format for other providers
+      body = {
+        model: actualModel,
+        messages,
+        temperature: 0.7,
+        max_tokens: 2000,
+      };
+    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -71,24 +103,54 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI API Error:', errorText);
+      console.error(`AI API Error for ${provider}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        url,
+        error: errorText,
+        model: actualModel
+      });
       return NextResponse.json(
-        { error: `AI API request failed: ${response.statusText}` },
+        { 
+          error: `${provider} API request failed: ${response.statusText}`,
+          details: errorText,
+          provider,
+          model: actualModel
+        },
         { status: response.status }
       );
     }
 
     const data = await response.json();
     
-    // Extract the response content
-    const content = data.choices?.[0]?.message?.content || '';
+    // Extract the response content based on provider
+    let content = '';
+    if (provider === 'gemini') {
+      // Gemini response format
+      content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!content) {
+        console.error('Gemini API response missing content:', data);
+        throw new Error('Gemini API response format error');
+      }
+    } else {
+      // OpenAI-compatible response format
+      content = data.choices?.[0]?.message?.content || '';
+      if (!content) {
+        console.error(`${provider} API response missing content:`, data);
+        throw new Error(`${provider} API response format error`);
+      }
+    }
     
     return NextResponse.json({ content });
 
   } catch (error) {
-    console.error('AI API Error:', error);
+    console.error(`AI API Error for ${currentProvider}:`, error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        provider: currentProvider,
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

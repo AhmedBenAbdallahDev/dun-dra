@@ -84,6 +84,8 @@ export default function ActionBox() {
         apiKey: aiConfig.apiKey,
         baseURL: aiConfig.provider === 'custom' ? aiConfig.customEndpoint : 
                  aiConfig.provider === 'openai' ? 'https://api.openai.com/v1' :
+                 aiConfig.provider === 'groq' ? 'https://api.groq.com/openai/v1' :
+                 aiConfig.provider === 'gemini' ? 'https://generativelanguage.googleapis.com/v1beta' :
                  'https://openrouter.ai/api/v1',
         model: aiConfig.useCustomModel ? aiConfig.customModelName : aiConfig.model,
         useCustomModel: aiConfig.useCustomModel,
