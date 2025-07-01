@@ -1,5 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface ChatMessage {
+  role: string;
+  content: string;
+}
+
+interface APIRequestBody {
+  model?: string;
+  messages?: ChatMessage[];
+  temperature?: number;
+  max_tokens?: number;
+  contents?: Array<{
+    parts: Array<{
+      text: string;
+    }>;
+  }>;
+  generationConfig?: {
+    temperature: number;
+    maxOutputTokens: number;
+  };
+}
+
+interface APIResponseData {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+}
+
 export async function POST(request: NextRequest) {
   let currentProvider = 'unknown';
   try {
@@ -99,28 +135,14 @@ export async function POST(request: NextRequest) {
           { error: 'Unsupported AI provider' },
           { status: 400 }
         );
-    }    let body: {
-      model?: string;
-      messages?: any[];
-      temperature?: number;
-      max_tokens?: number;
-      contents?: Array<{
-        parts: Array<{
-          text: string;
-        }>;
-      }>;
-      generationConfig?: {
-        temperature: number;
-        maxOutputTokens: number;
-      };
-    };
+    }    let body: APIRequestBody;
     
     if (provider === 'gemini') {
       // Gemini API format
       body = {
         contents: [{
           parts: [{
-            text: messages.map((msg: any) => `${msg.role}: ${msg.content}`).join('\n\n')
+            text: messages.map((msg: ChatMessage) => `${msg.role}: ${msg.content}`).join('\n\n')
           }]
         }],
         generationConfig: {
@@ -164,7 +186,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data = await response.json();
+    const data: APIResponseData = await response.json();
     
     // Extract the response content based on provider
     let content = '';
