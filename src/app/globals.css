@@ -165,9 +165,9 @@
   flex: 1;
 }
 
-/* Ensure game-master is properly closed */
-
-/* Mobile layout - Clean and organized */
+/* ================================
+   MOBILE LAYOUT - CLEAN VERSION
+   ================================ */
 @media (max-width: 767px) {
   /* Reset all fixed heights and overlapping styles */
   .game-controls {
