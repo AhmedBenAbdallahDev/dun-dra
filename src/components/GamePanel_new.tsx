@@ -32,7 +32,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleMouseMove = (event: React.MouseEvent, item: CharacterItem) => {
-    setShowDescription(true);
+    setShowDescription('block');
     // You can add position logic here for tooltip
     
     // Set description data
@@ -51,7 +51,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const hideWindow = () => {
-    setShowDescription(false);
+    setShowDescription('none');
   };
 
   const isDisabled = (item: CharacterItem): boolean => {
