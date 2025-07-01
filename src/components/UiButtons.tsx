@@ -337,47 +337,64 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Brand */}
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
                 Mythic Conjurer
               </h1>
               
-              {/* Enhanced Quick Stats Bar with animations */}
-              <div className="hidden md:flex items-center space-x-3">
-                {/* Health with progress bar */}
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-red-600/30 hover:border-red-500/50 transition-all group">
-                  <Heart className="h-4 w-4 text-red-400 group-hover:animate-pulse" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm">
-                      <span className="text-red-400 font-medium">{stats.hp}</span>
-                      <span className="text-slate-500">/</span>
-                      <span className="text-slate-300">{stats.maxHp}</span>
-                    </span>
-                    <div className="w-16 h-1 bg-red-900/50 rounded-full overflow-hidden mt-0.5">
-                      <div 
-                        className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100))}%` }}
-                      ></div>
-                    </div>
+              {/* Quick Stats Bar - Compact mobile version */}
+              <div className="flex items-center space-x-1 md:space-x-3">
+                {/* Mobile: Compact stats */}
+                <div className="md:hidden flex items-center space-x-1">
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-red-600/30">
+                    <Heart className="h-3 w-3 text-red-400" />
+                    <span className="text-red-400">{stats.hp}</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-blue-600/30">
+                    <Zap className="h-3 w-3 text-blue-400" />
+                    <span className="text-blue-400">{stats.mp}</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-slate-700">
+                    <Coins className="h-3 w-3 text-yellow-400" />
+                    <span className="text-yellow-400">{gold}</span>
                   </div>
                 </div>
                 
-                {/* Mana with progress bar */}
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-blue-600/30 hover:border-blue-500/50 transition-all group">
-                  <Zap className="h-4 w-4 text-blue-400" />
-                  <span className="text-sm">
-                    <span className="text-blue-400 font-medium">{stats.mp}</span>
-                    <span className="text-slate-500">/</span>
-                    <span className="text-slate-300">{stats.maxMp}</span>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                  <Coins className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm text-yellow-400 font-medium">{gold}</span>
+                {/* Desktop: Full stats with progress bars */}
+                <div className="hidden md:flex items-center space-x-3">
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-red-600/30 hover:border-red-500/50 transition-all group">
+                    <Heart className="h-4 w-4 text-red-400 group-hover:animate-pulse" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm">
+                        <span className="text-red-400 font-medium">{stats.hp}</span>
+                        <span className="text-slate-500">/</span>
+                        <span className="text-slate-300">{stats.maxHp}</span>
+                      </span>
+                      <div className="w-16 h-1 bg-red-900/50 rounded-full overflow-hidden mt-0.5">
+                        <div 
+                          className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100))}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-blue-600/30 hover:border-blue-500/50 transition-all group">
+                    <Zap className="h-4 w-4 text-blue-400" />
+                    <span className="text-sm">
+                      <span className="text-blue-400 font-medium">{stats.mp}</span>
+                      <span className="text-slate-500">/</span>
+                      <span className="text-slate-300">{stats.maxMp}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <Coins className="h-4 w-4 text-yellow-400" />
+                    <span className="text-sm text-yellow-400 font-medium">{gold}</span>
+                  </div>
                 </div>
               </div>
-            </div>            {/* Action Buttons */}
-            <div className="flex items-center space-x-2 md:space-x-3">
+            </div>            {/* Action Buttons - Compact mobile layout */}
+            <div className="flex items-center space-x-1 md:space-x-3">
               {/* Character Actions - Hidden on mobile, shown in menu */}
               <div className="hidden md:flex items-center space-x-2">
                 <Button
@@ -404,25 +421,25 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                 </Button>
               </div>
               
-              {/* Game Actions */}
+              {/* Game Actions - Compact on mobile */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleOpenShop}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg"
+                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg px-2 md:px-4"
               >
-                <Store className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Shop</span>
+                <Store className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Shop</span>
               </Button>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleSettingsWindow}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg"
+                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg px-2 md:px-4"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Settings</span>
+                <Settings className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Settings</span>
               </Button>              {/* Enhanced Menu Button with mobile improvements */}
               <Button
                 variant="ghost"

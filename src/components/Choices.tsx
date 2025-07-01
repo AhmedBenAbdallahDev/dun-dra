@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGameStore, useMiscStore } from '@/stores';
 import { useUIStore } from '@/stores/uiStore';
 
@@ -143,13 +143,13 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
   }
 
   return (
-    <div className="choices w-full space-y-3">
-      {/* Instruction hint for new players */}
-      <div className="text-center text-slate-400 text-xs mb-2 bg-slate-900/40 rounded-lg p-2 border border-amber-500/20 backdrop-blur-sm">
-        💡 <span className="text-amber-400">Choose an option below</span> to continue your adventure
+    <div className="choices w-full space-y-2">
+      {/* Instruction hint for new players - Compact */}
+      <div className="text-center text-slate-400 text-xs bg-slate-900/40 rounded-lg p-2 border border-amber-500/20">
+        💡 <span className="text-amber-400">Choose an option</span> to continue
       </div>
 
-      {/* Choice buttons */}
+      {/* Choice buttons - Compact mobile design */}
       {choices.map((choice, index) => {
         const isSelected = selectedChoice === index;
         const isDisabled = loading || isProcessing;
@@ -158,24 +158,19 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
           <button
             key={index}
             disabled={isDisabled}
-            className={`choice-button w-full bg-slate-900/60 backdrop-blur-sm hover:bg-slate-800/70 
-                       border rounded-xl p-4 text-left transition-all duration-300
-                       disabled:cursor-not-allowed text-sm md:text-base
-                       group relative overflow-hidden
+            className={`choice-button w-full bg-slate-900/60 hover:bg-slate-800/70 
+                       border rounded-lg p-3 md:p-4 text-left transition-all duration-300
+                       disabled:cursor-not-allowed text-sm group relative overflow-hidden min-h-[44px]
                        ${isSelected 
-                         ? 'border-emerald-500 bg-emerald-900/30 text-emerald-200 transform scale-[1.02] shadow-emerald-500/20 shadow-lg' 
+                         ? 'border-emerald-500 bg-emerald-900/30 text-emerald-200 transform scale-[1.02] shadow-lg' 
                          : isDisabled 
                            ? 'border-slate-600/30 text-slate-400 opacity-50'
-                           : 'border-slate-600/50 text-slate-200 hover:text-white hover:border-amber-500/70 hover:bg-amber-900/20 hover:shadow-amber-500/10 hover:shadow-lg'
+                           : 'border-slate-600/50 text-slate-200 hover:text-white hover:border-amber-500/70 hover:bg-amber-900/20'
                        }`}
             onClick={() => handleChoiceClick(choice, index)}
-            style={{
-              animationDelay: `${index * 100}ms`,
-              animation: 'fadeInUp 0.6s ease-out forwards'
-            }}
           >
-            {/* Choice number indicator */}
-            <div className={`absolute left-2 top-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold
+            {/* Choice number indicator - Smaller */}
+            <div className={`absolute left-2 top-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold
                            ${isSelected 
                              ? 'bg-emerald-500 text-white' 
                              : 'bg-slate-700 text-slate-300 group-hover:bg-amber-500 group-hover:text-white'
@@ -183,54 +178,50 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
               {index + 1}
             </div>
             
-            {/* Choice text */}
-            <div className="ml-8 pr-2">
+            {/* Choice text - More compact */}
+            <div className="ml-7 pr-2 leading-tight">
               {choice}
             </div>
             
             {/* Loading indicator for selected choice */}
             {isSelected && isProcessing && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="w-4 h-4 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full animate-spin"></div>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                <div className="w-3 h-3 border-2 border-emerald-300/30 border-t-emerald-300 rounded-full animate-spin"></div>
               </div>
             )}
             
             {/* Hover arrow indicator */}
             {!isSelected && !isDisabled && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-amber-400">→</span>
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-amber-400 text-sm">→</span>
               </div>
             )}
           </button>
         );
       })}
       
-      {/* Custom input */}
+      {/* Custom input - Compact */}
       {choices.length >= 1 && (
-        <div className="choice-input bg-slate-900/50 backdrop-blur-sm border border-blue-500/30 rounded-xl p-3 transition-all duration-300 shadow-lg"
-             style={{
-               animationDelay: `${choices.length * 100}ms`,
-               animation: 'fadeInUp 0.6s ease-out forwards'
-             }}>
+        <div className="choice-input bg-slate-900/50 border border-blue-500/30 rounded-lg p-2 md:p-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-blue-400 text-xs font-medium">💭 Custom Response:</span>
-            <span className="text-slate-500 text-xs">({interactivePoints} points left)</span>
+            <span className="text-blue-400 text-xs font-medium">💭 Custom:</span>
+            <span className="text-slate-500 text-xs">({interactivePoints} left)</span>
           </div>
           
           <div className="flex items-center gap-2">
             <input
               type="text"
               value={customInput}
-              onChange={(e) => setCustomInput(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Write your own creative answer..."
-              className="flex-1 bg-slate-800/50 border border-slate-600/30 rounded-lg px-3 py-2 outline-none text-slate-200 placeholder-slate-400 text-sm md:text-base focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30 transition-all backdrop-blur-sm"
+              placeholder="Write your own answer..."
+              className="flex-1 bg-slate-800/50 border border-slate-600/30 rounded-lg px-3 py-2 outline-none text-slate-200 placeholder-slate-400 text-sm focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30 transition-all min-h-[40px]"
               disabled={loading || isProcessing}
             />
             <button
               onClick={handleCustomAnswer}
               disabled={loading || isProcessing || !customInput.trim() || interactivePoints <= 0}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-2 shadow-lg hover:shadow-blue-500/20"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95 flex items-center gap-1 min-h-[40px]"
             >
               {isProcessing ? (
                 <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -242,7 +233,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
           </div>
           
           <div className="text-xs text-slate-500 mt-1">
-            💡 Creative answers cost 1 interactive point
+            💡 Creative answers cost 1 point
           </div>
         </div>
       )}

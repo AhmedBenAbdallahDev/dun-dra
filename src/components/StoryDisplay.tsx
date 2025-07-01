@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGameStore } from '@/stores';
 import { useMiscStore } from '@/stores/miscStore';
 
@@ -13,7 +13,7 @@ export default function StoryDisplay() {
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
-        setDots(prev => prev.length >= 3 ? '.' : prev + '.');
+        setDots((prev: string) => prev.length >= 3 ? '.' : prev + '.');
       }, 500);
       return () => clearInterval(interval);
     }
@@ -35,26 +35,26 @@ export default function StoryDisplay() {
   }, [gameData.story]);
 
   return (
-    <div className="story-display w-full h-full flex flex-col bg-gradient-to-br from-slate-800/90 via-slate-900/95 to-gray-900/90 backdrop-blur-sm rounded-xl border border-amber-500/20 shadow-2xl overflow-hidden">
+    <div className="story-display w-full h-full flex flex-col bg-gradient-to-br from-slate-800/90 via-slate-900/95 to-gray-900/90 rounded-lg border border-amber-500/20 shadow-xl overflow-hidden">
       {gameData.story && !loading ? (
         <div className="story-content flex flex-col h-full">
-          {/* Story Header */}
-          <div className="flex items-center gap-3 p-4 md:p-6 pb-3 border-b border-amber-500/20 bg-gradient-to-r from-amber-900/20 to-orange-900/20">
+          {/* Story Header - Compact */}
+          <div className="flex items-center gap-2 p-2 md:p-3 border-b border-amber-500/20 bg-gradient-to-r from-amber-900/20 to-orange-900/20">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">📜</span>
-              <span className="text-amber-400 text-sm md:text-base font-semibold tracking-wide">Your Adventure</span>
+              <span className="text-lg">📜</span>
+              <span className="text-amber-400 text-sm font-semibold">Adventure</span>
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-amber-400/50 via-orange-400/30 to-transparent"></div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-              <span className="text-emerald-400 text-xs font-medium">LIVE</span>
+              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+              <span className="text-emerald-400 text-xs">LIVE</span>
             </div>
           </div>
           
-          {/* Story Content - No scrolling, adaptive height */}
-          <div className="flex-1 p-4 md:p-6 min-h-0">
+          {/* Story Content - Maximized for text */}
+          <div className="flex-1 p-3 md:p-4 min-h-0">
             <div className="relative h-full">
-              <p className="text-slate-100 text-sm md:text-base lg:text-lg leading-relaxed whitespace-pre-wrap h-full overflow-hidden">
+              <p className="text-slate-100 text-sm md:text-base leading-relaxed whitespace-pre-wrap h-full overflow-y-auto">
                 {gameData.story}
               </p>
               
