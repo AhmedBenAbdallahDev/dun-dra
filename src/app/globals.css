@@ -136,7 +136,7 @@
   height: 100vh;
   width: 100%;
   padding: 0.5rem;
-  overflow: auto; /* Enable scrolling */
+  overflow: auto;
 }
 
 .game-master {
@@ -165,9 +165,7 @@
   flex: 1;
 }
 
-/* ================================
-   MOBILE LAYOUT - CLEAN VERSION
-   ================================ */
+/* Mobile Layout */
 @media (max-width: 767px) {
   /* Reset all fixed heights and overlapping styles */
   .game-controls {
