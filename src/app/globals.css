@@ -134,11 +134,13 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
   gap: 1rem;
   height: 100vh;
   width: 100%;
   padding: 0.5rem;
   overflow: auto;
+  background: transparent;
 }
 
 .game-master {
@@ -153,7 +155,7 @@
   border: 1px solid rgba(251, 191, 36, 0.2);
   font-size: 0.875rem;
   color: #f1f5f9;
-  overflow: hidden;
+  overflow-y: auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -165,6 +167,52 @@
   gap: 0.75rem;
   height: 50%;
   flex: 1;
+}
+
+.choices {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.choices h2 {
+  color: #f1f5f9;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.choices-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.choice-button {
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.7);
+  color: #f1f5f9;
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.choice-button:hover,
+.choice-button:active {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  transform: scale(0.98);
 }
 
 /* Mobile Layout */
@@ -234,69 +282,210 @@
   flex: 1;
 }
 
-/* Desktop Layout - Landscape/Larger Screens */
+/* Desktop Layout - Landscape/Larger Screens - IMPROVED DYNAMIC LAYOUT */
 @media (min-width: 768px) {
   .main-game {
     gap: 2rem;
-    height: 95vh;
-    padding: 1rem;
+    height: 100vh;
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
   }
   
   .game-master {
-    width: 70%;
-    height: 35%;
-    padding: 1rem 1.5rem;
-    border-radius: 1rem;
-    font-size: 1rem;
+    width: 90%;
+    max-width: 1200px;
+    height: 40%;
+    padding: 2rem 3rem;
+    border-radius: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0 auto;
   }
   
   .game-controls {
     display: flex;
     flex-direction: row;
-    width: 70%;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.5rem;
-    height: 40%;
+    width: 90%;
+    max-width: 1200px;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2rem;
+    height: 50%;
+    margin: 0 auto;
   }
   
   .panel-container {
     display: block;
-    width: 22%;
+    width: 280px;
+    min-width: 260px;
+    max-width: 320px;
     height: 100%;
+    flex-shrink: 0;
   }
   
   .choices {
-    width: 50%;
+    flex: 1;
+    min-width: 400px;
+    max-width: 800px;
     height: 100%;
+    margin: 0 1rem;
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Center choices content */
+  .choices h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #60a5fa;
+    margin-bottom: 1.5rem;
+  }
+  
+  .choices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    justify-content: center;
+    max-width: 100%;
+  }
+  
+  .choice-button {
+    min-height: 60px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.8);
+    color: #f1f5f9;
+    border: 2px solid rgba(100, 116, 139, 0.5);
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .choice-button:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
   }
 }
 
-/* Large Desktop Layout */
+/* Large Desktop Layout - ULTRAWIDE AND 4K OPTIMIZED */
 @media (min-width: 1024px) {
   .main-game {
     gap: 3rem;
+    padding: 2rem;
+    max-width: 1800px;
   }
   
   .game-master {
-    width: 65%;
-    height: 30%;
-    padding: 1.5rem 2rem;
-    font-size: 1.1rem;
+    width: 85%;
+    max-width: 1400px;
+    height: 35%;
+    padding: 2.5rem 4rem;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    border-radius: 2rem;
   }
   
   .game-controls {
-    width: 65%;
-    gap: 2rem;
-    height: 35%;
+    width: 85%;
+    max-width: 1400px;
+    gap: 3rem;
+    height: 55%;
   }
   
   .panel-container {
-    width: 25%;
+    width: 320px;
+    min-width: 300px;
+    max-width: 360px;
   }
   
   .choices {
-    width: 45%;
+    min-width: 500px;
+    max-width: 900px;
+    padding: 2.5rem;
+    border-radius: 2rem;
+  }
+  
+  .choices h2 {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  
+  .choices-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .choice-button {
+    min-height: 70px;
+    padding: 1.25rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 15px;
+  }
+  
+  /* Enhanced game panels for desktop */
+  .game-panel-box {
+    padding: 1.5rem;
+    border-radius: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .game-panel-box h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .action-button {
+    min-height: 56px;
+    min-width: 56px;
+  }
+}
+
+/* Ultra-wide Desktop Layout */
+@media (min-width: 1440px) {
+  .main-game {
+    max-width: 2000px;
+    padding: 3rem;
+  }
+  
+  .game-master {
+    max-width: 1600px;
+    font-size: 1.3rem;
+    padding: 3rem 5rem;
+  }
+  
+  .game-controls {
+    max-width: 1600px;
+    gap: 4rem;
+  }
+  
+  .panel-container {
+    width: 360px;
+    max-width: 400px;
+  }
+  
+  .choices {
+    max-width: 1000px;
+    padding: 3rem;
+  }
+  
+  .choices-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+  
+  .choice-button {
+    min-height: 80px;
+    padding: 1.5rem 2.5rem;
+    font-size: 1.2rem;
   }
 }
 
@@ -972,4 +1161,123 @@
   0%, 100% { background-position: 0% 50%; }
   33% { background-position: 50% 50%; }
   66% { background-position: 100% 50%; }
+}
+
+/* Desktop Panel Improvements - Better Spacing and Layout */
+@media (min-width: 768px) {
+  .panel-container {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(100, 116, 139, 0.4);
+    border-radius: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+  }
+  
+  .game-panel-box {
+    background: transparent;
+    border: none;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .game-panel-box h3 {
+    font-size: 1rem;
+    color: #60a5fa;
+    text-align: center;
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(100, 116, 139, 0.3);
+  }
+  
+  .action-button {
+    min-height: 48px;
+    min-width: 48px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(100, 116, 139, 0.4);
+  }
+  
+  .action-button:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* HP/MP bars for desktop */
+  .hp-bar, .mp-bar {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    backdrop-filter: blur(4px);
+  }
+  
+  .hp-bar {
+    background: linear-gradient(90deg, 
+      rgba(239, 68, 68, 0.8) 0%, 
+      rgba(239, 68, 68, 0.6) var(--hp-percentage, 100%), 
+      rgba(239, 68, 68, 0.2) var(--hp-percentage, 100%)
+    );
+    border: 1px solid rgba(239, 68, 68, 0.5);
+  }
+  
+  .mp-bar {
+    background: linear-gradient(90deg, 
+      rgba(59, 130, 246, 0.8) 0%, 
+      rgba(59, 130, 246, 0.6) var(--mp-percentage, 100%), 
+      rgba(59, 130, 246, 0.2) var(--mp-percentage, 100%)
+    );
+    border: 1px solid rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Desktop-specific choice enhancements */
+@media (min-width: 768px) {
+  .choices::before {
+    content: "⚔️ Choose Your Action";
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    color: #60a5fa;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+}
+
+/* Ensure desktop layout doesn't interfere with mobile */
+@media (min-width: 768px) {
+  /* Reset mobile-specific overrides for desktop */
+  .game-controls {
+    overflow: visible !important;
+  }
+  
+  .panel-container {
+    order: unset !important;
+    margin: 0 !important;
+  }
+  
+  .choices {
+    order: unset !important;
+  }
+  
+  .game-panel-box:not(.expanded) .action-button {
+    display: block !important;
+  }
+  
+  .game-panel-box .panel-content.hidden,
+  .game-panel-box:not(.expanded) .panel-content {
+    display: block !important;
+  }
 }
