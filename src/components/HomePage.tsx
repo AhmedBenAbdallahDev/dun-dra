@@ -96,10 +96,6 @@ export default function HomePage({ onStartGame }: HomePageProps) {
         {/* Header */}
         <div className="text-center mb-6 md:mb-8 relative">
           <div className="flex items-center justify-center gap-3 mb-4">
-            {/* Mobile only castle icon */}
-            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-2xl shadow-amber-500/20 md:hidden">
-              <span className="text-2xl">🏰</span>
-            </div>
             <div className="text-center">
               <h1 className="text-4xl md:text-6xl font-bold modern-title">
                 Mystic Conjurer

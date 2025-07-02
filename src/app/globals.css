@@ -598,22 +598,42 @@
   .panel-container {
     display: block !important;
     visibility: visible !important;
-    min-height: 140px !important;
+    min-height: 60px !important;
+    max-height: 150px !important;
     width: 100% !important;
+    background: rgba(17, 24, 39, 0.9) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(75, 85, 99, 0.5) !important;
+    margin: 4px 0 !important;
   }
   
   .game-panel-box {
-    min-height: 140px !important;
-    padding: 12px !important;
-    gap: 8px !important;
+    min-height: 50px !important;
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    background: transparent !important;
+    transition: all 0.3s ease !important;
   }
   
+  .game-panel-box h3 {
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    padding: 4px 0 !important;
+    color: #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  
+  /* Action buttons in mobile panels */
   .action-button {
-    min-height: 48px !important;
-    min-width: 48px !important;
+    min-height: 40px !important;
+    min-width: 40px !important;
     touch-action: manipulation !important;
+    margin: 2px !important;
   }
   
+  /* Selected state more visible on mobile */
   .action-button.selected {
     background: linear-gradient(135deg, rgba(0, 102, 204, 0.8) 0%, rgba(0, 136, 255, 0.6) 100%) !important;
     border: 2px solid #0088ff !important;
@@ -637,6 +657,26 @@
     font-size: 10px;
     font-weight: bold;
   }
+  
+  /* Ensure collapsed panels show only header */
+  .game-panel-box:not(.expanded) .action-button {
+    display: none !important;
+  }
+  
+  .game-panel-box .panel-content.hidden {
+    display: none !important;
+  }
+  
+  .game-panel-box:not(.expanded) .panel-content {
+    display: none !important;
+  }
+  
+  /* HP/MP bars in mobile */
+  .hp-bar, .mp-bar {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+    margin-bottom: 4px !important;
+  }
 }
 
 /* MOBILE LAYOUT - COMPLETELY REDESIGNED FOR CHOICES VISIBILITY */
@@ -656,7 +696,7 @@
   }
   
   .game-master {
-    height: 35% !important;
+    height: 40% !important;
     padding: 1rem !important;
     font-size: 1rem !important;
     border-radius: 0 !important;
@@ -665,35 +705,44 @@
   }
   
   .game-controls {
-    height: 65% !important;
+    height: 60% !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 8px !important;
-    gap: 4px !important;
+    gap: 8px !important;
     overflow-y: auto !important;
   }
   
-  /* CHOICES FIRST AND PROMINENT */
+  /* CHOICES FIRST AND PROMINENT - FIXED HEIGHT TO PREVENT OVERLAP */
   .choices {
     order: 0 !important;
     flex: 1 !important;
-    min-height: 200px !important;
-    max-height: none !important;
+    min-height: 220px !important;
+    max-height: 300px !important;
     width: 100% !important;
     margin: 0 !important;
-    background: rgba(30, 41, 59, 0.8) !important;
+    background: rgba(30, 41, 59, 0.9) !important;
     border-radius: 12px !important;
     padding: 16px !important;
-    border: 2px solid rgba(59, 130, 246, 0.3) !important;
+    border: 2px solid rgba(59, 130, 246, 0.5) !important;
+    overflow-y: auto !important;
+    z-index: 10 !important;
+    position: relative !important;
   }
   
-  /* PANELS AS COMPACT STRIPS AT BOTTOM */
+  /* PANELS AS COMPACT STRIPS AT BOTTOM - COLLAPSED BY DEFAULT */
   .panel-container {
     order: 1 !important;
-    height: 50px !important;
+    height: auto !important;
+    min-height: 60px !important;
+    max-height: 150px !important;
     width: 100% !important;
     flex-shrink: 0 !important;
-    margin: 2px 0 !important;
+    margin: 4px 0 !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    z-index: 5 !important;
+    position: relative !important;
   }
   
   .panel-container:first-child {
@@ -702,6 +751,23 @@
   
   .panel-container:last-child {
     order: 2 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  /* When panel is expanded, ensure it doesn't cover choices */
+  .game-panel-box.expanded {
+    max-height: 120px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Collapsed state shows only header */
+  .game-panel-box:not(.expanded) {
+    height: 50px !important;
+    overflow: hidden !important;
+  }
+  
+  .game-panel-box:not(.expanded) .action-button {
+    display: none !important;
   }
 }
 
@@ -811,36 +877,49 @@
   }
   
   .choices::before {
-    content: "📋 CHOOSE YOUR ACTION" !important;
+    content: "🎯 CHOOSE YOUR ACTION" !important;
     display: block !important;
     text-align: center !important;
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     color: #60a5fa !important;
+    font-weight: 600 !important;
     margin-bottom: 12px !important;
-    padding: 8px !important;
-    background: rgba(59, 130, 246, 0.1) !important;
-    border-radius: 6px !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    padding: 8px 12px !important;
+    background: rgba(59, 130, 246, 0.15) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
   }
   
   .choice-button {
-    background: rgba(30, 41, 59, 0.8) !important;
-    border: 2px solid rgba(100, 116, 139, 0.5) !important;
+    background: rgba(30, 41, 59, 0.9) !important;
+    border: 2px solid rgba(100, 116, 139, 0.6) !important;
     color: #f1f5f9 !important;
     font-weight: 500 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
   }
   
   .choice-button:hover,
   .choice-button:active {
-    background: rgba(59, 130, 246, 0.2) !important;
-    border-color: rgba(59, 130, 246, 0.7) !important;
+    background: rgba(59, 130, 246, 0.25) !important;
+    border-color: rgba(59, 130, 246, 0.8) !important;
     transform: scale(0.98) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
   }
   
   /* Make sure choices container has proper spacing */
   .choices-grid {
     margin-top: 8px !important;
+  }
+  
+  /* Clear visual hierarchy: Choices are primary, panels are secondary */
+  .choices {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
+  }
+  
+  .panel-container {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2) !important;
   }
 }
 

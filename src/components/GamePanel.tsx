@@ -15,7 +15,7 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const [isExpanded, setIsExpanded] = useState(false); // Start collapsed
+  const [isExpanded, setIsExpanded] = useState(false); // Always start collapsed
   const [isMobile, setIsMobile] = useState(false);
   
   // Check if mobile on mount and resize
@@ -23,15 +23,19 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 767;
       setIsMobile(mobile);
-      // Auto-collapse on mobile
-      if (mobile && isExpanded) {
+      // Auto-collapse on mobile when screen becomes mobile size
+      if (mobile) {
         setIsExpanded(false);
+      } else {
+        // On desktop, expand by default
+        setIsExpanded(true);
       }
     };
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
-  }, [isExpanded]);
+  }, []);
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
   const { setErrorMessage, setShowDescription } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
@@ -556,23 +560,27 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       <div 
         className={`game-panel-box ${isExpanded ? 'expanded' : ''}`}
         onClick={() => {
-          // Only toggle on mobile
+          // Only toggle on mobile and when not clicking action buttons
           if (isMobile) {
             setIsExpanded(!isExpanded);
           }
         }}
-        style={{ cursor: isMobile ? 'pointer' : 'default' }}
+        style={{ 
+          cursor: isMobile ? 'pointer' : 'default',
+          userSelect: 'none' 
+        }}
       >
         <h3>
           {title}
           {isMobile && (
-            <span className="text-xs opacity-70 ml-2">
-              {isExpanded ? '▼ Tap to collapse' : '▶ Tap to expand'}
+            <span className="text-xs opacity-70 ml-2 font-normal">
+              {isExpanded ? '▼ Tap to hide' : '▶ Tap to show'}
             </span>
           )}
         </h3>
-        {actions && actions.length > 0 ? (
-          actions.map((item, index) => {
+        <div className={`panel-content ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+          {actions && actions.length > 0 ? (
+            actions.map((item, index) => {
             const disabled = isDisabled(item);
             const cooldownText = getItemCooldownText(item);
             
@@ -661,14 +669,14 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                     Click to select for combat
                   </div>
                 )}
-              </button>
-            );
-          })
-        ) : (
-          <div className="col-span-3 text-center text-gray-400 text-sm">
-            No {title.toLowerCase()} available
-          </div>
-        )}
+              </button>              );
+            })
+          ) : (
+            <div className="col-span-3 text-center text-gray-400 text-sm">
+              No {title.toLowerCase()} available
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
