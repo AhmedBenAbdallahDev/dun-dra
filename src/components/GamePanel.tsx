@@ -533,6 +533,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         setErrorMessage('You can only sell this item.');
         return;
       }
+    }
   };
 
   return (
