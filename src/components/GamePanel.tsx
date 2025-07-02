@@ -608,11 +608,11 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                     }
                   `}
                   disabled={disabled}
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     handleItemUsage(item);
                   }}
-                  onMouseMove={(event) => handleMouseMove(event, item)}
+                  onMouseMove={(event: React.MouseEvent<HTMLButtonElement>) => handleMouseMove(event, item)}
                   onMouseLeave={hideWindow}
                   title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
                 >
@@ -647,9 +647,9 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   )}
                   
                   {/* Item Count for Stackable Items */}
-                  {(item as any).count && (item as any).count > 1 && (
+                  {item.quantity && item.quantity > 1 && (
                     <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-lg px-1 min-w-[16px] text-center">
-                      {(item as any).count}
+                      {item.quantity}
                     </div>
                   )}
                 </button>
