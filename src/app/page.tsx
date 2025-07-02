@@ -748,28 +748,28 @@ Current game state: ${JSON.stringify(gameData)}`
       {/* Background Images */}
       <BackgroundImgs />
       
-      {/* Main Game UI - Fixed Layout Like Svelte */}
+      {/* Main Game UI - Tailwind Layout */}
       {!death && !isOverlayActive && (
-        <div className={`main-game ${gameData.event.inCombat ? 'pt-16' : ''}`}>
-          {/* Story Display Area - 25% height, centered */}
-          <div className="game-master">
+        <div className={`flex flex-col items-center gap-4 h-screen w-full p-2 overflow-hidden ${gameData.event.inCombat ? 'pt-16' : ''} md:gap-6 md:p-4 max-w-6xl mx-auto`}>
+          {/* Story Display Area */}
+          <div className="w-full h-[45%] md:h-[35%] lg:h-[30%] bg-gradient-to-br from-slate-900/85 to-slate-800/75 backdrop-blur-2xl border border-amber-500/20 rounded-xl p-3 md:p-6 lg:p-8 shadow-2xl overflow-y-auto">
             <StoryDisplay />
           </div>
 
-          {/* Game Controls - 30% height, 3 columns */}
-          <div className="game-controls">
-            {/* Inventory Panel - 25% width */}
-            <div className="panel-container">
+          {/* Game Controls - Mobile: Column, Desktop: Row */}
+          <div className="flex flex-col md:flex-row w-full h-[50%] md:h-[60%] lg:h-[65%] gap-3 md:gap-6 overflow-hidden">
+            {/* Inventory Panel - Mobile: Collapsed strip, Desktop: Side panel */}
+            <div className="w-full md:w-60 lg:w-72 h-auto md:h-full min-h-[80px] md:min-h-0 bg-slate-900/80 border border-slate-600/30 rounded-xl p-2 md:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
               <GamePanel title="Inventory" actions={inventory} />
             </div>
             
-            {/* Choices - 100% width of middle area */}
-            <div className="choices">
+            {/* Choices - Mobile: Main area, Desktop: Center flex */}
+            <div className="flex-1 min-w-0 h-full min-h-[200px] bg-slate-900/80 border-2 border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-lg shadow-2xl overflow-y-auto">
               <Choices onChoiceSelect={handleChoiceSelection} />
             </div>
             
-            {/* Spells Panel - 25% width */}
-            <div className="panel-container">
+            {/* Spells Panel - Mobile: Collapsed strip, Desktop: Side panel */}
+            <div className="w-full md:w-60 lg:w-72 h-auto md:h-full min-h-[80px] md:min-h-0 bg-slate-900/80 border border-slate-600/30 rounded-xl p-2 md:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
               <GamePanel title="Spells" actions={spells} />
             </div>
           </div>

@@ -537,147 +537,159 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   return (
-    <div className="container-box">
-      {/* HP/MP Bar at top */}
-      {title === 'Inventory' && (
-        <div 
-          className="hp-bar"
-          style={{ '--hp-percentage': `${hpPercentage}%` } as React.CSSProperties}
-        >
-          {stats.hp}/{stats.maxHp}
-        </div>
-      )}
-      {title === 'Spells' && (
-        <div 
-          className="mp-bar"
-          style={{ '--mp-percentage': `${mpPercentage}%` } as React.CSSProperties}
-        >
-          {stats.mp}/{stats.maxMp}
-        </div>
-      )}
-      
-      {/* Game Panel Box */}
+    <div className="h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-xl overflow-hidden backdrop-blur-sm">
+      {/* Header with HP/MP bars */}
       <div 
-        className={`game-panel-box ${isExpanded ? 'expanded' : ''}`}
-        onClick={() => {
-          // Only toggle on mobile and when not clicking action buttons
-          if (isMobile) {
-            setIsExpanded(!isExpanded);
-          }
-        }}
-        style={{ 
-          cursor: isMobile ? 'pointer' : 'default',
-          userSelect: 'none' 
-        }}
+        className={`p-3 cursor-pointer select-none transition-all duration-200 ${
+          isMobile ? 'hover:bg-slate-800/50' : ''
+        }`}
+        onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
       >
-        <h3>
-          {title}
+        <h3 className="text-center text-sm font-semibold text-blue-400 mb-2 flex items-center justify-between">
+          <span>{title}</span>
           {isMobile && (
-            <span className="text-xs opacity-70 ml-2 font-normal">
-              {isExpanded ? '▼ Tap to hide' : '▶ Tap to show'}
+            <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+              ▼
             </span>
           )}
         </h3>
-        <div className={`panel-content ${!isExpanded && isMobile ? 'hidden' : ''}`}>
-          {actions && actions.length > 0 ? (
-            actions.map((item, index) => {
-            const disabled = isDisabled(item);
-            const cooldownText = getItemCooldownText(item);
-            
-            return (
-              <button
-                key={index}
-                className={`action-button relative group transition-all duration-200 ${
-                  disabled 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:scale-105 hover:shadow-lg'
-                } ${
-                  selectedName === item.name 
-                    ? 'ring-2 ring-green-400 bg-green-900/30 shadow-green-400/20 shadow-lg' 
-                    : 'hover:ring-1 hover:ring-amber-400/50'
-                } ${
-                  gameData.event.inCombat 
-                    ? 'combat-mode border-red-500/30' 
-                    : ''
-                }`}
-                disabled={disabled}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent panel toggle
-                  handleItemUsage(item);
-                }}
-                onMouseMove={(event) => handleMouseMove(event, item)}
-                onMouseLeave={hideWindow}
-                title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
-              >
-                {/* Item icon */}
-                <Image
-                  src={getItemIcon(item)}
-                  alt={item.name}
-                  width={32}
-                  height={32}
-                  className="pointer-events-none transition-transform group-hover:scale-110"
-                />
-                
-                {/* Selection indicator */}
-                {selectedName === item.name && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse">
-                    <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
-                  </div>
-                )}
-                
-                {/* Combat mode indicator */}
-                {gameData.event.inCombat && !disabled && (
-                  <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                )}
-                
-                {/* Cooldown display */}
-                {cooldownText && (
-                  <div className="absolute top-1 right-1 text-xs bg-red-600 text-white px-1 rounded border border-red-400">
-                    {cooldownText}
-                  </div>
-                )}
-                
-                {/* Damage/healing indicator */}
-                {item.damage && (
-                  <div className="absolute bottom-0 left-0 text-xs bg-orange-600 text-white px-1 rounded-tr border border-orange-400">
-                    ⚔{item.damage}
-                  </div>
-                )}
-                {item.healing && (
-                  <div className="absolute bottom-0 left-0 text-xs bg-green-600 text-white px-1 rounded-tr border border-green-400">
-                    ❤{item.healing}
-                  </div>
-                )}
-                
-                {/* Mana cost indicator */}
-                {item.manaCost && item.manaCost > 0 && (
-                  <div className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded-tl border border-blue-400">
-                    🔮{item.manaCost}
-                  </div>
-                )}
-                
-                {/* Disabled overlay */}
-                {disabled && (
-                  <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center">
-                    <span className="text-red-400 text-xs">❌</span>
-                  </div>
-                )}
-                
-                {/* Hover hint for combat */}
-                {gameData.event.inCombat && !disabled && selectedName !== item.name && (
-                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                    Click to select for combat
-                  </div>
-                )}
-              </button>              );
-            })
-          ) : (
-            <div className="col-span-3 text-center text-gray-400 text-sm">
-              No {title.toLowerCase()} available
+        
+        {/* HP Bar for Inventory */}
+        {title === 'Inventory' && (
+          <div className="mb-2">
+            <div 
+              className="hp-bar text-center text-xs font-medium py-1 px-2 rounded border border-red-500/40 text-red-100"
+              style={{ '--hp-percentage': `${hpPercentage}%` } as React.CSSProperties}
+            >
+              HP: {stats.hp}/{stats.maxHp}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        
+        {/* MP Bar for Spells */}
+        {title === 'Spells' && (
+          <div className="mb-2">
+            <div 
+              className="mp-bar text-center text-xs font-medium py-1 px-2 rounded border border-blue-500/40 text-blue-100"
+              style={{ '--mp-percentage': `${mpPercentage}%` } as React.CSSProperties}
+            >
+              MP: {stats.mp}/{stats.maxMp}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Items Grid - Responsive Grid Layout */}
+      <div className={`flex-1 p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+        {actions && actions.length > 0 ? (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 h-full content-start">
+            {actions.map((item, index) => {
+              const disabled = isDisabled(item);
+              const cooldownText = getItemCooldownText(item);
+              
+              return (
+                <button
+                  key={index}
+                  className={`
+                    relative group aspect-square w-full min-w-[44px] max-w-[56px] p-2
+                    rounded-lg border-2 transition-all duration-200 overflow-hidden
+                    flex items-center justify-center
+                    ${disabled 
+                      ? 'opacity-50 cursor-not-allowed bg-slate-800/50 border-slate-600/30' 
+                      : 'hover:scale-105 hover:shadow-lg bg-slate-800/70 border-slate-600/50 hover:border-slate-500/70'
+                    }
+                    ${selectedName === item.name 
+                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-lg scale-105' 
+                      : ''
+                    }
+                    ${gameData.event.inCombat 
+                      ? 'border-red-500/30 hover:border-red-400/50' 
+                      : ''
+                    }
+                  `}
+                  disabled={disabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleItemUsage(item);
+                  }}
+                  onMouseMove={(event) => handleMouseMove(event, item)}
+                  onMouseLeave={hideWindow}
+                  title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
+                >
+                  {/* Item Icon */}
+                  <Image
+                    src={getItemIcon(item)}
+                    alt={item.name}
+                    width={24}
+                    height={24}
+                    className="pointer-events-none transition-transform group-hover:scale-110 w-6 h-6"
+                  />
+                  
+                  {/* Selection Indicator */}
+                  {selectedName === item.name && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse">
+                      <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
+                    </div>
+                  )}
+                  
+                  {/* Combat Mode Indicator */}
+                  {gameData.event.inCombat && !disabled && (
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  )}
+                  
+                  {/* Cooldown Display */}
+                  {cooldownText && (
+                    <div className="absolute -top-1 -right-1 text-xs bg-red-600 text-white px-1 py-0.5 rounded border border-red-400 font-bold min-w-[16px] text-center">
+                      {cooldownText}
+                    </div>
+                  )}
+                  
+                  {/* Damage Indicator */}
+                  {item.damage && (
+                    <div className="absolute bottom-0 left-0 text-xs bg-orange-600 text-white px-1 rounded-tr border border-orange-400 leading-none">
+                      ⚔{item.damage}
+                    </div>
+                  )}
+                  
+                  {/* Healing Indicator */}
+                  {item.healing && (
+                    <div className="absolute bottom-0 left-0 text-xs bg-green-600 text-white px-1 rounded-tr border border-green-400 leading-none">
+                      ❤{item.healing}
+                    </div>
+                  )}
+                  
+                  {/* Mana Cost Indicator */}
+                  {item.manaCost && item.manaCost > 0 && (
+                    <div className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded-tl border border-blue-400 leading-none">
+                      🔮{item.manaCost}
+                    </div>
+                  )}
+                  
+                  {/* Disabled Overlay */}
+                  {disabled && (
+                    <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center">
+                      <span className="text-red-400 text-xs">❌</span>
+                    </div>
+                  )}
+                  
+                  {/* Combat Hover Hint */}
+                  {gameData.event.inCombat && !disabled && selectedName !== item.name && (
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                      Click to select
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-center text-slate-400 text-sm">
+            No {title.toLowerCase()} available
+          </div>
+        )}
+      </div>
+    </div>
+  );
     </div>
   );
 }
