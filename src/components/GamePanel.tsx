@@ -533,7 +533,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         setErrorMessage('You can only sell this item.');
         return;
       }
-    }
   };
 
   return (
@@ -650,50 +649,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   {(item as any).count && (item as any).count > 1 && (
                     <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-lg px-1 min-w-[16px] text-center">
                       {(item as any).count}
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-                  {cooldownText && (
-                    <div className="absolute -top-1 -right-1 text-xs bg-red-600 text-white px-1 py-0.5 rounded border border-red-400 font-bold min-w-[16px] text-center">
-                      {cooldownText}
-                    </div>
-                  )}
-                  
-                  {/* Damage Indicator */}
-                  {item.damage && (
-                    <div className="absolute bottom-0 left-0 text-xs bg-orange-600 text-white px-1 rounded-tr border border-orange-400 leading-none">
-                      ⚔{item.damage}
-                    </div>
-                  )}
-                  
-                  {/* Healing Indicator */}
-                  {item.healing && (
-                    <div className="absolute bottom-0 left-0 text-xs bg-green-600 text-white px-1 rounded-tr border border-green-400 leading-none">
-                      ❤{item.healing}
-                    </div>
-                  )}
-                  
-                  {/* Mana Cost Indicator */}
-                  {item.manaCost && item.manaCost > 0 && (
-                    <div className="absolute bottom-0 right-0 text-xs bg-blue-600 text-white px-1 rounded-tl border border-blue-400 leading-none">
-                      🔮{item.manaCost}
-                    </div>
-                  )}
-                  
-                  {/* Disabled Overlay */}
-                  {disabled && (
-                    <div className="absolute inset-0 bg-black/60 rounded flex items-center justify-center">
-                      <span className="text-red-400 text-xs">❌</span>
-                    </div>
-                  )}
-                  
-                  {/* Combat Hover Hint */}
-                  {gameData.event.inCombat && !disabled && selectedName !== item.name && (
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                      Click to select
                     </div>
                   )}
                 </button>
