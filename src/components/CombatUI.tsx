@@ -171,28 +171,26 @@ export default function CombatUI() {
     : 100;
   return (
     <div className="combat-banner fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-red-900/95 to-red-800/95 backdrop-blur-sm border-b-2 border-red-500 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-2 md:px-4 py-2 md:py-3">
+        <div className="flex items-center justify-between gap-2">
           {/* Combat Status - Left Side */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-red-200 font-medium text-sm">COMBAT</span>
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <div className="flex items-center gap-1 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-red-200 font-medium text-xs md:text-sm">COMBAT</span>
             </div>
             
             {enemy && (
-              <div className="flex items-center gap-3">
-                <span className="text-white font-semibold">{enemy.enemyName}</span>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden"
-                  >
+              <div className="flex items-center gap-1 md:gap-3 min-w-0">
+                <span className="text-white font-semibold text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{enemy.enemyName}</span>
+                <div className="flex items-center gap-1 md:gap-2">
+                  <div className="w-12 md:w-24 h-1.5 md:h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-red-500 transition-all duration-300"
                       style={{ width: `${enemyHpPercentage}%` }}
                     ></div>
                   </div>
-                  <span className="text-red-200 text-sm">{enemy.enemyHp} HP</span>
+                  <span className="text-red-200 text-xs md:text-sm">{enemy.enemyHp} HP</span>
                 </div>
               </div>
             )}

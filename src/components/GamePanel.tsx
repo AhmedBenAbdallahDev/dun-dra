@@ -579,10 +579,10 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         )}
       </div>
 
-      {/* Items Grid - Responsive Grid Layout */}
-      <div className={`flex-1 p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+      {/* Items Grid - Mobile Optimized for Combat */}
+      <div className={`flex-1 p-1 md:p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
         {actions && actions.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 h-full content-start">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 md:gap-2 h-full content-start">
             {actions.map((item, index) => {
               const disabled = isDisabled(item);
               const cooldownText = getItemCooldownText(item);
@@ -591,7 +591,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 <button
                   key={index}
                   className={`
-                    relative group aspect-square w-full min-w-[44px] max-w-[56px] p-2
+                    relative group aspect-square w-full min-w-[36px] max-w-[48px] md:max-w-[56px] p-1 md:p-2
                     rounded-lg border-2 transition-all duration-200 overflow-hidden
                     flex items-center justify-center
                     ${disabled 
@@ -603,7 +603,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                       : ''
                     }
                     ${gameData.event.inCombat 
-                      ? 'border-red-500/30 hover:border-red-400/50' 
+                      ? 'border-red-500/30 hover:border-red-400/50 cursor-pointer' 
                       : ''
                     }
                   `}
@@ -616,28 +616,46 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   onMouseLeave={hideWindow}
                   title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
                 >
-                  {/* Item Icon */}
+                  {/* Item Icon - Responsive Sizing */}
                   <Image
                     src={getItemIcon(item)}
                     alt={item.name}
-                    width={24}
-                    height={24}
-                    className="pointer-events-none transition-transform group-hover:scale-110 w-6 h-6"
+                    width={20}
+                    height={20}
+                    className="pointer-events-none transition-transform group-hover:scale-110 w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"
                   />
                   
                   {/* Selection Indicator */}
                   {selectedName === item.name && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse">
+                    <div className="absolute -top-1 -right-1 w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full animate-pulse">
                       <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
                     </div>
                   )}
                   
                   {/* Combat Mode Indicator */}
                   {gameData.event.inCombat && !disabled && (
-                    <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="absolute -bottom-1 -left-1 w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse">
+                      <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-60"></div>
+                    </div>
                   )}
                   
                   {/* Cooldown Display */}
+                  {cooldownText && (
+                    <div className="absolute inset-0 bg-slate-900/80 rounded-lg flex items-center justify-center">
+                      <span className="text-xs font-bold text-amber-300">{cooldownText}</span>
+                    </div>
+                  )}
+                  
+                  {/* Item Count for Stackable Items */}
+                  {(item as any).count && (item as any).count > 1 && (
+                    <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-lg px-1 min-w-[16px] text-center">
+                      {(item as any).count}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
                   {cooldownText && (
                     <div className="absolute -top-1 -right-1 text-xs bg-red-600 text-white px-1 py-0.5 rounded border border-red-400 font-bold min-w-[16px] text-center">
                       {cooldownText}
@@ -688,8 +706,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
           </div>
         )}
       </div>
-    </div>
-  );
     </div>
   );
 }

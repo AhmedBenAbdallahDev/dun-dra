@@ -148,27 +148,28 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
     <div className="w-full h-full flex flex-col gap-4">
       {/* Combat Mode - Show instructions instead of choices */}
       {gameData?.event?.inCombat ? (
-        <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-6 text-center">
-          <h3 className="text-red-400 font-semibold text-lg mb-4 flex items-center justify-center gap-2">
+        <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 md:p-6 text-center">
+          <h3 className="text-red-400 font-semibold text-base md:text-lg mb-3 md:mb-4 flex items-center justify-center gap-2">
             ⚔️ Combat Mode
           </h3>
-          <div className="space-y-3 text-sm text-red-200">
+          <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-red-200">
             <p className="flex items-center justify-center gap-2">
-              <span className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-              Select a weapon or spell from the panels
+              <span className="w-5 h-5 md:w-6 md:h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+              <span className="text-left">Select a weapon or spell from panels above</span>
             </p>
             <p className="flex items-center justify-center gap-2">
-              <span className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-              Roll the dice in the red banner above
+              <span className="w-5 h-5 md:w-6 md:h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+              <span className="text-left">Roll the dice in the red banner</span>
             </p>
             <p className="flex items-center justify-center gap-2">
-              <span className="w-6 h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-              Read the story to see your combat narrative
+              <span className="w-5 h-5 md:w-6 md:h-6 bg-red-500/20 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+              <span className="text-left">Read the story to see your combat result</span>
             </p>
           </div>
           {selectedName && (
-            <div className="mt-4 bg-green-900/30 border border-green-500/30 rounded-lg p-3">
+            <div className="mt-3 md:mt-4 bg-green-900/30 border border-green-500/30 rounded-lg p-2 md:p-3">
               <span className="text-green-400 text-sm">✅ Selected: <strong>{selectedName}</strong></span>
+              <div className="text-xs text-green-300 mt-1">Now click the dice button in the red banner above!</div>
             </div>
           )}
         </div>

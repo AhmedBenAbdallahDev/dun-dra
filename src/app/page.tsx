@@ -748,29 +748,68 @@ Current game state: ${JSON.stringify(gameData)}`
       {/* Background Images */}
       <BackgroundImgs />
       
-      {/* Main Game UI - Tailwind Layout */}
+      {/* Main Game UI - Improved Mobile Combat Layout */}
       {!death && !isOverlayActive && (
-        <div className={`flex flex-col items-center gap-4 h-screen w-full p-2 overflow-hidden ${gameData.event.inCombat ? 'pt-16' : ''} md:gap-6 md:p-4 max-w-6xl mx-auto`}>
-          {/* Story Display Area */}
-          <div className="w-full h-[45%] md:h-[35%] lg:h-[30%] bg-gradient-to-br from-slate-900/85 to-slate-800/75 backdrop-blur-2xl border border-amber-500/20 rounded-xl p-3 md:p-6 lg:p-8 shadow-2xl overflow-y-auto">
+        <div className={`
+          flex flex-col items-center gap-2 h-screen w-full p-2 overflow-hidden max-w-7xl mx-auto
+          ${gameData.event.inCombat ? 'pt-16' : 'pt-2'} 
+          md:gap-4 md:p-4 lg:gap-6 lg:p-6
+        `}>
+          {/* Story Display Area - Responsive Heights */}
+          <div className={`
+            w-full bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-2xl 
+            border border-amber-500/20 rounded-lg md:rounded-xl p-2 md:p-4 lg:p-6 
+            shadow-xl overflow-y-auto
+            ${gameData.event.inCombat 
+              ? 'h-[30%] md:h-[35%] lg:h-[30%]' 
+              : 'h-[45%] md:h-[40%] lg:h-[35%]'
+            }
+          `}>
             <StoryDisplay />
           </div>
 
-          {/* Game Controls - Mobile: Column, Desktop: Row */}
-          <div className="flex flex-col md:flex-row w-full h-[50%] md:h-[60%] lg:h-[65%] gap-3 md:gap-6 overflow-hidden">
-            {/* Inventory Panel - Mobile: Collapsed strip, Desktop: Side panel */}
-            <div className="w-full md:w-60 lg:w-72 h-auto md:h-full min-h-[80px] md:min-h-0 bg-slate-900/80 border border-slate-600/30 rounded-xl p-2 md:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
-              <GamePanel title="Inventory" actions={inventory} />
+          {/* Game Controls - Mobile: Optimized for Combat, Desktop: Row Layout */}
+          <div className={`
+            w-full overflow-hidden
+            ${gameData.event.inCombat 
+              ? 'h-[65%] md:h-[60%] lg:h-[65%]' 
+              : 'h-[50%] md:h-[55%] lg:h-[60%]'
+            }
+          `}>
+            {/* Mobile Layout: Stacked for Combat Clarity */}
+            <div className="flex flex-col md:hidden h-full gap-2">
+              {/* Mobile: Inventory + Spells in Same Row for Combat Access */}
+              <div className="flex gap-2 h-24">
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 backdrop-blur-lg shadow-lg overflow-hidden">
+                  <GamePanel title="Inventory" actions={inventory} />
+                </div>
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 backdrop-blur-lg shadow-lg overflow-hidden">
+                  <GamePanel title="Spells" actions={spells} />
+                </div>
+              </div>
+              
+              {/* Mobile: Choices Take Remaining Space */}
+              <div className="flex-1 bg-slate-900/80 border-2 border-blue-500/30 rounded-lg p-3 backdrop-blur-lg shadow-xl overflow-y-auto">
+                <Choices onChoiceSelect={handleChoiceSelection} />
+              </div>
             </div>
-            
-            {/* Choices - Mobile: Main area, Desktop: Center flex */}
-            <div className="flex-1 min-w-0 h-full min-h-[200px] bg-slate-900/80 border-2 border-blue-500/30 rounded-xl p-4 md:p-6 backdrop-blur-lg shadow-2xl overflow-y-auto">
-              <Choices onChoiceSelect={handleChoiceSelection} />
-            </div>
-            
-            {/* Spells Panel - Mobile: Collapsed strip, Desktop: Side panel */}
-            <div className="w-full md:w-60 lg:w-72 h-auto md:h-full min-h-[80px] md:min-h-0 bg-slate-900/80 border border-slate-600/30 rounded-xl p-2 md:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
-              <GamePanel title="Spells" actions={spells} />
+
+            {/* Desktop Layout: Traditional Side Panels */}
+            <div className="hidden md:flex w-full h-full gap-4 lg:gap-6">
+              {/* Desktop: Inventory Panel */}
+              <div className="w-60 lg:w-72 xl:w-80 h-full bg-slate-900/80 border border-slate-600/30 rounded-xl p-3 lg:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
+                <GamePanel title="Inventory" actions={inventory} />
+              </div>
+              
+              {/* Desktop: Choices Center */}
+              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border-2 border-blue-500/30 rounded-xl p-4 lg:p-6 backdrop-blur-lg shadow-2xl overflow-y-auto">
+                <Choices onChoiceSelect={handleChoiceSelection} />
+              </div>
+              
+              {/* Desktop: Spells Panel */}
+              <div className="w-60 lg:w-72 xl:w-80 h-full bg-slate-900/80 border border-slate-600/30 rounded-xl p-3 lg:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
+                <GamePanel title="Spells" actions={spells} />
+              </div>
             </div>
           </div>
         </div>
