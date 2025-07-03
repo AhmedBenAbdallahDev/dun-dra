@@ -160,7 +160,14 @@ export const useGameStore = create<GameState>()(
       })),
       
       clearLootBox: () => set((state) => ({
-        gameData: { ...state.gameData, lootBox: [] }
+        gameData: { 
+          ...state.gameData, 
+          lootBox: [],
+          event: {
+            ...state.gameData.event,
+            lootMode: false
+          }
+        }
       })),
       
       updateGameData: (data) => set((state) => ({

@@ -84,18 +84,21 @@ export default function LootUI({ onAnswer }: LootUIProps) {
       }
     });
 
+    // Clear loot state BEFORE sending AI message
     clearLootBox();
+    setEvent({ inCombat: false, shopMode: null, lootMode: false });
 
     onAnswer(
       "I've looted all. What should i do now..? (clear the gameData.lootBox array in your next response!)"
     );
-    setEvent({ lootMode: false });
   };
 
   const skipLoot = () => {
+    // Clear loot state BEFORE sending AI message
     clearLootBox();
+    setEvent({ inCombat: false, shopMode: null, lootMode: false });
+    
     onAnswer("I'll leave the loot and continue my adventure. (clear the gameData.lootBox array in your next response!)");
-    setEvent({ lootMode: false });
   };
 
   const getItemImage = (item: LootItem) => {

@@ -724,17 +724,19 @@ Current game state: ${JSON.stringify(gameData)}`
   // Determine if any major overlay is active (Combat UI should NOT hide main UI)
   const isOverlayActive = useMemo(() => {
     const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || !!gameData.event.shopMode;
-    console.log('Overlay state check:', {
+    console.log('🔍 Overlay state check:', {
       death,
       settingsWindow,
       shopWindow,
       lootMode: gameData.event.lootMode,
       inCombat: gameData.event.inCombat,
       shopMode: gameData.event.shopMode,
-      isOverlayActive: overlayState
+      isOverlayActive: overlayState,
+      hasChoices: gameData.choices?.length || 0,
+      hasStory: !!gameData.story
     });
     return overlayState;
-  }, [death, settingsWindow, shopWindow, gameData.event]);
+  }, [death, settingsWindow, shopWindow, gameData.event, gameData.choices?.length, gameData.story]);
 
   // Show home page if no active adventure or user wants to go home
   if (showHomePage) {
