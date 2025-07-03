@@ -22,13 +22,10 @@ interface SelectedItemState {
   clearSelectedItem: () => void
   setCombatScore: (score: number) => void
   setPrompt: (prompt: string) => void
-  
-  // Complete selected item object for external access
-  selectedItem: SelectedItemState
 }
 
 export const useSelectedItemStore = create<SelectedItemState>()(
-  subscribeWithSelector((set, get) => ({
+  subscribeWithSelector((set) => ({
     name: undefined,
     damage: undefined,
     healing: undefined,
@@ -41,30 +38,6 @@ export const useSelectedItemStore = create<SelectedItemState>()(
     prompt: undefined,
     other: undefined,
     showDescription: 'none',
-    
-    get selectedItem() {
-      const state = get();
-      return {
-        name: state.name,
-        damage: state.damage,
-        healing: state.healing,
-        manaCost: state.manaCost,
-        price: state.price,
-        type: state.type,
-        weaponClass: state.weaponClass,
-        element: state.element,
-        combatScore: state.combatScore,
-        prompt: state.prompt,
-        other: state.other,
-        showDescription: state.showDescription,
-        setSelectedItem: state.setSelectedItem,
-        setSelectedItemData: state.setSelectedItemData,
-        clearSelectedItem: state.clearSelectedItem,
-        setCombatScore: state.setCombatScore,
-        setPrompt: state.setPrompt,
-        selectedItem: state.selectedItem
-      };
-    },
     
     setSelectedItem: (item) => set((state) => ({ ...state, ...item })),
     

@@ -257,6 +257,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleItemUsage = (item: CharacterItem) => {
+    // 🛡️ SAFETY: Prevent multiple rapid clicks
+    if (!item || !item.name) {
+      console.log('❌ Invalid item provided to handleItemUsage');
+      return;
+    }
+
     console.log('🔥🔥🔥 ITEM CLICKED - DETAILED DEBUG:', {
       itemName: item.name,
       itemType: item.type,
@@ -539,7 +545,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         return;
       }
       
-      if (damage) {
+      if (damage && damage > 0) {
         const { combatScore } = calculateCombatScore(damage, type);
         const enemyHp = gameData.enemy?.enemyHp || 0;
         const prompt = generateCombatPrompt(name, combatScore, enemyHp);
