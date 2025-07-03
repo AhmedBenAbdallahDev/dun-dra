@@ -537,18 +537,18 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-xl overflow-hidden backdrop-blur-sm">
+    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-xl overflow-hidden backdrop-blur-sm`}>
       {/* Header with HP/MP bars */}
       <div 
-        className={`p-3 cursor-pointer select-none transition-all duration-200 ${
-          isMobile ? 'hover:bg-slate-800/50' : ''
+        className={`game-panel p-3 cursor-pointer select-none transition-all duration-200 ${
+          isMobile ? 'hover:bg-slate-800/50 active:bg-slate-700/50' : ''
         }`}
         onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
       >
-        <h3 className="text-center text-sm font-semibold text-blue-400 mb-2 flex items-center justify-between">
+        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center text-sm font-semibold text-blue-400 mb-2 flex items-center justify-between`}>
           <span>{title}</span>
           {isMobile && (
-            <span className={`text-xs transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+            <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
               ▼
             </span>
           )}
@@ -580,12 +580,13 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       </div>
 
       {/* Items Grid - Mobile Optimized for Combat */}
-      <div className={`flex-1 p-1 md:p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+      <div className={`game-panel-content flex-1 p-1 md:p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
         {actions && actions.length > 0 ? (
           <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 md:gap-2 h-full content-start">
             {actions.map((item, index) => {
               const disabled = isDisabled(item);
               const cooldownText = getItemCooldownText(item);
+              const isSelected = selectedName === item.name;
               
               return (
                 <button
@@ -598,15 +599,16 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                       ? 'opacity-50 cursor-not-allowed bg-slate-800/50 border-slate-600/30' 
                       : 'hover:scale-105 hover:shadow-lg bg-slate-800/70 border-slate-600/50 hover:border-slate-500/70'
                     }
-                    ${selectedName === item.name 
-                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-lg scale-105' 
+                    ${isSelected 
+                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-lg scale-105 selected' 
                       : ''
                     }
-                    ${gameData.event.inCombat 
+                    ${gameData.event?.inCombat 
                       ? 'border-red-500/30 hover:border-red-400/50 cursor-pointer' 
                       : ''
                     }
                   `}
+                  data-selected={isSelected}
                   disabled={disabled}
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
@@ -614,7 +616,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   }}
                   onMouseMove={(event: React.MouseEvent<HTMLButtonElement>) => handleMouseMove(event, item)}
                   onMouseLeave={hideWindow}
-                  title={gameData.event.inCombat ? `Click to select ${item.name} for combat` : item.name}
+                  title={gameData.event?.inCombat ? `Click to select ${item.name} for combat` : item.name}
                 >
                   {/* Item Icon - Responsive Sizing */}
                   <Image
