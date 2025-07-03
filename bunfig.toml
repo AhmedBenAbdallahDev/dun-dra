@@ -1,0 +1,42 @@
+# Bun Configuration File
+
+# Default framework is Next.js
+framework = "next"
+
+# Development server options
+[dev]
+port = 3000
+open = true # Open browser when starting dev server
+
+# Build options
+[build]
+minify = true
+target = "browser"
+
+# TypeScript options
+[typescript]
+typecheck = true
+
+# Loader options
+[loader]
+jsx = "react" # Use React JSX transform
+tsx = "react" # Use React TSX transform
+
+# Speed up installation
+[install]
+cache = true
+production = false
+peer = true
+frozen = false
+optional = true
+
+# Optimize for performance
+[optimize]
+tree_shaking = true
+minify = true
+jsx_optimization = true
+
+# Debug options
+[debug]
+# Set to true for more verbose logging
+verbose = false

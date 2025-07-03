@@ -1,0 +1,17 @@
+# Bun Environment Settings
+
+BUN_INSTALL_CACHE=true
+BUN_RUNTIME=auto
+
+# Memory settings for better build performance
+BUN_MEMORY_LIMIT=4096
+
+# Network settings
+BUN_INSPECT_HOST=localhost
+BUN_INSPECT_PORT=9229
+
+# Debug settings
+BUN_DEBUG=false
+
+# Next.js Specific
+NEXT_TELEMETRY_DISABLED=1
