@@ -17,6 +17,7 @@ interface AIConfig {
   customModelName: string;
   temperature: number;
   maxTokens: number;
+  useSystemProvider: boolean; // New toggle for using environment variables
 }
 
 export default function SettingsUI() {
@@ -30,7 +31,8 @@ export default function SettingsUI() {
     useCustomModel: false,
     customModelName: '',
     temperature: 0.7,
-    maxTokens: 2000
+    maxTokens: 2000,
+    useSystemProvider: false
   });
 
   const groqModels = [
@@ -115,6 +117,7 @@ export default function SettingsUI() {
           model: aiConfig.useCustomModel ? aiConfig.customModelName : aiConfig.model,
           useCustomModel: aiConfig.useCustomModel,
           customModelName: aiConfig.customModelName,
+          useSystemProvider: aiConfig.useSystemProvider,
           temperature: 0.1,
           max_tokens: 50
         }
@@ -246,40 +249,73 @@ export default function SettingsUI() {
                     </Select>
                   </div>
 
-                  {/* API Key */}
+                  {/* Use System Provider Toggle */}
                   <div className="space-y-2">
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        id="useSystemProvider"
+                        checked={aiConfig.useSystemProvider}
+                        onChange={(e) => setAIConfig({ ...aiConfig, useSystemProvider: e.target.checked })}
+                        className="w-4 h-4 text-amber-600 bg-slate-800 border-slate-600 rounded focus:ring-amber-500 focus:ring-2"
+                      />
+                      <Label htmlFor="useSystemProvider" className="text-slate-200 text-sm font-medium cursor-pointer">
+                        Use System Provider
+                      </Label>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      When enabled, the system will use environment variables for API keys (no need to enter your own)
+                    </p>
+                  </div>
+
+                  {/* API Key */}
+                  <div className={`space-y-2 ${aiConfig.useSystemProvider ? 'opacity-50' : ''}`}>
                     <Label className="text-slate-200 text-sm font-medium">API Key</Label>
                     <Input
                       type="password"
                       value={aiConfig.apiKey}
                       onChange={(e) => setAIConfig({ ...aiConfig, apiKey: e.target.value })}
+                      disabled={aiConfig.useSystemProvider}
                       placeholder={
+                        aiConfig.useSystemProvider ? 'Using system environment variables' :
                         aiConfig.provider === 'openrouter' ? 'sk-or-v1-... (optional if OPENROUTER_API_KEY set)' :
                         aiConfig.provider === 'openai' ? 'sk-... (optional if OPENAI_API_KEY set)' :
                         aiConfig.provider === 'groq' ? 'gsk_... (optional if GROQ_API_KEY set)' :
                         aiConfig.provider === 'gemini' ? 'AIza... (optional if GEMINI_API_KEY set)' :
                         'Enter API key'
                       }
-                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
+                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     <p className="text-xs text-slate-400">
-                      {aiConfig.provider === 'openrouter' && (
-                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a> or set OPENROUTER_API_KEY env var</>
+                      {aiConfig.useSystemProvider ? (
+                        'System will use pre-configured environment variables'
+                      ) : (
+                        <>
+                          {aiConfig.provider === 'openrouter' && (
+                            <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a> or set OPENROUTER_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'openai' && (
+                            <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a> or set OPENAI_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'groq' && (
+                            <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a> or set GROQ_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'gemini' && (
+                            <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a> or set GEMINI_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'custom' && 'API key for your endpoint or set CUSTOM_AI_API_KEY env var'}
+                        </>
                       )}
-                      {aiConfig.provider === 'openai' && (
-                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a> or set OPENAI_API_KEY env var</>
-                      )}
-                      {aiConfig.provider === 'groq' && (
-                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a> or set GROQ_API_KEY env var</>
-                      )}
-                      {aiConfig.provider === 'gemini' && (
-                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a> or set GEMINI_API_KEY env var</>
-                      )}
-                      {aiConfig.provider === 'custom' && 'API key for your endpoint or set CUSTOM_AI_API_KEY env var'}
                     </p>
-                    <div className="bg-slate-700/50 p-2 rounded text-xs text-slate-300">
-                      💡 <strong>Tip:</strong> Leave empty to use environment variables. User keys override env vars.
-                    </div>
+                    {aiConfig.useSystemProvider ? (
+                      <div className="bg-green-900/20 border border-green-500/30 p-3 rounded text-xs text-green-200">
+                        ✅ <strong>System Provider Enabled:</strong> The application will use pre-configured environment variables for API access. No personal API key required!
+                      </div>
+                    ) : (
+                      <div className="bg-slate-700/50 p-2 rounded text-xs text-slate-300">
+                        💡 <strong>Tip:</strong> Leave empty to use environment variables. User keys override env vars.
+                      </div>
+                    )}
                   </div>
 
                   {/* Custom Endpoint */}
@@ -462,9 +498,36 @@ export default function SettingsUI() {
                 <div className="space-y-4 flex-1">
                   <h3 className="text-slate-200 font-medium">Connection Test</h3>
                   
+                  {/* Configuration Status */}
+                  <div className={`p-3 rounded-lg border text-sm ${
+                    aiConfig.useSystemProvider 
+                      ? 'bg-green-900/20 border-green-500/30 text-green-200'
+                      : aiConfig.apiKey
+                        ? 'bg-blue-900/20 border-blue-500/30 text-blue-200'
+                        : 'bg-yellow-900/20 border-yellow-500/30 text-yellow-200'
+                  }`}>
+                    <div className="flex items-center gap-2 font-medium mb-1">
+                      {aiConfig.useSystemProvider ? (
+                        <>🏢 System Provider Mode</>
+                      ) : aiConfig.apiKey ? (
+                        <>🔑 User API Key Mode</>
+                      ) : (
+                        <>⚠️ No Configuration</>
+                      )}
+                    </div>
+                    <div className="text-xs opacity-90">
+                      {aiConfig.useSystemProvider 
+                        ? `Using environment variables for ${aiConfig.provider} provider`
+                        : aiConfig.apiKey
+                          ? `Using your personal ${aiConfig.provider} API key`
+                          : 'No API key configured and system provider disabled'
+                      }
+                    </div>
+                  </div>
+                  
                   <Button
                     onClick={handleTestConnection}
-                    disabled={isTestingConnection || !aiConfig.apiKey}
+                    disabled={isTestingConnection || (!aiConfig.useSystemProvider && !aiConfig.apiKey)}
                     className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white disabled:opacity-50 h-12 rounded-xl font-medium"
                   >
                     {isTestingConnection ? (

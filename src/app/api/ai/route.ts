@@ -48,13 +48,32 @@ export async function POST(request: NextRequest) {
       baseURL = '',  // Remove default, will be set based on provider
       model = 'openrouter/cypher-alpha:free',
       useCustomModel = false,
-      customModelName = ''
+      customModelName = '',
+      useSystemProvider = false
     } = config || {};
     
     currentProvider = provider;
     
-    // Get API key - use user provided key if available, otherwise fallback to environment variables
+    // Get API key - prioritize system provider if enabled, otherwise use user key with env fallback
     const getAPIKey = () => {
+      if (useSystemProvider) {
+        // When system provider is enabled, always use environment variables
+        switch (provider) {
+          case 'openrouter':
+            return process.env.OPENROUTER_API_KEY || '';
+          case 'openai':
+            return process.env.OPENAI_API_KEY || '';
+          case 'groq':
+            return process.env.GROQ_API_KEY || '';
+          case 'gemini':
+            return process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
+          case 'custom':
+            return process.env.CUSTOM_AI_API_KEY || '';
+          default:
+            return '';
+        }
+      }
+      
       if (apiKey && apiKey.trim() !== '') {
         return apiKey; // Use user-provided key
       }
@@ -82,11 +101,16 @@ export async function POST(request: NextRequest) {
     const actualModel = useCustomModel && customModelName ? customModelName : model;
 
     if (!finalApiKey && provider !== 'local') {
+      const errorMessage = useSystemProvider 
+        ? `System provider is enabled but no environment variable found for ${provider}. Please set ${provider.toUpperCase()}_API_KEY in your environment.`
+        : `API key is required for ${provider}. Please provide an API key or set the environment variable: ${provider.toUpperCase()}_API_KEY`;
+        
       return NextResponse.json(
         { 
-          error: `API key is required for ${provider}. Please provide an API key or set the environment variable: ${provider.toUpperCase()}_API_KEY`,
+          error: errorMessage,
           provider,
-          envVar: `${provider.toUpperCase()}_API_KEY`
+          envVar: `${provider.toUpperCase()}_API_KEY`,
+          useSystemProvider
         },
         { status: 400 }
       );

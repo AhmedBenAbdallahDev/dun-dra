@@ -65,7 +65,8 @@ export default function Home() {
           useCustomModel: false,
           customModelName: '',
           temperature: 0.7,
-          maxTokens: 2000
+          maxTokens: 2000,
+          useSystemProvider: false
         };
       };
 
@@ -73,9 +74,9 @@ export default function Home() {
       console.log('🔍 AI Config:', aiConfig);
       
       // Check if AI is configured
-      if (!aiConfig.apiKey || aiConfig.apiKey.trim() === '') {
-        console.log('❌ AI not configured - no API key');
-        toast.error('AI not configured. Please set up your AI configuration in Settings to start your adventure.', {
+      if (!aiConfig.useSystemProvider && (!aiConfig.apiKey || aiConfig.apiKey.trim() === '')) {
+        console.log('❌ AI not configured - no API key and system provider disabled');
+        toast.error('AI not configured. Please set up your AI configuration in Settings or enable "Use System Provider" to start your adventure.', {
           duration: 8000,
           action: {
             label: 'Open Settings',
@@ -516,8 +517,8 @@ Current game state: ${JSON.stringify(gameData)}`
         
         const aiConfig = getAIConfig();
         
-        if (!aiConfig.apiKey && aiConfig.provider !== 'local') {
-          toast.error('Please configure your AI settings first');
+        if (!aiConfig.useSystemProvider && !aiConfig.apiKey && aiConfig.provider !== 'local') {
+          toast.error('Please configure your AI settings first or enable "Use System Provider"');
           setLoading(false);
           return;
         }
