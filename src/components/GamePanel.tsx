@@ -37,9 +37,9 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
-  const { setErrorMessage, setShowDescription } = useUIStore();
+  const { setErrorMessage, setShowDescription, setDiceNumber } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
-  const { name: selectedName } = useSelectedItemStore();
+  const { name: selectedName, setSelectedItem, clearSelectedItem } = useSelectedItemStore();
   const { gameData, addChatMessage } = useGameStore();
   const { setDescription } = useDescriptionStore();
 
@@ -52,8 +52,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const diceNumber = Math.floor(Math.random() * maxDice) + 1;
     const combatScore = baseValue * diceNumber;
     
-    // 🎯 CRITICAL FIX: Store dice number in UI store immediately like Svelte does with $misc.diceNumber
-    const { setDiceNumber } = useUIStore.getState();
+    // 🎯 CRITICAL FIX: Store dice number immediately like Svelte does with $misc.diceNumber
     setDiceNumber(diceNumber);
     
     console.log('🎯 GamePanel: Combat score calculated:', {
@@ -280,16 +279,9 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
     const { mp, maxMp, hp, maxHp } = stats;
     const { inCombat, shopMode } = gameData.event || {};
-    const { setSelectedItem, clearSelectedItem } = useSelectedItemStore.getState();
 
-    // 🚨 CRITICAL DEBUG: Check if stores are working
-    console.log('🔧 Store states before item usage:', {
-      gameStore: { inCombat, shopMode, enemy: gameData.enemy?.enemyName },
-      characterStore: { hp, mp, maxHp, maxMp },
-      selectedItemStore: useSelectedItemStore.getState()
-    });
-
-    // Clear previous selection
+    // 🚨 CRITICAL FIX: Use the hooks directly instead of getState()
+    // Clear previous selection first
     clearSelectedItem();
     
     // 🚨 ADD IMMEDIATE VISUAL FEEDBACK
