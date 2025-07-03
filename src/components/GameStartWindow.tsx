@@ -30,23 +30,23 @@ const characterClasses: CharacterClass[] = [
     description: 'A wielder of arcane magic, with high mana and spell power but lower physical defense.',
     stats: {
       hp: 80,
-      mana: 120,
+      mana: 110,
       damage: 15,
       defense: 8
     },
-    startingGold: 200
+    startingGold: 30
   },
   {
     id: 'warrior',
     name: '⚔️ Warrior',
     description: 'A skilled fighter with high health and defense, but limited magical abilities.',
     stats: {
-      hp: 120,
-      mana: 40,
+      hp: 110,
+      mana: 80,
       damage: 25,
       defense: 15
     },
-    startingGold: 150
+    startingGold: 30
   }
 ];
 
