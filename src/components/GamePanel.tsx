@@ -258,14 +258,23 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const handleItemUsage = (item: CharacterItem) => {
-    console.log('🔥 Item clicked:', {
-      name: item.name,
-      type: item.type,
-      damage: item.damage,
-      manaCost: item.manaCost,
-      inCombat: gameData.event?.inCombat,
-      currentHP: stats.hp,
-      currentMP: stats.mp
+    console.log('🔥🔥🔥 ITEM CLICKED - DETAILED DEBUG:', {
+      itemName: item.name,
+      itemType: item.type,
+      itemDamage: item.damage,
+      itemManaCost: item.manaCost,
+      gameState: {
+        inCombat: gameData.event?.inCombat,
+        shopMode: gameData.event?.shopMode,
+        hasEnemy: !!gameData.enemy,
+        enemyHp: gameData.enemy?.enemyHp
+      },
+      playerStats: {
+        hp: stats.hp,
+        maxHp: stats.maxHp,
+        mp: stats.mp,
+        maxMp: stats.maxMp
+      }
     });
     
     const { type, name, damage, manaCost, healing, mana, cooldown } = item;
@@ -273,17 +282,33 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     const { inCombat, shopMode } = gameData.event || {};
     const { setSelectedItem, clearSelectedItem } = useSelectedItemStore.getState();
 
+    // 🚨 CRITICAL DEBUG: Check if stores are working
+    console.log('🔧 Store states before item usage:', {
+      gameStore: { inCombat, shopMode, enemy: gameData.enemy?.enemyName },
+      characterStore: { hp, mp, maxHp, maxMp },
+      selectedItemStore: useSelectedItemStore.getState()
+    });
+
     // Clear previous selection
     clearSelectedItem();
+    
+    // 🚨 ADD IMMEDIATE VISUAL FEEDBACK
+    console.log(`🎯 PROCESSING ${type.toUpperCase()}: ${name}`);
 
     // Handle different item types like in Svelte version
     if (type === 'weapon') {
-      if (shopMode) return;
+      console.log('🗡️ WEAPON CLICKED:', name);
+      if (shopMode) {
+        console.log('⚠️ Cannot use weapon in shop mode');
+        return;
+      }
       if (!damage) {
+        console.log('⚠️ Weapon has no damage, can only sell');
         setErrorMessage('You can only sell that item.');
         return;
       }
       if (!inCombat) {
+        console.log('⚠️ Not in combat, cannot use weapon');
         setErrorMessage('You are not in a combat.');
         return;
       }
@@ -308,24 +333,34 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         prompt,
         manaCost: 0
       });
+      
+      console.log('✅ WEAPON SELECTED SUCCESSFULLY!');
       return;
     }
 
     if (type === 'destruction spell') {
-      if (shopMode) return;
+      console.log('🔥 DESTRUCTION SPELL CLICKED:', name);
+      if (shopMode) {
+        console.log('⚠️ Cannot use spell in shop mode');
+        return;
+      }
       if (!damage) {
+        console.log('⚠️ Spell has no damage, can only sell');
         setErrorMessage('You can only sell that item.');
         return;
       }
       if (!inCombat) {
+        console.log('⚠️ Not in combat, cannot use spell');
         setErrorMessage('You are not in a combat.');
         return;
       }
       if (mp < (manaCost || 0)) {
+        console.log('⚠️ Not enough mana');
         setErrorMessage('You have not enough mana.');
         return;
       }
       if (cooldown && cooldowns[name] && cooldowns[name] < cooldown) {
+        console.log('⚠️ Spell on cooldown');
         setErrorMessage(`This spell is on cooldown. ${cooldowns[name]}/${cooldown}`);
         return;
       }
@@ -356,6 +391,8 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         prompt,
         manaCost: manaCost || 0
       });
+      
+      console.log('✅ DESTRUCTION SPELL SELECTED SUCCESSFULLY!');
       return;
     }
 
@@ -612,7 +649,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   disabled={disabled}
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleItemUsage(item);
+                    console.log('🚨 ITEM BUTTON CLICKED!', { itemName: item.name, itemType: item.type });
+                    try {
+                      handleItemUsage(item);
+                    } catch (error) {
+                      console.error('❌ ERROR in handleItemUsage:', error);
+                    }
                   }}
                   onMouseMove={(event: React.MouseEvent<HTMLButtonElement>) => handleMouseMove(event, item)}
                   onMouseLeave={hideWindow}

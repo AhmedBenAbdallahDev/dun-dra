@@ -30,7 +30,12 @@ export default function CombatUI() {
     selectedCombatScore,
     diceNumber,
     hasPrompt: !!selectedPrompt,
-    diceButtonEnabled: !!selectedName && !diceThrown
+    diceButtonEnabled: !!selectedName && !diceThrown,
+    combatState: {
+      inCombat: event.inCombat,
+      hasEnemy: !!enemy?.enemyName,
+      enemyHp: enemy?.enemyHp
+    }
   });
 
   // Don't render if not in combat
