@@ -791,8 +791,8 @@ Current game state: ${JSON.stringify(gameData)}`
                 </div>
               </div>
               
-              {/* Mobile: Choices Take Remaining Space */}
-              <div className="flex-1 bg-slate-900/80 border-2 border-blue-500/30 rounded-lg p-3 backdrop-blur-lg shadow-xl overflow-y-auto">
+              {/* Mobile: Choices Take Remaining Space - No Scrolling */}
+              <div className="flex-1 bg-slate-900/80 border-2 border-blue-500/30 rounded-lg p-3 backdrop-blur-lg shadow-xl">
                 <Choices onChoiceSelect={handleChoiceSelection} />
               </div>
             </div>
