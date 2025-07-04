@@ -8,7 +8,6 @@ import { useCooldownsStore, useSelectedItemStore } from '@/stores/selectedItemSt
 import { useGameStore } from '@/stores/gameStore';
 import { useDescriptionStore } from '@/stores/miscStore';
 import { CharacterItem } from '@/stores/characterStore';
-import { getUnifiedItemIcon } from '@/lib/iconSystem';
 
 interface GamePanelProps {
   title: string;
@@ -166,9 +165,6 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   const getItemIcon = (item: CharacterItem): string => {
-    return getUnifiedItemIcon(item);
-  };
-    
     // Weapons - specific weapon class icons with expanded variety
     if (item.type === 'weapon') {
       const weaponIcons: Record<string, string> = {
