@@ -24,15 +24,15 @@ export default function SettingsUI() {
   const { settingsWindow, toggleSettingsWindow } = useUIStore();
   const [activeTab, setActiveTab] = useState<'basic' | 'advanced' | 'test'>('basic');
   const [aiConfig, setAIConfig] = useState<AIConfig>({
-    provider: 'openrouter',
+    provider: 'groq',
     apiKey: '',
     customEndpoint: '',
-    model: 'openrouter/cypher-alpha:free',
+    model: 'llama3-70b-8192',
     useCustomModel: false,
     customModelName: '',
     temperature: 0.7,
     maxTokens: 2000,
-    useSystemProvider: false
+    useSystemProvider: true
   });
 
   const groqModels = [
@@ -64,7 +64,7 @@ export default function SettingsUI() {
       case 'custom':
         return 'gpt-3.5-turbo';
       default:
-        return 'openrouter/cypher-alpha:free';
+        return 'llama3-70b-8192';
     }
   };
 
@@ -230,14 +230,14 @@ export default function SettingsUI() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-700">
+                        <SelectItem value="groq" className="text-slate-200 hover:bg-slate-700">
+                          ⚡ Groq (Default)
+                        </SelectItem>
                         <SelectItem value="openrouter" className="text-slate-200 hover:bg-slate-700">
                           🌐 OpenRouter
                         </SelectItem>
                         <SelectItem value="openai" className="text-slate-200 hover:bg-slate-700">
                           🤖 OpenAI
-                        </SelectItem>
-                        <SelectItem value="groq" className="text-slate-200 hover:bg-slate-700">
-                          ⚡ Groq
                         </SelectItem>
                         <SelectItem value="gemini" className="text-slate-200 hover:bg-slate-700">
                           🌟 Gemini
@@ -264,7 +264,7 @@ export default function SettingsUI() {
                       </Label>
                     </div>
                     <p className="text-xs text-slate-400">
-                      When enabled, the system will use environment variables for API keys (no need to enter your own)
+                      When enabled, the system will use pre-configured environment variables for API keys (Groq is configured by default)
                     </p>
                   </div>
 
@@ -309,7 +309,7 @@ export default function SettingsUI() {
                     </p>
                     {aiConfig.useSystemProvider ? (
                       <div className="bg-green-900/20 border border-green-500/30 p-3 rounded text-xs text-green-200">
-                        ✅ <strong>System Provider Enabled:</strong> The application will use pre-configured environment variables for API access. No personal API key required!
+                        ✅ <strong>System Provider Enabled:</strong> Using pre-configured Groq API for fast, free AI responses. No personal API key required!
                       </div>
                     ) : (
                       <div className="bg-slate-700/50 p-2 rounded text-xs text-slate-300">

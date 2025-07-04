@@ -58,22 +58,22 @@ export default function Home() {
         }
         
         return {
-          provider: 'openrouter',
+          provider: 'groq',
           apiKey: '',
           customEndpoint: '',
-          model: 'openrouter/cypher-alpha:free',
+          model: 'llama3-70b-8192',
           useCustomModel: false,
           customModelName: '',
           temperature: 0.7,
           maxTokens: 2000,
-          useSystemProvider: false
+          useSystemProvider: true
         };
       };
 
       const aiConfig = getAIConfig();
       console.log('🔍 AI Config:', aiConfig);
       
-      // Check if AI is configured
+      // Check if AI is configured - allow system provider or user-provided API key
       if (!aiConfig.useSystemProvider && (!aiConfig.apiKey || aiConfig.apiKey.trim() === '')) {
         console.log('❌ AI not configured - no API key and system provider disabled');
         toast.error('AI not configured. Please set up your AI configuration in Settings or enable "Use System Provider" to start your adventure.', {
@@ -87,6 +87,12 @@ export default function Home() {
           }
         });
         return;
+      }
+      
+      if (aiConfig.useSystemProvider) {
+        console.log('✅ Using system provider for AI configuration');
+      } else {
+        console.log('✅ Using user-provided API key for AI configuration');
       }
 
       console.log('✅ AI configured, making request...');
@@ -499,24 +505,27 @@ Current game state: ${JSON.stringify(gameData)}`
           try {
             const savedConfig = localStorage.getItem('mythic-conjurer-ai-config');
             return savedConfig ? JSON.parse(savedConfig) : {
-              provider: 'openrouter',
+              provider: 'groq',
               apiKey: '',
-              baseURL: 'https://openrouter.ai/api/v1',
-              model: 'meta-llama/llama-3.1-8b-instruct:free'
+              baseURL: 'https://api.groq.com/openai/v1',
+              model: 'llama3-70b-8192',
+              useSystemProvider: true
             };
           } catch (error) {
             console.error('Failed to parse AI config:', error);
             return {
-              provider: 'openrouter',
+              provider: 'groq',
               apiKey: '',
-              baseURL: 'https://openrouter.ai/api/v1',
-              model: 'meta-llama/llama-3.1-8b-instruct:free'
+              baseURL: 'https://api.groq.com/openai/v1',
+              model: 'llama3-70b-8192',
+              useSystemProvider: true
             };
           }
         };
         
         const aiConfig = getAIConfig();
         
+        // Check if AI is configured - allow system provider or user-provided API key
         if (!aiConfig.useSystemProvider && !aiConfig.apiKey && aiConfig.provider !== 'local') {
           toast.error('Please configure your AI settings first or enable "Use System Provider"');
           setLoading(false);

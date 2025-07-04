@@ -26,14 +26,15 @@ export default function ActionBox() {
     
     // Default config if none saved
     return {
-      provider: 'openrouter',
+      provider: 'groq',
       apiKey: '',
       customEndpoint: '',
-      model: 'openrouter/cypher-alpha:free',
+      model: 'llama3-70b-8192',
       useCustomModel: false,
       customModelName: '',
       temperature: 0.7,
-      maxTokens: 2000
+      maxTokens: 2000,
+      useSystemProvider: true
     };
   };
   const handleSubmit = async () => {
