@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/tooltip';
 import { Coins, Package, Sparkles, Sword, Heart, Zap, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getUnifiedItemIcon } from '@/lib/iconSystem';
 
 interface LootUIProps {
   onAnswer: (answer: string) => void;
@@ -27,35 +28,9 @@ export default function LootUI({ onAnswer }: LootUIProps) {
   const { loading } = useMiscStore();
   const [isLooting, setIsLooting] = useState(false);
 
+  // Use unified icon system instead of local function
   const getItemIcon = (item: LootItem): string => {
-    // Enhanced icon mapping based on item properties
-    if (item.type === 'gold' || item.type === 'currency') return '/images/gold.svg';
-    if (item.type === 'weapon' && item.weaponClass) {
-      const weaponIcons: Record<string, string> = {
-        'sword': '/images/sword.svg',
-        'axe': '/images/axe.svg',
-        'bow': '/images/bow.svg',
-        'dagger': '/images/dagger.svg',
-        'mace': '/images/mace.svg',
-        'spear': '/images/spear.svg',
-        'flail': '/images/flail.svg',
-      };
-      return weaponIcons[item.weaponClass.toLowerCase()] || '/images/sword.svg';
-    }
-    if (item.type === 'potion' || item.healing) return '/images/potion.svg';
-    if (item.element) {
-      const elementIcons: Record<string, string> = {
-        'fire': '/images/fire.svg',
-        'ice': '/images/ice.svg',
-        'lightning': '/images/lightning.svg',
-        'dark': '/images/dark.svg',
-        'light': '/images/light.svg',
-        'toxic': '/images/toxic.svg',
-        'arcane': '/images/arcane.svg',
-      };
-      return elementIcons[item.element.toLowerCase()] || '/images/arcane.svg';
-    }
-    return '/images/item.svg';
+    return getUnifiedItemIcon(item);
   };
 
   const getRarityBadgeColor = (item: LootItem): string => {

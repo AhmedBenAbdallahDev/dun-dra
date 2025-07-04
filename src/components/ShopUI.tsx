@@ -9,6 +9,7 @@ import { useDescriptionStore } from '@/stores/miscStore';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
+import { getUnifiedItemIcon } from '@/lib/iconSystem';
 
 interface ShopItem {
   id: string;
@@ -187,51 +188,9 @@ export default function ShopUI() {
   const handleMouseLeave = () => {
     clearDescription();
   };
+  // Use unified icon system for consistent icons
   const getItemIcon = (item: ShopItem | CharacterItem) => {
-    // Handle weapons with specific weapon class icons
-    if (item.type === 'weapon') {
-      const extendedItem = item as ShopItem | (CharacterItem & { weaponClass?: string });
-      const weaponClass = extendedItem?.weaponClass || '';
-      const weaponIcons: { [key: string]: string } = {
-        sword: '/images/sword.svg',
-        dagger: '/images/dagger.svg',
-        bow: '/images/bow.svg',
-        mace: '/images/mace.svg',
-        spear: '/images/spear.svg',
-        axe: '/images/axe.svg',
-        flail: '/images/flail.svg'
-      };
-      return weaponIcons[weaponClass.toLowerCase()] || '/images/sword.svg';
-    }
-    
-    // Handle spells with element-specific icons
-    if (item.type === 'spell' && item.element) {
-      const elementIcons: { [key: string]: string } = {
-        fire: '/images/fire.svg',
-        ice: '/images/ice.svg',
-        lightning: '/images/lightning.svg',
-        light: '/images/light.svg',
-        dark: '/images/dark.svg',
-        toxic: '/images/toxic.svg',
-        arcane: '/images/arcane.svg'
-      };
-      return elementIcons[item.element.toLowerCase()] || '/images/arcane.svg';
-    }
-    
-    // Handle potions
-    if (item.type === 'potion') {
-      return '/images/potion.svg';
-    }
-    
-    // Handle general item types
-    const typeIcons: { [key: string]: string } = {
-      weapon: '/images/sword.svg',
-      potion: '/images/potion.svg',
-      spell: '/images/arcane.svg',
-      armor: '/images/item.svg',
-      misc: '/images/item.svg'
-    };
-    return typeIcons[item.type] || '/images/item.svg';
+    return getUnifiedItemIcon(item);
   };
 
   const getShopTitle = () => {
