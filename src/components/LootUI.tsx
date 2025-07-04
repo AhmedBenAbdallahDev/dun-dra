@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/tooltip';
 import { Coins, Package, Sparkles, Sword, Heart, Zap, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getUnifiedItemIcon } from '@/lib/iconSystem';
 
 interface LootUIProps {
   onAnswer: (answer: string) => void;
@@ -28,9 +27,279 @@ export default function LootUI({ onAnswer }: LootUIProps) {
   const { loading } = useMiscStore();
   const [isLooting, setIsLooting] = useState(false);
 
-  // Use unified icon system instead of local function
+  // Comprehensive icon system matching GamePanel
   const getItemIcon = (item: LootItem): string => {
-    return getUnifiedItemIcon(item);
+    // Weapons - specific weapon class icons with expanded variety
+    if (item.type === 'weapon') {
+      const weaponIcons: Record<string, string> = {
+        // Melee Weapons
+        'sword': '/images/sword.svg',
+        'greatsword': '/images/sword.svg',
+        'longsword': '/images/sword.svg',
+        'shortsword': '/images/sword.svg',
+        'broadsword': '/images/sword.svg',
+        'scimitar': '/images/sword.svg',
+        'rapier': '/images/sword.svg',
+        'katana': '/images/sword.svg',
+        
+        // Axes
+        'axe': '/images/axe.svg',
+        'hatchet': '/images/axe.svg',
+        'battleaxe': '/images/axe.svg',
+        'greataxe': '/images/axe.svg',
+        'tomahawk': '/images/axe.svg',
+        
+        // Ranged Weapons
+        'bow': '/images/bow.svg',
+        'longbow': '/images/bow.svg',
+        'shortbow': '/images/bow.svg',
+        'crossbow': '/images/bow.svg',
+        'compound bow': '/images/bow.svg',
+        
+        // Daggers & Knives
+        'dagger': '/images/dagger.svg',
+        'knife': '/images/dagger.svg',
+        'stiletto': '/images/dagger.svg',
+        'dirk': '/images/dagger.svg',
+        'kukri': '/images/dagger.svg',
+        'tanto': '/images/dagger.svg',
+        
+        // Blunt Weapons
+        'mace': '/images/mace.svg',
+        'club': '/images/mace.svg',
+        'hammer': '/images/mace.svg',
+        'warhammer': '/images/mace.svg',
+        'maul': '/images/mace.svg',
+        'morningstar': '/images/mace.svg',
+        
+        // Polearms
+        'spear': '/images/spear.svg',
+        'lance': '/images/spear.svg',
+        'pike': '/images/spear.svg',
+        'halberd': '/images/spear.svg',
+        'glaive': '/images/spear.svg',
+        'trident': '/images/spear.svg',
+        
+        // Flails & Chains
+        'flail': '/images/flail.svg',
+        'chain': '/images/flail.svg',
+        'nunchaku': '/images/flail.svg',
+        
+        // Magic Weapons
+        'staff': '/images/arcane.svg',
+        'wand': '/images/arcane.svg',
+        'rod': '/images/arcane.svg',
+        'scepter': '/images/arcane.svg',
+        'orb': '/images/arcane.svg',
+      };
+      return weaponIcons[item.weaponClass?.toLowerCase() || 'sword'] || '/images/sword.svg';
+    }
+    
+    // Potions - Enhanced with different potion types
+    if (item.type === 'potion' || item.name?.toLowerCase().includes('potion')) {
+      const itemName = item.name?.toLowerCase() || '';
+      
+      // Health potions (red)
+      if (itemName.includes('health') || itemName.includes('healing') || itemName.includes('life') || item.healing) {
+        return '/images/potion.svg'; // Red healing potion
+      }
+      
+      // Mana potions (blue) 
+      if (itemName.includes('mana') || itemName.includes('magic') || itemName.includes('arcane') || item.mana) {
+        return '/images/ice.svg'; // Blue mana effect
+      }
+      
+      // Poison potions (green)
+      if (itemName.includes('poison') || itemName.includes('toxic') || itemName.includes('venom')) {
+        return '/images/toxic.svg';
+      }
+      
+      return '/images/potion.svg';
+    }
+    
+    // Spells - Enhanced element-based icons with more variety
+    if (item.type === 'spell' || item.type === 'healing spell' || item.type === 'destruction spell') {
+      const spellIcons: Record<string, string> = {
+        // Primary Elements
+        'fire': '/images/fire.svg',
+        'flame': '/images/fire.svg',
+        'burn': '/images/fire.svg',
+        'inferno': '/images/fire.svg',
+        'ignite': '/images/fire.svg',
+        
+        'ice': '/images/ice.svg',
+        'frost': '/images/ice.svg',
+        'freeze': '/images/ice.svg',
+        'blizzard': '/images/ice.svg',
+        'chill': '/images/ice.svg',
+        'cold': '/images/ice.svg',
+        
+        'lightning': '/images/lightning.svg',
+        'thunder': '/images/lightning.svg',
+        'shock': '/images/lightning.svg',
+        'storm': '/images/lightning.svg',
+        'electric': '/images/lightning.svg',
+        'bolt': '/images/lightning.svg',
+        
+        // Nature Elements
+        'toxic': '/images/toxic.svg',
+        'poison': '/images/toxic.svg',
+        'acid': '/images/toxic.svg',
+        'venom': '/images/toxic.svg',
+        'earth': '/images/toxic.svg',
+        'nature': '/images/toxic.svg',
+        'plant': '/images/toxic.svg',
+        'thorn': '/images/toxic.svg',
+        
+        // Light & Dark
+        'light': '/images/light.svg',
+        'holy': '/images/light.svg',
+        'divine': '/images/light.svg',
+        'radiant': '/images/light.svg',
+        'heal': '/images/light.svg',
+        'cure': '/images/light.svg',
+        'blessing': '/images/light.svg',
+        
+        'dark': '/images/dark.svg',
+        'shadow': '/images/dark.svg',
+        'unholy': '/images/dark.svg',
+        'curse': '/images/dark.svg',
+        'death': '/images/dark.svg',
+        'drain': '/images/dark.svg',
+        'necro': '/images/dark.svg',
+        
+        // Arcane & Mystic
+        'arcane': '/images/arcane.svg',
+        'magic': '/images/arcane.svg',
+        'mystic': '/images/arcane.svg',
+        'enchant': '/images/arcane.svg',
+        'charm': '/images/arcane.svg',
+        'illusion': '/images/arcane.svg',
+        'teleport': '/images/arcane.svg',
+        'summon': '/images/arcane.svg',
+        
+        // Hybrid Elements
+        'water': '/images/ice.svg',
+        'steam': '/images/fire.svg',
+        'wind': '/images/lightning.svg',
+        'air': '/images/lightning.svg',
+        'spirit': '/images/light.svg',
+        'psychic': '/images/arcane.svg',
+        'force': '/images/arcane.svg',
+      };
+      
+      // Check both element and name for icon matching
+      const element = item.element?.toLowerCase() || '';
+      const spellName = item.name?.toLowerCase() || '';
+      
+      // First try element match
+      if (element && spellIcons[element]) {
+        return spellIcons[element];
+      }
+      
+      // Then try name-based matching
+      for (const [key, icon] of Object.entries(spellIcons)) {
+        if (spellName.includes(key)) {
+          return icon;
+        }
+      }
+      
+      return '/images/arcane.svg'; // Default for spells
+    }
+    
+    // Enhanced special items based on name patterns and type
+    const itemName = item.name?.toLowerCase() || '';
+    const itemType = item.type?.toLowerCase() || '';
+    
+    // Currency and valuables
+    if (itemType === 'gold' || itemName.includes('gold') || itemName.includes('coin') || 
+        itemName.includes('currency') || itemName.includes('money')) {
+      return '/images/gold.svg';
+    }
+    
+    // Tools and utilities
+    if (itemName.includes('key') || itemName.includes('lockpick') || itemName.includes('tool')) {
+      return '/images/item.svg';
+    }
+    
+    // Magical artifacts and gems
+    if (itemName.includes('gem') || itemName.includes('crystal') || itemName.includes('orb') ||
+        itemName.includes('stone') || itemName.includes('shard')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Books, scrolls and knowledge items
+    if (itemName.includes('scroll') || itemName.includes('book') || itemName.includes('tome') || 
+        itemName.includes('grimoire') || itemName.includes('manual') || itemName.includes('guide')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Jewelry and accessories
+    if (itemName.includes('ring') || itemName.includes('amulet') || itemName.includes('necklace') || 
+        itemName.includes('pendant') || itemName.includes('charm') || itemName.includes('talisman') ||
+        itemType === 'accessory' || itemType === 'jewelry') {
+      return '/images/unique.svg';
+    }
+    
+    // Food and consumables
+    if (itemName.includes('bread') || itemName.includes('food') || itemName.includes('meal') || 
+        itemName.includes('ration') || itemName.includes('apple') || itemName.includes('meat') ||
+        itemType === 'food' || itemType === 'consumable') {
+      return '/images/potion.svg'; // Use potion icon for consumables
+    }
+    
+    // Bombs and explosives
+    if (itemName.includes('bomb') || itemName.includes('explosive') || itemName.includes('grenade') ||
+        itemName.includes('dynamite') || itemName.includes('powder')) {
+      return '/images/fire.svg'; // Fire for explosives
+    }
+    
+    // Arrows and ammunition
+    if (itemName.includes('arrow') || itemName.includes('bolt') || itemName.includes('ammo') ||
+        itemName.includes('dart') || itemName.includes('shot')) {
+      return '/images/bow.svg';
+    }
+    
+    // Armor and protection
+    if (itemType === 'armor' || itemName.includes('armor') || itemName.includes('shield') ||
+        itemName.includes('helmet') || itemName.includes('boots') || itemName.includes('gloves')) {
+      return '/images/item.svg'; // Generic item for armor
+    }
+    
+    // Special artifacts and legendary items
+    if (itemName.includes('artifact') || itemName.includes('relic') || itemName.includes('legendary') || 
+        itemName.includes('epic') || itemName.includes('ancient') || itemName.includes('blessed') ||
+        item.rarity === 'legendary' || item.rarity === 'epic') {
+      return '/images/unique.svg';
+    }
+    
+    // Skills and abilities
+    if (itemType === 'skill' || itemName.includes('skill') || itemName.includes('ability') ||
+        itemName.includes('technique') || itemName.includes('backstab') || itemName.includes('stealth')) {
+      return '/images/dagger.svg'; // Skill icon
+    }
+    
+    // Element-based fallback for items with element property
+    if (item.element) {
+      const elementIcons: Record<string, string> = {
+        'fire': '/images/fire.svg',
+        'ice': '/images/ice.svg',
+        'lightning': '/images/lightning.svg',
+        'arcane': '/images/arcane.svg',
+        'toxic': '/images/toxic.svg',
+        'light': '/images/light.svg',
+        'dark': '/images/dark.svg',
+      };
+      return elementIcons[item.element.toLowerCase()] || '/images/arcane.svg';
+    }
+    
+    // Type-based fallback
+    if (itemType === 'unique' || itemType === 'rare') {
+      return '/images/unique.svg';
+    }
+    
+    // Ultimate fallback
+    return '/images/item.svg';
   };
 
   const getRarityBadgeColor = (item: LootItem): string => {
