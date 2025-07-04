@@ -180,7 +180,7 @@ export default function SettingsUI() {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl bg-gradient-to-br from-slate-900/95 to-slate-950/95 border-slate-700/70 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px] rounded-2xl">
+      <Card className="w-full max-w-4xl bg-gradient-to-br from-slate-900/95 to-slate-950/95 border-slate-700/70 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px] md:h-[85vh] md:max-h-[600px] rounded-2xl overflow-hidden mobile-settings-modal">
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b border-slate-700/70">
@@ -211,11 +211,11 @@ export default function SettingsUI() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 p-4 overflow-hidden">
+          <div className="flex-1 overflow-y-auto mobile-settings-content">
             {activeTab === 'basic' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 mobile-basic-tab">
                 {/* Left Column */}
-                <div className="space-y-4">
+                <div className="space-y-4 mobile-left-column">
                   {/* AI Provider */}
                   <div className="space-y-2">
                     <Label className="text-slate-200 text-sm font-medium">AI Provider</Label>                    <Select
@@ -334,7 +334,7 @@ export default function SettingsUI() {
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-4">
+                <div className="space-y-4 mobile-right-column">
                   {/* Model Selection */}
                   <div className="space-y-2">
                     <Label className="text-slate-200 text-sm font-medium">Model</Label>
@@ -441,7 +441,7 @@ export default function SettingsUI() {
             )}
 
             {activeTab === 'advanced' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 mobile-advanced-tab">
                 <div className="space-y-4">
                   <h3 className="text-slate-200 font-medium">Generation Settings</h3>
                   
@@ -494,7 +494,7 @@ export default function SettingsUI() {
             )}
 
             {activeTab === 'test' && (
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col p-4 mobile-test-tab">
                 <div className="space-y-4 flex-1">
                   <h3 className="text-slate-200 font-medium">Connection Test</h3>
                   
