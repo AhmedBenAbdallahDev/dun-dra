@@ -549,12 +549,12 @@ export default function LootUI({ onAnswer }: LootUIProps) {
                                 side="top" 
                                 align="center"
                                 avoidCollisions={true}
-                                className="max-w-xs bg-slate-900/98 border-slate-600/60 text-white shadow-2xl backdrop-blur-sm"
+                                className="max-w-xs bg-slate-900/98 backdrop-blur-md border-2 border-purple-500/60 text-slate-100 shadow-2xl"
                                 sideOffset={8}
                               >
-                              <div className="space-y-2">
+                              <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <div className="font-semibold text-amber-400 text-sm">{item.name}</div>
+                                  <div className="font-bold text-base text-slate-200">{item.name}</div>
                                   {item.rarity && (
                                     <Badge 
                                       variant="outline" 
@@ -565,43 +565,84 @@ export default function LootUI({ onAnswer }: LootUIProps) {
                                   )}
                                 </div>
                                 
-                                <div className="text-xs text-slate-300 space-y-1">
-                                  <div>Type: <span className="text-white">{item.type}</span></div>
-                                  {item.element && <div>Element: <span className="text-amber-300">{item.element}</span></div>}
-                                  {item.weaponClass && <div>Class: <span className="text-blue-300">{item.weaponClass}</span></div>}
+                                <div className="text-sm text-slate-300 space-y-1">
+                                  <div className="capitalize flex items-center gap-2">
+                                    <span>Type: </span>
+                                    <span className="text-slate-200">{item.type}</span>
+                                    {item.weaponClass && (
+                                      <>
+                                        <span>•</span>
+                                        <span className="text-slate-400">{item.weaponClass}</span>
+                                      </>
+                                    )}
+                                  </div>
+                                  {item.element && (
+                                    <div className="flex items-center gap-2">
+                                      <span>Element:</span>
+                                      <span className="text-slate-200 capitalize">{item.element}</span>
+                                    </div>
+                                  )}
                                 </div>
                                 
-                                {/* Enhanced stats display */}
+                                {/* Enhanced stats display matching DescriptionWindow */}
                                 {(item.damage || item.healing || item.mana || item.armor || item.manaCost || item.price) && (
-                                  <div className="grid grid-cols-2 gap-1 text-xs">
+                                  <div className="grid grid-cols-2 gap-2">
                                     {item.damage && (
-                                      <div className="text-red-400">⚔ {item.damage}</div>
+                                      <div className="flex items-center justify-between bg-red-900/30 rounded-lg px-2 py-1">
+                                        <span className="text-red-400 text-xs font-medium">⚔️ Damage</span>
+                                        <span className="text-white font-bold text-xs">{item.damage}</span>
+                                      </div>
                                     )}
                                     {item.healing && (
-                                      <div className="text-green-400">♥ {item.healing}</div>
+                                      <div className="flex items-center justify-between bg-green-900/30 rounded-lg px-2 py-1">
+                                        <span className="text-green-400 text-xs font-medium">❤️ Healing</span>
+                                        <span className="text-white font-bold text-xs">{item.healing}</span>
+                                      </div>
                                     )}
                                     {item.mana && (
-                                      <div className="text-blue-400">✦ {item.mana}</div>
+                                      <div className="flex items-center justify-between bg-blue-900/30 rounded-lg px-2 py-1">
+                                        <span className="text-blue-400 text-xs font-medium">⚡ Mana</span>
+                                        <span className="text-white font-bold text-xs">{item.mana}</span>
+                                      </div>
                                     )}
                                     {item.armor && (
-                                      <div className="text-purple-400">🛡 {item.armor}</div>
+                                      <div className="flex items-center justify-between bg-gray-900/30 rounded-lg px-2 py-1">
+                                        <span className="text-gray-400 text-xs font-medium">🛡️ Armor</span>
+                                        <span className="text-white font-bold text-xs">{item.armor}</span>
+                                      </div>
                                     )}
                                     {item.manaCost && (
-                                      <div className="text-cyan-400">💧 {item.manaCost}</div>
+                                      <div className="flex items-center justify-between bg-purple-900/30 rounded-lg px-2 py-1">
+                                        <span className="text-purple-400 text-xs font-medium">� Cost</span>
+                                        <span className="text-white font-bold text-xs">{item.manaCost}</span>
+                                      </div>
                                     )}
-                                    {item.price && (
-                                      <div className="text-amber-400">💰 {item.price}</div>
-                                    )}
+                                  </div>
+                                )}
+                                
+                                {/* Price Section */}
+                                {item.price && (
+                                  <div className="border-t border-purple-500/30 pt-2">
+                                    <div className="flex items-center justify-between bg-yellow-900/20 rounded-lg px-2 py-1 border border-yellow-500/30">
+                                      <span className="text-yellow-300 font-medium flex items-center gap-1 text-xs">
+                                        <span>💰</span>
+                                        <span>Price</span>
+                                      </span>
+                                      <span className="text-yellow-400 font-bold text-xs flex items-center gap-1">
+                                        <span>{item.price}</span>
+                                        <span className="text-xs">gold</span>
+                                      </span>
+                                    </div>
                                   </div>
                                 )}
                                 
                                 {item.description && (
-                                  <div className="text-xs text-slate-400 italic border-t border-slate-700/50 pt-1">
+                                  <div className="text-xs text-slate-400 italic border-t border-purple-500/20 pt-2">
                                     {item.description}
                                   </div>
                                 )}
                                 
-                                <div className="text-xs text-amber-300 border-t border-amber-500/20 pt-1 font-medium">
+                                <div className="text-xs text-purple-300 border-t border-purple-500/20 pt-2 font-medium">
                                   Click to loot this item
                                 </div>
                               </div>
