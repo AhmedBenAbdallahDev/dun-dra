@@ -21,6 +21,8 @@ import SettingsUI from '@/components/SettingsUI';
 import InGameWarnMsgs from '@/components/InGameWarnMsgs';
 import DeathUI from '@/components/DeathUI';
 import HomePage from '@/components/HomePage';
+import UISizingPanel from '@/components/UISizingPanel';
+import UISizingInitializer from '@/components/UISizingInitializer';
 import type { GameData } from '@/stores/gameStore';
 
 export default function Home() {
@@ -754,6 +756,9 @@ Current game state: ${JSON.stringify(gameData)}`
 
   return (
     <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      {/* Initialize UI sizing CSS properties */}
+      <UISizingInitializer />
+      
       {/* Combat Banner - Fixed at top */}
       {gameData.event.inCombat && <CombatUI />}
       
@@ -832,6 +837,9 @@ Current game state: ${JSON.stringify(gameData)}`
         <UiButtons onMapTravel={handleMapTravel} onBackToHome={handleBackToHome} />
       </div>
       <DescriptionWindow />
+      
+      {/* UI Sizing Panel - Available everywhere */}
+      <UISizingPanel />
       
       {/* Modal/Overlay Components - Render based on their specific states */}
       {(shopWindow || gameData.event.shopMode) && <ShopUI />}
