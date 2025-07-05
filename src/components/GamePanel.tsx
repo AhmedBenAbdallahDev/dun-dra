@@ -764,15 +764,15 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   return (
-    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-xl overflow-hidden backdrop-blur-sm`}>
-      {/* Header with HP/MP bars */}
+    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-lg overflow-hidden backdrop-blur-sm`}>
+      {/* Header with HP/MP bars - More Compact */}
       <div 
-        className={`game-panel p-3 cursor-pointer select-none transition-all duration-200 ${
+        className={`game-panel p-2 cursor-pointer select-none transition-all duration-200 ${
           isMobile ? 'hover:bg-slate-800/50 active:bg-slate-700/50' : ''
         }`}
         onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
       >
-        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center text-sm font-semibold text-blue-400 mb-2 flex items-center justify-between`}>
+        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center text-xs font-semibold text-blue-400 mb-1.5 flex items-center justify-between`}>
           <span>{title}</span>
           {isMobile && (
             <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
@@ -781,9 +781,9 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
           )}
         </h3>
         
-        {/* HP Bar for Inventory */}
+        {/* HP Bar for Inventory - Compact */}
         {title === 'Inventory' && (
-          <div className="mb-2">
+          <div className="mb-1.5">
             <div 
               className="hp-bar text-center text-xs font-medium py-1 px-2 rounded border border-red-500/40 text-red-100"
               style={{ '--hp-percentage': `${hpPercentage}%` } as React.CSSProperties}
@@ -793,9 +793,9 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
           </div>
         )}
         
-        {/* MP Bar for Spells */}
+        {/* MP Bar for Spells - Compact */}
         {title === 'Spells' && (
-          <div className="mb-2">
+          <div className="mb-1.5">
             <div 
               className="mp-bar text-center text-xs font-medium py-1 px-2 rounded border border-blue-500/40 text-blue-100"
               style={{ '--mp-percentage': `${mpPercentage}%` } as React.CSSProperties}
@@ -806,10 +806,10 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         )}
       </div>
 
-      {/* Items Grid - Mobile Optimized for Combat */}
-      <div className={`game-panel-content flex-1 p-1 md:p-2 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+      {/* Items Grid - Mobile Optimized for Combat - More Compact */}
+      <div className={`game-panel-content flex-1 p-1 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
         {actions && actions.length > 0 ? (
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 md:gap-2 h-full content-start">
+          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 h-full content-start">
             {actions.map((item, index) => {
               const disabled = isDisabled(item);
               const cooldownText = getItemCooldownText(item);
@@ -819,15 +819,15 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 <button
                   key={index}
                   className={`
-                    relative group aspect-square w-full min-w-[36px] max-w-[48px] md:max-w-[56px] p-1 md:p-2
-                    rounded-lg border-2 transition-all duration-200 overflow-hidden
+                    relative group aspect-square w-full min-w-[32px] max-w-[44px] md:max-w-[48px] p-1
+                    rounded-md border transition-all duration-200 overflow-hidden
                     flex items-center justify-center
                     ${disabled 
                       ? 'opacity-50 cursor-not-allowed bg-slate-800/50 border-slate-600/30' 
-                      : 'hover:scale-105 hover:shadow-lg bg-slate-800/70 border-slate-600/50 hover:border-slate-500/70'
+                      : 'hover:scale-105 hover:shadow-md bg-slate-800/70 border-slate-600/50 hover:border-slate-500/70'
                     }
                     ${isSelected 
-                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-lg scale-105 selected' 
+                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-md scale-105 selected' 
                       : ''
                     }
                     ${gameData.event?.inCombat 
@@ -850,39 +850,39 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   onMouseLeave={hideWindow}
                   title={gameData.event?.inCombat ? `Click to select ${item.name} for combat` : item.name}
                 >
-                  {/* Item Icon - Responsive Sizing */}
+                  {/* Item Icon - More Compact */}
                   <Image
                     src={getItemIcon(item)}
                     alt={item.name}
-                    width={20}
-                    height={20}
-                    className="pointer-events-none transition-transform group-hover:scale-110 w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"
+                    width={16}
+                    height={16}
+                    className="pointer-events-none transition-transform group-hover:scale-110 w-3 h-3 md:w-4 md:h-4"
                   />
                   
-                  {/* Selection Indicator */}
+                  {/* Selection Indicator - Smaller */}
                   {selectedName === item.name && (
-                    <div className="absolute -top-1 -right-1 w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full animate-pulse">
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-pulse">
                       <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
                     </div>
                   )}
                   
-                  {/* Combat Mode Indicator */}
+                  {/* Combat Mode Indicator - Smaller */}
                   {gameData.event.inCombat && !disabled && (
-                    <div className="absolute -bottom-1 -left-1 w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse">
+                    <div className="absolute -bottom-0.5 -left-0.5 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse">
                       <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-60"></div>
                     </div>
                   )}
                   
-                  {/* Cooldown Display */}
+                  {/* Cooldown Display - Compact */}
                   {cooldownText && (
-                    <div className="absolute inset-0 bg-slate-900/80 rounded-lg flex items-center justify-center">
+                    <div className="absolute inset-0 bg-slate-900/80 rounded-md flex items-center justify-center">
                       <span className="text-xs font-bold text-amber-300">{cooldownText}</span>
                     </div>
                   )}
                   
-                  {/* Item Count for Stackable Items */}
+                  {/* Item Count for Stackable Items - Smaller */}
                   {item.quantity && item.quantity > 1 && (
-                    <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-lg px-1 min-w-[16px] text-center">
+                    <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-md px-1 min-w-[14px] text-center">
                       {item.quantity}
                     </div>
                   )}

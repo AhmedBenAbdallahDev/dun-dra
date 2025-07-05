@@ -788,38 +788,38 @@ Current game state: ${JSON.stringify(gameData)}`
               : 'h-[50%] md:h-[55%] lg:h-[60%]'
             }
           `}>
-            {/* Mobile Layout: Stacked for Combat Clarity */}
-            <div className="flex flex-col md:hidden h-full gap-2">
-              {/* Mobile: Inventory + Spells in Same Row for Combat Access */}
-              <div className="flex gap-2 h-24">
-                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 backdrop-blur-lg shadow-lg overflow-hidden">
+            {/* Mobile Layout: Stacked for Combat Clarity - More Compact */}
+            <div className="flex flex-col md:hidden h-full gap-1.5">
+              {/* Mobile: Inventory + Spells in Same Row for Combat Access - Thinner */}
+              <div className="flex gap-1.5 h-20">
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-1.5 backdrop-blur-lg shadow-lg overflow-hidden">
                   <GamePanel title="Inventory" actions={inventory} />
                 </div>
-                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 backdrop-blur-lg shadow-lg overflow-hidden">
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-1.5 backdrop-blur-lg shadow-lg overflow-hidden">
                   <GamePanel title="Spells" actions={spells} />
                 </div>
               </div>
               
-              {/* Mobile: Choices Take Remaining Space - No Scrolling */}
-              <div className="flex-1 bg-slate-900/80 border-2 border-blue-500/30 rounded-lg p-3 backdrop-blur-lg shadow-xl">
+              {/* Mobile: Choices Take Remaining Space - No Scrolling - More Compact */}
+              <div className="flex-1 bg-slate-900/80 border border-blue-500/30 rounded-lg p-2 backdrop-blur-lg shadow-xl">
                 <Choices onChoiceSelect={handleChoiceSelection} />
               </div>
             </div>
 
-            {/* Desktop Layout: Traditional Side Panels */}
-            <div className="hidden md:flex w-full h-full gap-4 lg:gap-6">
-              {/* Desktop: Inventory Panel */}
-              <div className="w-60 lg:w-72 xl:w-80 h-full bg-slate-900/80 border border-slate-600/30 rounded-xl p-3 lg:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
+            {/* Desktop Layout: Traditional Side Panels - More Compact */}
+            <div className="hidden md:flex w-full h-full gap-3">
+              {/* Desktop: Inventory Panel - Narrower */}
+              <div className="w-52 lg:w-60 xl:w-68 h-full bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 lg:p-3 backdrop-blur-lg shadow-lg overflow-hidden">
                 <GamePanel title="Inventory" actions={inventory} />
               </div>
               
-              {/* Desktop: Choices Center */}
-              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border-2 border-blue-500/30 rounded-xl p-4 lg:p-6 backdrop-blur-lg shadow-2xl overflow-y-auto">
+              {/* Desktop: Choices Center - Less Padding */}
+              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border border-blue-500/30 rounded-lg p-3 lg:p-4 backdrop-blur-lg shadow-xl overflow-y-auto">
                 <Choices onChoiceSelect={handleChoiceSelection} />
               </div>
               
-              {/* Desktop: Spells Panel */}
-              <div className="w-60 lg:w-72 xl:w-80 h-full bg-slate-900/80 border border-slate-600/30 rounded-xl p-3 lg:p-4 backdrop-blur-lg shadow-lg overflow-hidden">
+              {/* Desktop: Spells Panel - Narrower */}
+              <div className="w-52 lg:w-60 xl:w-68 h-full bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 lg:p-3 backdrop-blur-lg shadow-lg overflow-hidden">
                 <GamePanel title="Spells" actions={spells} />
               </div>
             </div>
