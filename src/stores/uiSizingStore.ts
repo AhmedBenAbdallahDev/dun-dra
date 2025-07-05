@@ -184,9 +184,11 @@ export const useUISizingStore = create<UISizingState>()(
       
       updateSizing: (key, value) => {
         set({ [key]: value });
-        // Apply CSS custom properties
-        const state = get();
-        applyCSS(state);
+        // Apply CSS custom properties immediately
+        setTimeout(() => {
+          const state = get();
+          applyCSS(state);
+        }, 0);
       },
       
       resetToDefaults: () => {

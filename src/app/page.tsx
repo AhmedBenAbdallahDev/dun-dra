@@ -794,37 +794,75 @@ Current game state: ${JSON.stringify(gameData)}`
             }
           `}>
             {/* Mobile Layout: Stacked for Combat Clarity - More Compact */}
-            <div className="flex flex-col md:hidden h-full gap-1.5">
+            <div className="flex flex-col md:hidden h-full"
+                 style={{ gap: 'var(--main-gap-mobile, 6px)' }}>
               {/* Mobile: Inventory + Spells in Same Row for Combat Access - Thinner */}
-              <div className="flex gap-1.5 h-20">
-                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-1.5 backdrop-blur-lg shadow-lg overflow-hidden">
+              <div className="flex h-20"
+                   style={{ 
+                     gap: 'var(--main-gap-mobile, 6px)',
+                     height: 'var(--panel-height-mobile, 80px)'
+                   }}>
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                     style={{ 
+                       padding: 'var(--panel-padding-mobile, 6px)',
+                       borderRadius: 'var(--panel-border-radius, 8px)',
+                       borderWidth: 'var(--border-width, 1px)',
+                     }}>
                   <GamePanel title="Inventory" actions={inventory} />
                 </div>
-                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg p-1.5 backdrop-blur-lg shadow-lg overflow-hidden">
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                     style={{ 
+                       padding: 'var(--panel-padding-mobile, 6px)',
+                       borderRadius: 'var(--panel-border-radius, 8px)',
+                       borderWidth: 'var(--border-width, 1px)',
+                     }}>
                   <GamePanel title="Spells" actions={spells} />
                 </div>
               </div>
               
               {/* Mobile: Choices Take Remaining Space - No Scrolling - More Compact */}
-              <div className="flex-1 bg-slate-900/80 border border-blue-500/30 rounded-lg p-2 backdrop-blur-lg shadow-xl">
+              <div className="flex-1 bg-slate-900/80 border border-blue-500/30 rounded-lg backdrop-blur-lg shadow-xl"
+                   style={{ 
+                     padding: 'var(--container-padding-mobile, 8px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
                 <Choices onChoiceSelect={handleChoiceSelection} />
               </div>
             </div>
 
             {/* Desktop Layout: Traditional Side Panels - More Compact */}
-            <div className="hidden md:flex w-full h-full gap-3">
+            <div className="hidden md:flex w-full h-full"
+                 style={{ gap: 'var(--main-gap-desktop, 12px)' }}>
               {/* Desktop: Inventory Panel - Narrower */}
-              <div className="w-52 lg:w-60 xl:w-68 h-full bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 lg:p-3 backdrop-blur-lg shadow-lg overflow-hidden">
+              <div className="h-full bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                   style={{ 
+                     width: 'var(--panel-width-desktop, 208px)',
+                     padding: 'var(--panel-padding-desktop, 12px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
                 <GamePanel title="Inventory" actions={inventory} />
               </div>
               
               {/* Desktop: Choices Center - Less Padding */}
-              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border border-blue-500/30 rounded-lg p-3 lg:p-4 backdrop-blur-lg shadow-xl overflow-y-auto">
+              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border border-blue-500/30 rounded-lg backdrop-blur-lg shadow-xl overflow-y-auto"
+                   style={{ 
+                     padding: 'var(--container-padding-desktop, 16px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
                 <Choices onChoiceSelect={handleChoiceSelection} />
               </div>
               
               {/* Desktop: Spells Panel - Narrower */}
-              <div className="w-52 lg:w-60 xl:w-68 h-full bg-slate-900/80 border border-slate-600/30 rounded-lg p-2 lg:p-3 backdrop-blur-lg shadow-lg overflow-hidden">
+              <div className="h-full bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                   style={{ 
+                     width: 'var(--panel-width-desktop, 208px)',
+                     padding: 'var(--panel-padding-desktop, 12px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
                 <GamePanel title="Spells" actions={spells} />
               </div>
             </div>

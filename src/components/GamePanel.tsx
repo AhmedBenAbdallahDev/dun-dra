@@ -764,15 +764,25 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
   };
 
   return (
-    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-lg overflow-hidden backdrop-blur-sm`}>
+    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-lg overflow-hidden backdrop-blur-sm`}
+         style={{ 
+           borderRadius: 'var(--panel-border-radius, 8px)',
+           borderWidth: 'var(--border-width, 1px)',
+         }}>
       {/* Header with HP/MP bars - More Compact */}
       <div 
-        className={`game-panel p-2 cursor-pointer select-none transition-all duration-200 ${
+        className={`game-panel cursor-pointer select-none transition-all duration-200 ${
           isMobile ? 'hover:bg-slate-800/50 active:bg-slate-700/50' : ''
         }`}
+        style={{
+          padding: isMobile ? 'var(--panel-padding-mobile, 6px)' : 'var(--panel-padding-desktop, 12px)',
+        }}
         onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
       >
-        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center text-xs font-semibold text-blue-400 mb-1.5 flex items-center justify-between`}>
+        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center font-semibold text-blue-400 mb-1.5 flex items-center justify-between`}
+            style={{ 
+              fontSize: isMobile ? 'var(--title-font-size-mobile, 12px)' : 'var(--title-font-size-desktop, 14px)'
+            }}>
           <span>{title}</span>
           {isMobile && (
             <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
@@ -807,9 +817,15 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
       </div>
 
       {/* Items Grid - Mobile Optimized for Combat - More Compact */}
-      <div className={`game-panel-content flex-1 p-1 ${!isExpanded && isMobile ? 'hidden' : ''}`}>
+      <div className={`game-panel-content flex-1 ${!isExpanded && isMobile ? 'hidden' : ''}`}
+           style={{ 
+             padding: 'var(--panel-padding-mobile, 6px)' 
+           }}>
         {actions && actions.length > 0 ? (
-          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 h-full content-start">
+          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 h-full content-start"
+               style={{ 
+                 gap: isMobile ? 'var(--item-gap-mobile, 4px)' : 'var(--item-gap-desktop, 8px)' 
+               }}>
             {actions.map((item, index) => {
               const disabled = isDisabled(item);
               const cooldownText = getItemCooldownText(item);
@@ -819,7 +835,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 <button
                   key={index}
                   className={`
-                    relative group aspect-square w-full min-w-[32px] max-w-[44px] md:max-w-[48px] p-1
+                    relative group aspect-square w-full p-1
                     rounded-md border transition-all duration-200 overflow-hidden
                     flex items-center justify-center
                     ${disabled 
@@ -835,6 +851,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                       : ''
                     }
                   `}
+                  style={{
+                    minWidth: isMobile ? 'var(--item-size-mobile, 32px)' : 'var(--item-size-desktop, 48px)',
+                    maxWidth: isMobile ? 'var(--item-size-mobile, 32px)' : 'var(--item-size-desktop, 48px)',
+                    borderRadius: 'var(--button-border-radius, 6px)',
+                    borderWidth: 'var(--border-width, 1px)',
+                  }}
                   data-selected={isSelected}
                   disabled={disabled}
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -856,7 +878,11 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                     alt={item.name}
                     width={16}
                     height={16}
-                    className="pointer-events-none transition-transform group-hover:scale-110 w-3 h-3 md:w-4 md:h-4"
+                    className="pointer-events-none transition-transform group-hover:scale-110"
+                    style={{
+                      width: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
+                      height: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
+                    }}
                   />
                   
                   {/* Selection Indicator - Smaller */}

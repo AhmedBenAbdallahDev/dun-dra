@@ -197,7 +197,9 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
             {choices.length > 0 ? (
               <>
                 {/* Mobile: Fixed 4-Button Layout (No Scrolling) - Compact */}
-                <div className="md:hidden h-full flex flex-col gap-2 pt-8">
+                <div className="md:hidden h-full flex flex-col pt-8" style={{
+                  gap: 'var(--choice-gap-mobile, 8px)'
+                }}>
                   {/* Always show 4 buttons: 3 story choices + 1 custom input */}
                   {choices.slice(0, 3).map((choice: string, index: number) => {
                     const isSelected = selectedChoice === index;
@@ -209,7 +211,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                         disabled={isDisabled}
                         onClick={() => handleChoiceClick(choice, index)}
                         className={`
-                          flex-1 min-h-[48px] p-2.5 text-left text-sm leading-tight
+                          flex-1 p-2.5 text-left text-sm leading-tight
                           rounded-lg transition-all duration-200 relative overflow-hidden
                           flex items-center group border
                           ${isSelected 
@@ -219,6 +221,12 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                               : 'bg-slate-800/80 hover:bg-blue-600/20 border-slate-600/40 hover:border-blue-500/70 cursor-pointer hover:scale-[1.01] hover:shadow-md hover:shadow-blue-500/20 active:scale-95'
                           }
                         `}
+                        style={{
+                          minHeight: 'var(--choice-button-height-mobile, 48px)',
+                          fontSize: 'var(--body-font-size-mobile, 14px)',
+                          borderRadius: 'var(--button-border-radius, 6px)',
+                          borderWidth: 'var(--border-width, 1px)',
+                        }}
                       >
                         {/* Choice number indicator - smaller */}
                         <div className={`
@@ -232,7 +240,8 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                         </div>
                         
                         {/* Choice text - more compact */}
-                        <div className="ml-7 pr-6 flex-1 text-slate-100 word-wrap break-words">
+                        <div className="ml-7 pr-6 flex-1 text-slate-100 word-wrap break-words"
+                             style={{ fontSize: 'var(--body-font-size-mobile, 14px)' }}>
                           {choice}
                         </div>
                         
@@ -255,12 +264,17 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
 
                   {/* Custom Input as 4th Button on Mobile - Compact */}
                   <div className={`
-                    flex-1 min-h-[48px] p-2.5 rounded-lg border transition-all duration-200
+                    flex-1 p-2.5 rounded-lg border transition-all duration-200
                     ${customInput.trim() 
                       ? 'bg-purple-600/20 border-purple-500/60' 
                       : 'bg-slate-800/80 border-slate-600/40'
                     }
-                  `}>
+                  `}
+                  style={{
+                    minHeight: 'var(--choice-button-height-mobile, 48px)',
+                    borderRadius: 'var(--button-border-radius, 6px)',
+                    borderWidth: 'var(--border-width, 1px)',
+                  }}>
                     <div className="flex items-center gap-2 mb-1.5">
                       <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold text-white">
                         4
@@ -278,11 +292,19 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                         placeholder="Write your action..."
                         disabled={loading || isProcessing}
                         className="flex-1 px-2 py-1.5 bg-slate-900/60 border border-slate-600/50 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 text-xs"
+                        style={{
+                          fontSize: 'var(--body-font-size-mobile, 14px)',
+                          borderRadius: 'var(--button-border-radius, 6px)',
+                        }}
                       />
                       <button
                         onClick={handleCustomAnswer}
                         disabled={loading || isProcessing || !customInput.trim() || interactivePoints <= 0}
                         className="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white rounded-md transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 active:scale-95 text-xs"
+                        style={{
+                          borderRadius: 'var(--button-border-radius, 6px)',
+                          fontSize: 'var(--body-font-size-mobile, 14px)',
+                        }}
                       >
                         {isProcessing ? (
                           <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -297,7 +319,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
 
                 {/* Desktop: Scrollable Layout - Compact */}
                 <div className="hidden md:flex flex-col h-full pt-8">
-                  <div className="flex-1 overflow-y-auto space-y-2">
+                  <div className="flex-1 overflow-y-auto" style={{ gap: 'var(--choice-gap-desktop, 8px)' }}>
                     {choices.map((choice: string, index: number) => {
                       const isSelected = selectedChoice === index;
                       const isDisabled = loading || isProcessing;
@@ -308,7 +330,7 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                           disabled={isDisabled}
                           onClick={() => handleChoiceClick(choice, index)}
                           className={`
-                            w-full min-h-[56px] lg:min-h-[60px] p-3 lg:p-4
+                            w-full p-3 lg:p-4 mb-2
                             text-left text-sm lg:text-base leading-relaxed
                             rounded-lg transition-all duration-200 relative overflow-hidden
                             flex items-center group border
@@ -319,6 +341,12 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                                 : 'bg-slate-800/80 hover:bg-blue-600/20 border-slate-600/40 hover:border-blue-500/70 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/20 active:scale-95'
                             }
                           `}
+                          style={{
+                            minHeight: 'var(--choice-button-height-desktop, 56px)',
+                            fontSize: 'var(--body-font-size-desktop, 16px)',
+                            borderRadius: 'var(--button-border-radius, 6px)',
+                            borderWidth: 'var(--border-width, 1px)',
+                          }}
                         >
                           {/* Choice number indicator - smaller */}
                           <div className={`
@@ -332,7 +360,8 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
                           </div>
                           
                           {/* Choice text - more compact */}
-                          <div className="ml-9 pr-10 flex-1 text-slate-100 word-wrap break-words">
+                          <div className="ml-9 pr-10 flex-1 text-slate-100 word-wrap break-words"
+                               style={{ fontSize: 'var(--body-font-size-desktop, 16px)' }}>
                             {choice}
                           </div>
                           

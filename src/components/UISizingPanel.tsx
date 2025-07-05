@@ -378,8 +378,12 @@ export default function UISizingPanel() {
     <>
       {/* Keyboard hint */}
       {!isVisible && (
-        <div className="fixed bottom-4 right-4 z-50 bg-slate-800/90 backdrop-blur-sm border border-slate-600/50 rounded-lg px-3 py-2 text-slate-300 text-sm pointer-events-none">
-          Press <kbd className="px-1.5 py-0.5 bg-slate-700 rounded border border-slate-600 font-mono text-xs">U</kbd> for UI sizing panel
+        <div className="fixed bottom-4 right-4 z-50 bg-slate-900/95 backdrop-blur-md border border-amber-500/40 rounded-lg px-4 py-3 text-amber-200 text-sm pointer-events-none shadow-lg shadow-amber-500/10">
+          <div className="flex items-center gap-2">
+            <span>Press</span>
+            <kbd className="px-2 py-1 bg-amber-600/20 border border-amber-500/30 rounded font-mono text-xs text-amber-300 shadow-inner">U</kbd>
+            <span>for UI Panel</span>
+          </div>
         </div>
       )}
       
@@ -396,30 +400,39 @@ export default function UISizingPanel() {
         flat={false}
         theme={{
           colors: {
-            elevation1: '#1e293b',
-            elevation2: '#334155',
-            elevation3: '#475569',
-            accent1: '#f59e0b',
-            accent2: '#d97706',
-            accent3: '#92400e',
-            highlight1: '#3b82f6',
-            highlight2: '#1d4ed8',
-            highlight3: '#1e40af',
-            vivid1: '#10b981',
+            elevation1: '#0f172a', // slate-900
+            elevation2: '#1e293b', // slate-800
+            elevation3: '#334155', // slate-700
+            accent1: '#f59e0b',    // amber-500
+            accent2: '#d97706',    // amber-600
+            accent3: '#92400e',    // amber-800
+            highlight1: '#3b82f6', // blue-500
+            highlight2: '#1d4ed8', // blue-700
+            highlight3: '#1e40af', // blue-800
+            vivid1: '#10b981',     // emerald-500
+            folderWidgetColor: '#f59e0b',
+            folderTextColor: '#f1f5f9',
+            toolTipBackground: '#1e293b',
+            toolTipText: '#f1f5f9',
           },
           fontSizes: {
-            root: '11px',
+            root: '12px',
           },
           sizes: {
-            rootWidth: '340px',
-            controlWidth: '160px',
+            rootWidth: '360px',
+            controlWidth: '180px',
+            numberInputMinWidth: '50px',
+            scrubberWidth: '12px',
+            scrubberHeight: '20px',
+            rowHeight: '24px',
+            folderTitleHeight: '28px',
           },
           space: {
-            xs: '3px',
-            sm: '6px',
-            md: '10px',
-            rowGap: '7px',
-            colGap: '7px',
+            xs: '4px',
+            sm: '8px',
+            md: '12px',
+            rowGap: '8px',
+            colGap: '8px',
           },
         }}
       />
