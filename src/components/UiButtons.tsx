@@ -10,8 +10,6 @@ import {
   Heart, 
   Zap, 
   Coins, 
-  Backpack, 
-  Sparkles, 
   Store, 
   Settings, 
   Menu, 
@@ -30,15 +28,18 @@ interface UiButtonsProps {
 
 export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps) {
   const [showStats, setShowStats] = useState(false);
-  const [showInventory, setShowInventory] = useState(false);
-  const [showSpells, setShowSpells] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  const { stats, inventory, spells } = useCharacterStore();
+  const { stats } = useCharacterStore();
   const { gameData, setCurrentShop, gold } = useGameStore();  const { loading, toggleShopWindow, toggleSettingsWindow, setStarted, reset: resetUI, started } = useUIStore();
   
   const handleMusicToggle = async () => {
+    console.log('🎵 UiButtons: Music toggle clicked:', { 
+      currentlyPlaying: audioPlaying, 
+      hasAudioElement: !!audioElement 
+    });
+    
     try {
       if (!audioElement) {
         // Create audio element with placeholder/example audio
@@ -51,7 +52,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         // This can be extended later when audio files are available
         setAudioElement(audio);
         setAudioPlaying(true);
-        console.log('Music started (placeholder - no audio file available)');
+        console.log('🎵 Music started (placeholder - no audio file available)');
       } else {
         if (audioPlaying) {
           audioElement.pause();
@@ -108,43 +109,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
     };
   });
   
-  // Get element icon function
-  const getElementIcon = (element?: string) => {
-    if (!element) return '🔮';
-    
-    const elementIcons: Record<string, string> = {
-      fire: '🔥',
-      ice: '❄️',
-      lightning: '⚡',
-      earth: '🌍',
-      wind: '💨',
-      water: '💧',
-      dark: '🌑',
-      light: '☀️',
-      arcane: '✨',
-      toxic: '☠️'
-    };
-    
-    return elementIcons[element.toLowerCase()] || '🔮';
-  };
-
-  // Get weapon icon function
-  const getWeaponIcon = (weaponClass?: string) => {
-    if (!weaponClass) return '⚔️';
-    
-    const weaponIcons: Record<string, string> = {
-      sword: '⚔️',
-      dagger: '🗡️',
-      bow: '🏹',
-      mace: '🔨',
-      spear: '🔱',
-      axe: '🪓',
-      flail: '⛓️',
-      staff: '🔮'
-    };
-    
-    return weaponIcons[weaponClass.toLowerCase()] || '⚔️';
-  };    const handleOpenShop = () => {
+  const handleOpenShop = () => {
     const testShop = generateShop('general');
     setCurrentShop(testShop);
     toggleShopWindow();
@@ -170,6 +135,21 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
     // Game data is auto-saved via Zustand persist middleware
     // Show confirmation message
     console.log('Game saved successfully!');
+    const toast = document.createElement('div');
+    toast.textContent = 'Game Saved Successfully!';
+    toast.style.cssText = `
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      background: #10b981; 
+      color: white; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      z-index: 9999;
+      font-weight: 500;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => document.body.removeChild(toast), 3000);
   };
   const handleLoadGame = () => {
     // First hide the menu to prevent any state issues
@@ -178,11 +158,28 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
       menuElement.style.display = 'none';
     }
     
+    // Show loading message
+    const toast = document.createElement('div');
+    toast.textContent = 'Loading Game...';
+    toast.style.cssText = `
+      position: fixed; 
+      top: 20px; 
+      right: 20px; 
+      background: #3b82f6; 
+      color: white; 
+      padding: 12px 20px; 
+      border-radius: 8px; 
+      z-index: 9999;
+      font-weight: 500;
+    `;
+    document.body.appendChild(toast);
+    
     // Game data is auto-loaded via Zustand persist middleware
     // Add a delay to break potential update cycles
     setTimeout(() => {
+      document.body.removeChild(toast);
       window.location.href = window.location.pathname; // Reload without state update cycles
-    }, 100);
+    }, 1000);
   };  const StatCard = () => (
     <Card className="absolute bottom-16 md:bottom-20 left-2 md:left-4 bg-slate-900/95 border-slate-700 text-white z-50 backdrop-blur-sm shadow-2xl max-w-[280px] w-[calc(100vw-1rem)] md:w-auto">
       <CardHeader className="pb-3">
@@ -213,88 +210,8 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
           <span className="text-sm text-yellow-400 font-medium">{gold}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Sword className="h-4 w-4 text-purple-500" />
+          <Sword className="h-4 w-4 text-amber-500" />
           <span className="text-sm text-slate-300">{gameData.heroClass || 'Unknown'}</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const InventoryCard = () => (
-    <Card className="absolute bottom-16 md:bottom-20 left-2 md:left-64 bg-slate-900/95 border-slate-700 text-white z-50 max-w-sm backdrop-blur-sm shadow-2xl w-[calc(100vw-1rem)] md:w-auto">      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
-          <Backpack className="h-4 w-4" />
-          Inventory
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto">
-          {inventory.length === 0 ? (
-            <div className="text-slate-400 text-sm italic">Empty inventory</div>
-          ) : (
-            inventory.map((item, index) => (
-              <div key={index} className="p-2 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                <div className="flex items-center justify-between">
-                  <div className="font-medium text-slate-200 text-sm">{item.name}</div>
-                  {item.quantity && item.quantity > 1 && (
-                    <span className="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">
-                      x{item.quantity}
-                    </span>
-                  )}
-                </div>
-                {item.damage && (
-                  <div className="text-xs text-red-400 mt-1">{getWeaponIcon(item.weaponClass)} {item.damage} damage</div>
-                )}
-                {item.armor && (
-                  <div className="text-xs text-blue-400 mt-1">🛡️ {item.armor} armor</div>
-                )}
-                {item.healing && (
-                  <div className="text-xs text-green-400 mt-1">❤️ +{item.healing} HP</div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const SpellsCard = () => (
-    <Card className="absolute bottom-16 md:bottom-20 right-2 md:right-4 bg-slate-900/95 border-slate-700 text-white z-50 max-w-sm backdrop-blur-sm shadow-2xl w-[calc(100vw-1rem)] md:w-auto">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
-          <Sparkles className="h-4 w-4" />
-          Spells
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2 max-h-48 md:max-h-64 overflow-y-auto">
-          {spells.length === 0 ? (
-            <div className="text-slate-400 text-sm italic">No spells learned</div>
-          ) : (
-            spells.map((spell, index) => (
-              <div key={index} className="p-2 md:p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                <div className="font-medium text-slate-200 text-sm">{spell.name}</div>
-                <div className="flex flex-wrap gap-1 md:gap-2 mt-2">
-                  {spell.damage && (
-                    <span className="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">
-                      💥 {spell.damage}
-                    </span>
-                  )}
-                  {spell.manaCost && (
-                    <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded">
-                      ⚡ {spell.manaCost} MP
-                    </span>
-                  )}
-                  {spell.element && (
-                    <span className="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded">
-                      {getElementIcon(spell.element)} {spell.element}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
         </div>
       </CardContent>
     </Card>
@@ -305,7 +222,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-slate-100 text-sm md:text-base">
           <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
+            <path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3h-6zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3v6zM9 21l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6h6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42 2.89 2.87L15 21h6v-6z"/>
           </svg>
           Quick Travel
         </CardTitle>
@@ -420,36 +337,75 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Brand */}
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Mythic Conjurer
-              </h1>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              {/* Mobile: Badge/Logo only */}
+              <div className="md:hidden w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-sm font-bold text-white">🏰</span>
+              </div>
               
-              {/* Quick Stats Bar */}
+              {/* Desktop: Full brand with logo */}
               <div className="hidden md:flex items-center space-x-3">
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                  <Heart className="h-4 w-4 text-red-400" />
-                  <span className="text-sm">
-                    <span className="text-red-400 font-medium">{stats.hp}</span>
-                    <span className="text-slate-500">/</span>
-                    <span className="text-slate-300">{stats.maxHp}</span>
-                  </span>
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <span className="text-sm font-bold text-white">🏰</span>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                  <Zap className="h-4 w-4 text-blue-400" />
-                  <span className="text-sm">
-                    <span className="text-blue-400 font-medium">{stats.mp}</span>
-                    <span className="text-slate-500">/</span>
-                    <span className="text-slate-300">{stats.maxMp}</span>
-                  </span>
+                <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                  Mythic Conjurer
+                </h1>
+              </div>
+              
+              {/* Quick Stats Bar - Compact mobile version */}
+              <div className="flex items-center space-x-1 md:space-x-3">
+                {/* Mobile: Compact stats */}
+                <div className="md:hidden flex items-center space-x-1">
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-red-600/30">
+                    <Heart className="h-3 w-3 text-red-400" />
+                    <span className="text-red-400">{stats.hp}</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-blue-600/30">
+                    <Zap className="h-3 w-3 text-blue-400" />
+                    <span className="text-blue-400">{stats.mp}</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-slate-800/60 px-2 py-1 rounded text-xs border border-slate-700">
+                    <Coins className="h-3 w-3 text-yellow-400" />
+                    <span className="text-yellow-400">{gold}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-                  <Coins className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm text-yellow-400 font-medium">{gold}</span>
+                
+                {/* Desktop: Full stats with progress bars */}
+                <div className="hidden md:flex items-center space-x-3">
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-red-600/30 hover:border-red-500/50 transition-all group">
+                    <Heart className="h-4 w-4 text-red-400 group-hover:animate-pulse" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm">
+                        <span className="text-red-400 font-medium">{stats.hp}</span>
+                        <span className="text-slate-500">/</span>
+                        <span className="text-slate-300">{stats.maxHp}</span>
+                      </span>
+                      <div className="w-16 h-1 bg-red-900/50 rounded-full overflow-hidden mt-0.5">
+                        <div 
+                          className="h-full bg-gradient-to-r from-red-600 to-red-400 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100))}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-2 rounded-lg border border-blue-600/30 hover:border-blue-500/50 transition-all group">
+                    <Zap className="h-4 w-4 text-blue-400" />
+                    <span className="text-sm">
+                      <span className="text-blue-400 font-medium">{stats.mp}</span>
+                      <span className="text-slate-500">/</span>
+                      <span className="text-slate-300">{stats.maxMp}</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+                    <Coins className="h-4 w-4 text-yellow-400" />
+                    <span className="text-sm text-yellow-400 font-medium">{gold}</span>
+                  </div>
                 </div>
               </div>
-            </div>            {/* Action Buttons */}
-            <div className="flex items-center space-x-2 md:space-x-3">
+            </div>            {/* Action Buttons - Compact mobile layout */}
+            <div className="flex items-center space-x-1 md:space-x-3">
               {/* Character Actions - Hidden on mobile, shown in menu */}
               <div className="hidden md:flex items-center space-x-2">
                 <Button
@@ -460,25 +416,6 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                 >
                   <User className="h-4 w-4 mr-2" />
                   Stats
-                </Button>
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowInventory(!showInventory)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                >
-                  <Backpack className="h-4 w-4 mr-2" />
-                  Inventory
-                </Button>
-                  <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowSpells(!showSpells)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95"
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Spells
                 </Button>
                 
                 <Button
@@ -495,25 +432,25 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                 </Button>
               </div>
               
-              {/* Game Actions */}
+              {/* Game Actions - Compact on mobile */}
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleOpenShop}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg"
+                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg px-2 md:px-4"
               >
-                <Store className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Shop</span>
+                <Store className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Shop</span>
               </Button>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleSettingsWindow}
-                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg"
+                className="text-slate-300 hover:text-white hover:bg-slate-800/60 border border-slate-700 transition-all duration-200 transform hover:scale-105 active:scale-95 hover:shadow-lg px-2 md:px-4"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Settings</span>
+                <Settings className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Settings</span>
               </Button>              {/* Enhanced Menu Button with mobile improvements */}
               <Button
                 variant="ghost"
@@ -547,26 +484,6 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
                   >
                     <User className="h-4 w-4 mr-2" />
                     Character Stats
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowInventory(!showInventory);
-                      document.getElementById('simple-menu')!.style.display = 'none';
-                    }}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center transition-colors"
-                  >
-                    <Backpack className="h-4 w-4 mr-2" />
-                    Inventory
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setShowSpells(!showSpells);
-                      document.getElementById('simple-menu')!.style.display = 'none';
-                    }}
-                    className="w-full text-left px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center transition-colors"
-                  >
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Spells
                   </button>
                   <div className="h-px bg-slate-700"></div>
                 </div>
@@ -616,10 +533,8 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
             </div>
           </div>
         </div>
-      </div>      {/* Stat overlays */}
+      </div>      {/* Stat overlays - Only Stats and Map, no duplicates */}
       {showStats && <StatCard />}
-      {showInventory && <InventoryCard />}
-      {showSpells && <SpellsCard />}
       {showMap && <MapCard />}
       
       {/* Music and Fullscreen buttons - floating position like Svelte version */}
@@ -656,7 +571,7 @@ export default function UiButtons({ onBackToHome, onMapTravel }: UiButtonsProps)
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-900/95 border border-slate-700 rounded-lg p-4 md:p-6 shadow-2xl backdrop-blur-sm max-w-sm w-full">
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-400"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400"></div>
               <span className="text-slate-300 text-sm md:text-base">Loading...</span>
             </div>
           </div>

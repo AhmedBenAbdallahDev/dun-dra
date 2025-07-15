@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Simple Club",
+    "damage": 4,
+    "price": 40,
+    "type": "weapon",
+    "weaponClass": "club"
+  },
+  {
+    "name": "Shield",
+    "damage": 0,
+    "price": 100,
+    "type": "armor",
+    "weaponClass": "shield"
+  },
+  {
+    "name": "Healing Herbs",
+    "damage": 0,
+    "price": 80,
+    "type": "potion",
+    "weaponClass": "potion"
+  },
+  {
+    "name": "Holy Symbol",
+    "damage": 0,
+    "price": 150,
+    "type": "equipment",
+    "weaponClass": "holy"
+  },
+  {
+    "name": "Rope",
+    "damage": 0,
+    "price": 25,
+    "type": "tool",
+    "weaponClass": "tool"
+  },
+  {
+    "name": "Rations",
+    "damage": 0,
+    "price": 30,
+    "type": "consumable",
+    "weaponClass": "food"
+  }
+]

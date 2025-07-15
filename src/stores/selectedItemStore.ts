@@ -18,6 +18,7 @@ interface SelectedItemState {
   
   // Actions
   setSelectedItem: (item: Partial<SelectedItemState>) => void
+  setSelectedItemData: (item: Partial<SelectedItemState>) => void
   clearSelectedItem: () => void
   setCombatScore: (score: number) => void
   setPrompt: (prompt: string) => void
@@ -39,6 +40,8 @@ export const useSelectedItemStore = create<SelectedItemState>()(
     showDescription: 'none',
     
     setSelectedItem: (item) => set((state) => ({ ...state, ...item })),
+    
+    setSelectedItemData: (item) => set((state) => ({ ...state, ...item })),
     
     clearSelectedItem: () => set({
       name: undefined,
@@ -68,6 +71,7 @@ interface CooldownsState {
   // Actions
   setCooldown: (spellName: string, cooldown: number) => void
   decrementCooldowns: () => void
+  incrementAllCooldowns: () => void
   getCooldown: (spellName: string) => number
   isCooldownActive: (spellName: string, requiredCooldown: number) => boolean
   clearCooldowns: () => void
@@ -80,12 +84,21 @@ export const useCooldownsStore = create<CooldownsState>()(
     setCooldown: (spellName, cooldown) => set((state) => ({
       cooldowns: { ...state.cooldowns, [spellName]: cooldown }
     })),
-      decrementCooldowns: () => set((state) => {
+    
+    decrementCooldowns: () => set((state) => {
       const newCooldowns = { ...state.cooldowns }
       Object.keys(newCooldowns).forEach(key => {
         if (newCooldowns[key] > 0) {
           newCooldowns[key] -= 1
         }
+      })
+      return { cooldowns: newCooldowns }
+    }),
+    
+    incrementAllCooldowns: () => set((state) => {
+      const newCooldowns = { ...state.cooldowns }
+      Object.keys(newCooldowns).forEach(key => {
+        newCooldowns[key] = (newCooldowns[key] || 0) + 1
       })
       return { cooldowns: newCooldowns }
     }),

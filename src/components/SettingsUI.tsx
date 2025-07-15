@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Image from 'next/image';
 
 interface AIConfig {
   provider: 'openrouter' | 'custom' | 'openai' | 'groq' | 'gemini';
@@ -18,27 +17,29 @@ interface AIConfig {
   customModelName: string;
   temperature: number;
   maxTokens: number;
+  useSystemProvider: boolean; // New toggle for using environment variables
 }
 
 export default function SettingsUI() {
   const { settingsWindow, toggleSettingsWindow } = useUIStore();
   const [activeTab, setActiveTab] = useState<'basic' | 'advanced' | 'test'>('basic');
   const [aiConfig, setAIConfig] = useState<AIConfig>({
-    provider: 'openrouter',
+    provider: 'groq',
     apiKey: '',
     customEndpoint: '',
-    model: 'anthropic/claude-3.5-sonnet',
+    model: 'llama3-70b-8192',
     useCustomModel: false,
     customModelName: '',
     temperature: 0.7,
-    maxTokens: 2000
+    maxTokens: 2000,
+    useSystemProvider: true
   });
 
   const groqModels = [
     'llama3-70b-8192',
     'llama3-8b-8192',
     'mixtral-8x7b-32768',
-    'gemma-7b-it',
+    'moonshotai/kimi-k2-instruct',
     'llama2-70b-4096',
     'llama2-13b-4096',
     'llama2-7b-4096',
@@ -48,6 +49,24 @@ export default function SettingsUI() {
     'gemini-1.5-pro',
     'gemini-1.5-flash',
   ];
+
+  // Function to get default model for each provider
+  const getDefaultModel = (provider: string) => {
+    switch (provider) {
+      case 'openrouter':
+        return 'openrouter/cypher-alpha:free';
+      case 'openai':
+        return 'gpt-4';
+      case 'groq':
+        return 'llama3-70b-8192';
+      case 'gemini':
+        return 'gemini-1.5-pro';
+      case 'custom':
+        return 'gpt-3.5-turbo';
+      default:
+        return 'llama3-70b-8192';
+    }
+  };
 
   const [testResult, setTestResult] = useState<string>('');
   const [isTestingConnection, setIsTestingConnection] = useState(false);
@@ -98,6 +117,7 @@ export default function SettingsUI() {
           model: aiConfig.useCustomModel ? aiConfig.customModelName : aiConfig.model,
           useCustomModel: aiConfig.useCustomModel,
           customModelName: aiConfig.customModelName,
+          useSystemProvider: aiConfig.useSystemProvider,
           temperature: 0.1,
           max_tokens: 50
         }
@@ -124,27 +144,33 @@ export default function SettingsUI() {
       setIsTestingConnection(false);
     }
   };  const openRouterModels = [
-    'anthropic/claude-3.5-sonnet',
-    'anthropic/claude-3-haiku',
-    'openai/gpt-4',
-    'openai/gpt-4-turbo',
-    'openai/gpt-3.5-turbo',
-    'meta-llama/llama-3.1-8b-instruct',
-    'mistralai/mistral-7b-instruct',
-    'google/gemini-pro',
+    // Free models
+    'openrouter/cypher-alpha:free',
+    'meta-llama/llama-3.1-8b-instruct:free',
+    'meta-llama/llama-3.1-70b-instruct:free',
+    'meta-llama/llama-3-8b-instruct:free', 
+    'meta-llama/llama-3-70b-instruct:free',
+    'microsoft/wizardlm-2-8x22b:free',
     'deepseek-ai/deepseek-coder:free',
     'deepseek-ai/deepseek-llm:free',
-    'deepseek/deepseek-chat-v3-0324:free'
+    'deepseek/deepseek-chat-v3-0324:free',
+    'mistralai/mistral-7b-instruct:free',
+    'mistralai/mixtral-8x7b-instruct:free',
+    'huggingfaceh4/zephyr-7b-beta:free',
+    'openchat/openchat-7b:free',
+    'gryphe/mythomix-l2-13b:free',
+    'undi95/toppy-m-7b:free',
+    'koboldai/psyfighter-13b-2:free'
   ];
   if (!settingsWindow) return null;
 
   const TabButton = ({ id, label, icon }: { id: 'basic' | 'advanced' | 'test', label: string, icon: string }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+      className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
         activeTab === id 
-          ? 'bg-purple-600 text-white' 
-          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+          ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg' 
+          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
       }`}
     >
       <span>{icon}</span>
@@ -153,22 +179,25 @@ export default function SettingsUI() {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-3xl bg-slate-900/95 border-slate-700 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px]">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl bg-gradient-to-br from-slate-900/95 to-slate-950/95 border-slate-700/70 shadow-2xl backdrop-blur-md h-[85vh] max-h-[600px] md:h-[85vh] md:max-h-[600px] rounded-2xl overflow-hidden mobile-settings-modal">
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-slate-700">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-600/20 rounded-lg">
-                <Image src="/images/info.svg" alt="Settings" width={16} height={16} className="opacity-80" />
+          <div className="flex justify-between items-center p-6 border-b border-slate-700/70">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-xl">⚙️</span>
               </div>
-              <h2 className="text-lg font-semibold text-slate-100">AI Configuration</h2>
+              <div>
+                <h2 className="text-xl font-bold text-slate-100">AI Configuration</h2>
+                <p className="text-sm text-slate-400">Configure your AI models and settings</p>
+              </div>
             </div>
             <Button
               onClick={toggleSettingsWindow}
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 rounded-xl p-2"
             >
               ✕
             </Button>
@@ -182,29 +211,33 @@ export default function SettingsUI() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 p-4 overflow-hidden">
+          <div className="flex-1 overflow-y-auto mobile-settings-content">
             {activeTab === 'basic' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 mobile-basic-tab">
                 {/* Left Column */}
-                <div className="space-y-4">
+                <div className="space-y-4 mobile-left-column">
                   {/* AI Provider */}
                   <div className="space-y-2">
                     <Label className="text-slate-200 text-sm font-medium">AI Provider</Label>                    <Select
                       value={aiConfig.provider}
-                      onValueChange={(value) => setAIConfig({ ...aiConfig, provider: value as typeof aiConfig.provider })}
+                      onValueChange={(value) => setAIConfig({ 
+                        ...aiConfig, 
+                        provider: value as typeof aiConfig.provider,
+                        model: getDefaultModel(value) // Set appropriate default model
+                      })}
                     >
                       <SelectTrigger className="bg-slate-800/60 border-slate-700 text-slate-200 h-9">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-slate-700">
+                        <SelectItem value="groq" className="text-slate-200 hover:bg-slate-700">
+                          ⚡ Groq (Default)
+                        </SelectItem>
                         <SelectItem value="openrouter" className="text-slate-200 hover:bg-slate-700">
                           🌐 OpenRouter
                         </SelectItem>
                         <SelectItem value="openai" className="text-slate-200 hover:bg-slate-700">
                           🤖 OpenAI
-                        </SelectItem>
-                        <SelectItem value="groq" className="text-slate-200 hover:bg-slate-700">
-                          ⚡ Groq
                         </SelectItem>
                         <SelectItem value="gemini" className="text-slate-200 hover:bg-slate-700">
                           🌟 Gemini
@@ -216,31 +249,73 @@ export default function SettingsUI() {
                     </Select>
                   </div>
 
-                  {/* API Key */}
+                  {/* Use System Provider Toggle */}
                   <div className="space-y-2">
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        id="useSystemProvider"
+                        checked={aiConfig.useSystemProvider}
+                        onChange={(e) => setAIConfig({ ...aiConfig, useSystemProvider: e.target.checked })}
+                        className="w-4 h-4 text-amber-600 bg-slate-800 border-slate-600 rounded focus:ring-amber-500 focus:ring-2"
+                      />
+                      <Label htmlFor="useSystemProvider" className="text-slate-200 text-sm font-medium cursor-pointer">
+                        Use System Provider
+                      </Label>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      When enabled, the system will use pre-configured environment variables for API keys (Groq is configured by default)
+                    </p>
+                  </div>
+
+                  {/* API Key */}
+                  <div className={`space-y-2 ${aiConfig.useSystemProvider ? 'opacity-50' : ''}`}>
                     <Label className="text-slate-200 text-sm font-medium">API Key</Label>
                     <Input
                       type="password"
                       value={aiConfig.apiKey}
                       onChange={(e) => setAIConfig({ ...aiConfig, apiKey: e.target.value })}
-                      placeholder={aiConfig.provider === 'openrouter' ? 'sk-or-v1-...' : 'Enter API key'}
-                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                      disabled={aiConfig.useSystemProvider}
+                      placeholder={
+                        aiConfig.useSystemProvider ? 'Using system environment variables' :
+                        aiConfig.provider === 'openrouter' ? 'sk-or-v1-... (optional if OPENROUTER_API_KEY set)' :
+                        aiConfig.provider === 'openai' ? 'sk-... (optional if OPENAI_API_KEY set)' :
+                        aiConfig.provider === 'groq' ? 'gsk_... (optional if GROQ_API_KEY set)' :
+                        aiConfig.provider === 'gemini' ? 'AIza... (optional if GEMINI_API_KEY set)' :
+                        'Enter API key'
+                      }
+                      className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                     <p className="text-xs text-slate-400">
-                      {aiConfig.provider === 'openrouter' && (
-                        <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">OpenRouter.ai</a></>
+                      {aiConfig.useSystemProvider ? (
+                        'System will use pre-configured environment variables'
+                      ) : (
+                        <>
+                          {aiConfig.provider === 'openrouter' && (
+                            <>Get from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenRouter.ai</a> or set OPENROUTER_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'openai' && (
+                            <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">OpenAI</a> or set OPENAI_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'groq' && (
+                            <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Groq Console</a> or set GROQ_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'gemini' && (
+                            <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">Google AI Studio</a> or set GEMINI_API_KEY env var</>
+                          )}
+                          {aiConfig.provider === 'custom' && 'API key for your endpoint or set CUSTOM_AI_API_KEY env var'}
+                        </>
                       )}
-                      {aiConfig.provider === 'openai' && (
-                        <>Get from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">OpenAI</a></>
-                      )}
-                      {aiConfig.provider === 'groq' && (
-                        <>Get from <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">Groq Console</a></>
-                      )}
-                      {aiConfig.provider === 'gemini' && (
-                        <>Get from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:underline">Google AI Studio</a></>
-                      )}
-                      {aiConfig.provider === 'custom' && 'API key for your endpoint'}
                     </p>
+                    {aiConfig.useSystemProvider ? (
+                      <div className="bg-green-900/20 border border-green-500/30 p-3 rounded text-xs text-green-200">
+                        ✅ <strong>System Provider Enabled:</strong> Using pre-configured Groq API for fast, free AI responses. No personal API key required!
+                      </div>
+                    ) : (
+                      <div className="bg-slate-700/50 p-2 rounded text-xs text-slate-300">
+                        💡 <strong>Tip:</strong> Leave empty to use environment variables. User keys override env vars.
+                      </div>
+                    )}
                   </div>
 
                   {/* Custom Endpoint */}
@@ -252,14 +327,14 @@ export default function SettingsUI() {
                         value={aiConfig.customEndpoint || ''}
                         onChange={(e) => setAIConfig({ ...aiConfig, customEndpoint: e.target.value })}
                         placeholder="https://your-proxy.com/v1/chat/completions"
-                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                       />
                     </div>
                   )}
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-4">
+                <div className="space-y-4 mobile-right-column">
                   {/* Model Selection */}
                   <div className="space-y-2">
                     <Label className="text-slate-200 text-sm font-medium">Model</Label>
@@ -320,7 +395,7 @@ export default function SettingsUI() {
                           : setAIConfig({ ...aiConfig, model: e.target.value })
                         }
                         placeholder={aiConfig.provider === 'openai' ? 'gpt-4' : 'Model name'}
-                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-purple-500 h-9"
+                        className="bg-slate-800/60 border-slate-700 text-slate-200 placeholder-slate-400 focus:border-amber-500 h-9"
                       />
                     )}
                     
@@ -336,7 +411,7 @@ export default function SettingsUI() {
                             useCustomModel: e.target.checked,
                             model: e.target.checked ? aiConfig.customModelName : aiConfig.model
                           })}
-                          className="w-3 h-3 accent-purple-600"
+                          className="w-3 h-3 accent-amber-600"
                         />
                         <Label htmlFor="useCustomModel" className="text-xs text-slate-300 cursor-pointer">
                           Use custom model name
@@ -349,7 +424,7 @@ export default function SettingsUI() {
                   <div className="space-y-3 pt-4">                    <Button
                       onClick={handleSaveSettings}
                       disabled={isSaving}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white h-9 disabled:opacity-50"
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white h-10 disabled:opacity-50 rounded-xl font-medium"
                     >
                       {isSaving ? (
                         <div className="flex items-center gap-2">
@@ -366,7 +441,7 @@ export default function SettingsUI() {
             )}
 
             {activeTab === 'advanced' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 mobile-advanced-tab">
                 <div className="space-y-4">
                   <h3 className="text-slate-200 font-medium">Generation Settings</h3>
                   
@@ -381,7 +456,7 @@ export default function SettingsUI() {
                       step="0.1"
                       value={aiConfig.temperature}
                       onChange={(e) => setAIConfig({ ...aiConfig, temperature: parseFloat(e.target.value) })}
-                      className="w-full accent-purple-500"
+                      className="w-full accent-amber-500"
                     />
                     <p className="text-xs text-slate-400">Controls creativity (0 = focused, 2 = creative)</p>
                   </div>
@@ -392,7 +467,7 @@ export default function SettingsUI() {
                       type="number"
                       value={aiConfig.maxTokens}
                       onChange={(e) => setAIConfig({ ...aiConfig, maxTokens: parseInt(e.target.value) })}
-                      className="bg-slate-800/60 border-slate-700 text-slate-200 focus:border-purple-500 h-9"
+                      className="bg-slate-800/60 border-slate-700 text-slate-200 focus:border-amber-500 h-9"
                     />
                     <p className="text-xs text-slate-400">Maximum response length</p>
                   </div>
@@ -402,15 +477,15 @@ export default function SettingsUI() {
                   <h3 className="text-slate-200 font-medium">Performance Tips</h3>
                   <div className="space-y-3 text-sm text-slate-300">
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-purple-400">🚀 DeepSeek Models</p>
+                      <p className="font-medium text-amber-400">🚀 DeepSeek Models</p>
                       <p className="text-xs mt-1">Free models with good performance for RPG scenarios</p>
                     </div>
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-blue-400">⚡ Temperature Guide</p>
+                      <p className="font-medium text-emerald-400">⚡ Temperature Guide</p>
                       <p className="text-xs mt-1">0.7 = balanced, 1.0+ = creative stories</p>
                     </div>
                     <div className="p-3 bg-slate-800/30 rounded-lg">
-                      <p className="font-medium text-green-400">🎯 Token Limit</p>
+                      <p className="font-medium text-orange-400">🎯 Token Limit</p>
                       <p className="text-xs mt-1">2000-4000 for detailed responses</p>
                     </div>
                   </div>
@@ -419,14 +494,41 @@ export default function SettingsUI() {
             )}
 
             {activeTab === 'test' && (
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col p-4 mobile-test-tab">
                 <div className="space-y-4 flex-1">
                   <h3 className="text-slate-200 font-medium">Connection Test</h3>
                   
+                  {/* Configuration Status */}
+                  <div className={`p-3 rounded-lg border text-sm ${
+                    aiConfig.useSystemProvider 
+                      ? 'bg-green-900/20 border-green-500/30 text-green-200'
+                      : aiConfig.apiKey
+                        ? 'bg-blue-900/20 border-blue-500/30 text-blue-200'
+                        : 'bg-yellow-900/20 border-yellow-500/30 text-yellow-200'
+                  }`}>
+                    <div className="flex items-center gap-2 font-medium mb-1">
+                      {aiConfig.useSystemProvider ? (
+                        <>🏢 System Provider Mode</>
+                      ) : aiConfig.apiKey ? (
+                        <>🔑 User API Key Mode</>
+                      ) : (
+                        <>⚠️ No Configuration</>
+                      )}
+                    </div>
+                    <div className="text-xs opacity-90">
+                      {aiConfig.useSystemProvider 
+                        ? `Using environment variables for ${aiConfig.provider} provider`
+                        : aiConfig.apiKey
+                          ? `Using your personal ${aiConfig.provider} API key`
+                          : 'No API key configured and system provider disabled'
+                      }
+                    </div>
+                  </div>
+                  
                   <Button
                     onClick={handleTestConnection}
-                    disabled={isTestingConnection || !aiConfig.apiKey}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 h-12"
+                    disabled={isTestingConnection || (!aiConfig.useSystemProvider && !aiConfig.apiKey)}
+                    className="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white disabled:opacity-50 h-12 rounded-xl font-medium"
                   >
                     {isTestingConnection ? (
                       <div className="flex items-center gap-2">

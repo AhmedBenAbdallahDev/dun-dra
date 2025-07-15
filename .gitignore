@@ -52,3 +52,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.babelrc.json
+.bun-set
+.npmrc
+bunfig.toml
+package.json
+package.json

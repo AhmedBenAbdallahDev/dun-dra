@@ -22,8 +22,8 @@ const DescriptionWindow = () => {
   
   const { showDescription, x, y } = useUIStore();
 
-  // Only show if there's something to describe and showDescription is not 'none'
-  if (!name || showDescription === 'none') {
+  // Only show if there's something to describe and showDescription is 'block'
+  if (!name || showDescription !== 'block') {
     return null;
   }
 

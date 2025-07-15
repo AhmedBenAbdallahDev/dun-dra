@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Iron Battle Axe",
+    "damage": 6,
+    "price": 120,
+    "type": "weapon",
+    "weaponClass": "axe"
+  },
+  {
+    "name": "Leather Armor",
+    "damage": 0,
+    "price": 180,
+    "type": "armor",
+    "weaponClass": "armor"
+  },
+  {
+    "name": "Healing Potion",
+    "damage": 0,
+    "price": 200,
+    "type": "potion",
+    "weaponClass": "potion"
+  },
+  {
+    "name": "Bear Trap",
+    "damage": 4,
+    "price": 150,
+    "type": "trap",
+    "weaponClass": "trap"
+  },
+  {
+    "name": "Throwing Axe",
+    "damage": 5,
+    "price": 100,
+    "type": "weapon",
+    "weaponClass": "thrown"
+  },
+  {
+    "name": "War Paint",
+    "damage": 0,
+    "price": 50,
+    "type": "consumable",
+    "weaponClass": "buff"
+  }
+]

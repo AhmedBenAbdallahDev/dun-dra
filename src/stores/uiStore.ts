@@ -28,8 +28,9 @@ interface UIState {
   shopWindow: boolean
   inventoryWindow: boolean
   settingsWindow: boolean
-    // Actions
+  // Actions
   setErrorWarnMsg: (msg: string) => void
+  setErrorMessage: (msg: string) => void
   setBuyWarnMsg: (msg: string) => void
   setSellWarnMsg: (msg: string) => void
   setShowInfoWindow: (show: boolean) => void
@@ -84,8 +85,9 @@ export const useUIStore = create<UIState>()(
     inventoryWindow: false,
     settingsWindow: false,
     
-    setErrorWarnMsg: (msg) => set({ errorWarnMsg: msg }),
-    setBuyWarnMsg: (msg) => set({ buyWarnMsg: msg }),
+  setErrorWarnMsg: (msg) => set({ errorWarnMsg: msg }),
+  setErrorMessage: (msg) => set({ errorWarnMsg: msg }),
+  setBuyWarnMsg: (msg) => set({ buyWarnMsg: msg }),
     setSellWarnMsg: (msg) => set({ sellWarnMsg: msg }),
     setShowInfoWindow: (show) => set({ showInfoWindow: show }),
     setLoading: (loading) => set({ loading }),

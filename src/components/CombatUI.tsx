@@ -2,25 +2,42 @@
 
 import { useState } from 'react';
 import { useGameStore, useCharacterStore, useSelectedItemStore, useUIStore, useCooldownsStore } from '@/stores';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { generateCombatLoot } from '@/lib/lootSystem';
 import Image from 'next/image';
 
 export default function CombatUI() {
-  const { gameData, addChatMessage, setEnemy } = useGameStore();
-  const { stats, takeDamage, spendMp, heal } = useCharacterStore();
+  const { gameData, addChatMessage, setEnemy, setEvent, setLootBox } = useGameStore();
+  const { stats, takeDamage, spendMp, heal, addExperience } = useCharacterStore();
   const { 
     name: selectedName, 
     damage: selectedDamage, 
     healing: selectedHealing, 
     manaCost: selectedManaCost, 
     combatScore: selectedCombatScore,
+    prompt: selectedPrompt,
+    other: selectedOther,
     clearSelectedItem 
   } = useSelectedItemStore();
   const { diceNumber, setDiceNumber, setDeath } = useUIStore();
   const { cooldowns, setCooldown } = useCooldownsStore();
-    const [diceThrown, setDiceThrown] = useState(false);
+  const [diceThrown, setDiceThrown] = useState(false);
   const { enemy, event } = gameData;
+
+  // 🎯 Debug logging for selectedItem state
+  console.log('🎲 CombatUI: Current selectedItem state:', {
+    selectedName,
+    selectedDamage, 
+    selectedManaCost,
+    selectedCombatScore,
+    diceNumber,
+    hasPrompt: !!selectedPrompt,
+    diceButtonEnabled: !!selectedName && !diceThrown,
+    combatState: {
+      inCombat: event.inCombat,
+      hasEnemy: !!enemy?.enemyName,
+      enemyHp: enemy?.enemyHp
+    }
+  });
 
   // Don't render if not in combat
   if (!event.inCombat || !enemy?.enemyName) {
@@ -28,68 +45,149 @@ export default function CombatUI() {
   }
 
   const throwDice = async () => {
+    console.log('🎲 CombatUI: Dice throw initiated:', {
+      selectedItem: { name: selectedName, damage: selectedDamage, manaCost: selectedManaCost },
+      enemy: { name: enemy?.enemyName, hp: enemy?.enemyHp },
+      playerStats: { hp: stats.hp, mp: stats.mp },
+      preDiceNumber: diceNumber // 🎯 Use pre-calculated dice from GamePanel
+    });
+    
     if (!selectedName) {
+      console.log('🎲 CombatUI: No item selected, showing warning');
       addChatMessage({
-        content: 'You need to choose a weapon or spell.',
+        content: 'You need to choose a weapon or spell first.',
         type: 'system',
         timestamp: Date.now()
       });
       return;
     }
 
-    // Generate dice number (1-23)
-    const diceRoll = Math.floor(Math.random() * 23) + 1;
-    setDiceNumber(diceRoll);
+    console.log('🎲 CombatUI: Starting dice animation with pre-calculated dice:', diceNumber);
 
-    // Set cooldown for spells
-    if (cooldowns[selectedName] !== undefined) {
+    // 🚨 MOBILE SAFETY: Ensure we have a valid dice number - fallback generation
+    let currentDiceNumber = diceNumber;
+    if (!currentDiceNumber || currentDiceNumber === 0 || isNaN(currentDiceNumber)) {
+      const maxDice = (selectedManaCost && selectedManaCost > 0) ? 23 : 20;
+      currentDiceNumber = Math.floor(Math.random() * maxDice) + 1;
+      setDiceNumber(currentDiceNumber);
+      console.log('🎲 CombatUI: Generated fallback dice number:', currentDiceNumber);
+    }
+
+    // 🎯 CRITICAL FIX: Don't generate new dice - use the pre-calculated one from GamePanel (like Svelte)
+    // This matches the Svelte behavior where dice is calculated during item selection, not during throw
+    
+    // Clear cooldown for the used spell (matches Svelte logic)
+    if (cooldowns[selectedName]) {
       setCooldown(selectedName, 0);
     }
 
-    // Calculate combat damage
+    // Show dice animation first
+    setDiceThrown(true);
+    
+    // Wait for animation exactly like Svelte (1000ms) 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Apply damage effects exactly like Svelte AFTER animation
     if (selectedDamage) {
-      // Enemy damage to player
+      // Player takes damage from enemy (matches Svelte calculation exactly)
       if (enemy?.enemyHp) {
-        if (selectedDamage !== 0) {
-          let damageToPlayer = Math.floor(enemy.enemyHp / (diceRoll === 1 ? 2 : diceRoll));
-          if (diceRoll === 1) {
-            damageToPlayer = Math.floor(enemy.enemyHp / 2); // Buff for rolling 1
+        let damageToPlayer: number;
+        if (selectedDamage !== 0 && !selectedOther) {
+          if (diceNumber === 1) {
+            damageToPlayer = Math.floor(enemy.enemyHp / 2);
+          } else {
+            damageToPlayer = Math.floor(enemy.enemyHp / diceNumber);
           }
-          takeDamage(damageToPlayer);
         } else {
-          takeDamage(5); // Default damage
+          damageToPlayer = 5; // Default damage when no weapon damage
         }
-      }      // Player damage to enemy
+        console.log('🎲 CombatUI: Player taking damage:', damageToPlayer);
+        takeDamage(damageToPlayer);
+      }
+
+      // 🎯 CRITICAL FIX: Use pre-calculated combatScore from selectedItem (like Svelte)
       if (enemy?.enemyHp && selectedCombatScore) {
         const newEnemyHp = Math.max(0, enemy.enemyHp - selectedCombatScore);
-        // Update enemy HP in game store
-        setEnemy({ enemyHp: newEnemyHp });
+        console.log('🎲 CombatUI: Enemy taking damage:', {
+          previousHp: enemy.enemyHp,
+          combatScore: selectedCombatScore,
+          newHp: newEnemyHp
+        });
+        setEnemy({ ...enemy, enemyHp: newEnemyHp });
+        
+        // 🏆 NEW FEATURE: Auto-end combat when enemy dies
+        if (newEnemyHp <= 0) {
+          console.log('🏆 CombatUI: Enemy defeated! Ending combat and generating victory rewards');
+          
+          // Calculate experience gained based on enemy max HP
+          const baseExp = Math.floor((enemy.enemyMaxHp || enemy.enemyHp) * 0.5) + 10;
+          const expGained = Math.max(10, baseExp + Math.floor(Math.random() * 15));
+          
+          // Generate loot based on enemy level
+          const lootItems = generateCombatLoot(enemy.enemyName || 'enemy', enemy.enemyMaxHp || 20);
+          
+          // End combat and transition to victory
+          setTimeout(() => {
+            // Clear combat state
+            setEvent({ inCombat: false, shopMode: null, lootMode: false });
+            setEnemy(null);
+            clearSelectedItem();
+            setDiceNumber(0);
+            setDiceThrown(false);
+            
+            // Add experience and handle level ups
+            const levelResult = addExperience(expGained);
+            
+            let victoryMessage = `Victory! You defeated the ${enemy.enemyName}! You gained ${expGained} experience points.`;
+            
+            if (levelResult.leveledUp) {
+              victoryMessage += ` 🎉 LEVEL UP! You are now level ${levelResult.newLevel}! Your stats have increased!`;
+            }
+            
+            if (lootItems.length > 0) {
+              victoryMessage += ' You found some loot!';
+            }
+            
+            // Set loot if any
+            if (lootItems.length > 0) {
+              setLootBox(lootItems);
+              setEvent({ inCombat: false, shopMode: null, lootMode: true });
+            }
+            
+            // Add victory message
+            addChatMessage({
+              content: victoryMessage,
+              type: 'system',
+              timestamp: Date.now()
+            });
+          }, 1500); // Delay to show defeat animation
+          
+          return; // Skip the rest of combat logic
+        }
       }
     }
 
-    // Show dice animation
-    setDiceThrown(true);
-    
-    // Wait for animation
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if player died
+    // Check if player died after taking damage
     if (stats.hp <= 0) {
+      console.log('🎲 CombatUI: Player died, sending death prompt');
       addChatMessage({
-        content: 'You have fallen in combat...',
-        type: 'system',
+        content: 'give a sad gameData.story, because player dies in the last combat event.',
+        type: 'user',
         timestamp: Date.now()
       });
-      setDeath(true);    } else {
-      // Continue combat or end it based on enemy HP
-      const combatPrompt = (enemy.enemyHp ?? 0) <= 0 
-        ? `I defeated the ${enemy.enemyName}! What happens next?`
-        : `I used ${selectedName} against ${enemy.enemyName}. Combat continues.`;
-      
-      // This would trigger AI response in parent component
+      setDeath(true);
+      setDiceNumber(0);
+      clearSelectedItem();
+      setDiceThrown(false);
+      return;
+    }
+
+    // 🎯 CRITICAL FIX: Use pre-calculated prompt from selectedItem (like Svelte)
+    if (selectedPrompt) {
+      console.log('🎲 CombatUI: Sending pre-calculated combat prompt:', selectedPrompt);
       addChatMessage({
-        content: combatPrompt,
-        type: 'user',
+        content: selectedPrompt,
+        type: 'user', 
         timestamp: Date.now()
       });
     }
@@ -99,109 +197,144 @@ export default function CombatUI() {
       spendMp(selectedManaCost);
     }
 
-    setDiceNumber(0);    // If heal skill used, heal player
+    // If heal skill used, heal player (matches Svelte logic)
     if (selectedHealing && selectedCombatScore) {
       heal(selectedCombatScore);
     }
 
-    // Clear selected item
+    // Reset dice and clear selection exactly like Svelte
+    setDiceNumber(0);
     clearSelectedItem();
     setDiceThrown(false);
   };
-  const enemyHpPercentage = enemy.enemyHp && enemy.enemyMaxHp 
+  
+  // 🚨 MOBILE EMERGENCY: Force exit combat function
+  const emergencyExitCombat = () => {
+    console.log('🚨 Emergency combat exit triggered');
+    addChatMessage({
+      content: 'Combat ended by player.',
+      type: 'system',
+      timestamp: Date.now()
+    });
+    setEnemy(null);
+    clearSelectedItem();
+    setDiceNumber(0);
+    setDiceThrown(false);
+  };
+
+  const enemyHpPercentage = enemy.enemyHp && enemy.enemyMaxHp
     ? (enemy.enemyHp / enemy.enemyMaxHp) * 100 
     : 100;
-
   return (
-    <div className="combat-ui fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="bg-slate-900/95 border-red-500/60 text-white max-w-2xl w-full shadow-2xl backdrop-blur-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-center text-xl text-red-400">
-            You are now in <span className="text-red-500">Combat</span> against:
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent className="space-y-6">
-          {/* Enemy Status */}
-          {enemy && (
-            <div className="flex justify-between items-center">
-              <div>                <h5 className="text-lg font-semibold text-gray-300 mb-2">
-                  {enemy.enemyName}
-                </h5>
-                <div 
-                  className="enemy-hp-bar w-32 h-8 rounded border flex items-center justify-center relative overflow-hidden"
-                  style={{
-                    background: `linear-gradient(to right, #E1683C ${enemyHpPercentage}%, #1f1f1f ${enemyHpPercentage}%)`
-                  }}
-                >
-                  <p className="text-sm relative z-10">
-                    {enemy.enemyHp} <span className="text-xs opacity-80">HP</span>
-                  </p>
+    <div className="combat-banner fixed top-0 left-0 right-0 z-40 bg-gradient-to-r from-red-900/95 to-red-800/95 backdrop-blur-sm border-b-2 border-red-500 shadow-lg">
+      <div className="max-w-7xl mx-auto px-2 md:px-4 py-2 md:py-3">
+        <div className="flex items-center justify-between gap-2">
+          {/* Combat Status - Left Side */}
+          <div className="flex items-center gap-2 md:gap-4 min-w-0">
+            <div className="flex items-center gap-1 md:gap-2">
+              <div className="w-2 h-2 md:w-3 md:h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-red-200 font-medium text-xs md:text-sm">COMBAT</span>
+            </div>
+            
+            {enemy && (
+              <div className="flex items-center gap-1 md:gap-3 min-w-0">
+                <span className="text-white font-semibold text-xs md:text-sm truncate max-w-[80px] md:max-w-none">{enemy.enemyName}</span>
+                <div className="flex items-center gap-1 md:gap-2">
+                  <div className="w-12 md:w-24 h-1.5 md:h-2 bg-gray-700 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-red-500 transition-all duration-300"
+                      style={{ width: `${enemyHpPercentage}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-red-200 text-xs md:text-sm">{enemy.enemyHp} HP</span>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Combat Info */}
-          <div className="combat-info space-y-3">
-            <ul className="space-y-2 text-gray-300">
-              {!selectedName ? (
-                <li className="flex items-center gap-2">
-                  ⚔️ Choose a <span className="text-green-400">weapon</span> or a{' '}
-                  <span className="text-green-400">spell.</span>
-                </li>
-              ) : selectedDamage ? (
-                <li className="flex items-center gap-2">
-                  ⚔️ You chose <span className="text-green-400">{selectedName}</span> with{' '}
-                  <span className="text-green-400">x{selectedDamage}</span> damage!
-                </li>
-              ) : selectedHealing ? (
-                <li className="flex items-center gap-2">
-                  ⚔️ You chose <span className="text-green-400">{selectedName}</span> with{' '}
-                  <span className="text-green-400">x{selectedHealing}</span> heal power!
-                </li>
-              ) : (
-                <li className="flex items-center gap-2">
-                  ⚔️ You chose <span className="text-green-400">{selectedName}</span> with{' '}
-                  <span className="text-green-400">unique</span> power!
-                </li>
-              )}
-              
-              <li className="flex items-center gap-2">
-                🎲 Then, press the <span className="text-green-400">dice</span> to learn your fate!
-              </li>
-              
-              <li className="flex items-center gap-2 text-sm opacity-80">
-                🔮 Success is related to <span className="text-green-400">damage</span> and the{' '}
-                <span className="text-green-400">dice number.</span>
-              </li>
-            </ul>
-
-            {/* Dice Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={throwDice}
-                className="combat-button w-18 h-18 p-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-600 rounded-lg transition-transform hover:scale-105"
-                disabled={diceThrown}
-              >                {!diceThrown ? (
-                  <Image 
-                    src="/images/dice.webp" 
-                    alt="throw dice button" 
-                    width={56}
-                    height={56}
-                    className="w-14 h-14" 
-                  />
-                ) : (
-                  <div className="dice-number text-2xl font-bold text-green-400 flex flex-col items-center">
-                    <span>{diceNumber}</span>
-                    <span className="text-xs text-gray-400">/23</span>
-                  </div>
-                )}
-              </Button>
-            </div>
+            )}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Combat Instructions - Center */}
+          <div className="text-center text-white min-w-0 flex-1 px-4">
+            {!selectedName ? (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-yellow-300 text-sm font-medium animate-pulse">
+                  � Step 1: Choose a weapon or spell
+                </span>
+                <span className="text-gray-400 text-xs">
+                  👈 Click any item in your inventory or spells panel
+                </span>
+              </div>
+            ) : !diceThrown ? (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-green-300 text-sm font-medium">
+                  ✅ {selectedName} selected!
+                </span>
+                <span className="text-yellow-300 text-xs animate-pulse">
+                  📋 Step 2: Press dice to attack →
+                </span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-blue-300 text-sm font-medium">
+                  🎲 Rolling dice...
+                </span>
+                <span className="text-gray-400 text-xs">
+                  Combat resolving...
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Dice Button - Right Side */}
+          <div className="flex items-center gap-3">
+            {selectedName && selectedDamage && (
+              <div className="text-right text-xs text-gray-300">
+                <div>Damage: x{selectedDamage}</div>
+                {selectedManaCost && selectedManaCost > 0 && <div>Mana: {selectedManaCost}</div>}
+              </div>
+            )}
+            
+            <button
+              onClick={throwDice}
+              className="combat-dice-btn relative bg-gray-800 hover:bg-gray-700 border-2 border-yellow-500 rounded-lg p-2 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!selectedName || diceThrown}
+              title={!selectedName ? "Select a weapon or spell first" : "Roll dice to attack"}
+            >
+              {!diceThrown ? (
+                <Image 
+                  src="/images/dice.webp" 
+                  alt="Attack dice" 
+                  width={32}
+                  height={32}
+                  className="w-8 h-8" 
+                />
+              ) : (
+                <div className="w-8 h-8 flex flex-col items-center justify-center">
+                  <span className="text-lg font-bold text-yellow-400">{diceNumber}</span>
+                  <span className="text-xs text-gray-400">/{selectedManaCost && selectedManaCost > 0 ? '23' : '20'}</span>
+                </div>
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Emergency Exit - Only show on small screens */}
+          <div className="sm:hidden">
+            <button
+              onClick={emergencyExitCombat}
+              className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded border border-red-400"
+              title="Emergency exit combat"
+            >
+              🚨 Exit
+            </button>
+          </div>
+        </div>
+
+        {/* Debug Info - Remove after testing */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-2 text-xs text-yellow-300 bg-yellow-900/30 p-1 rounded">
+            DEBUG: Selected: {selectedName || 'None'} | Enemy: {enemy?.enemyName || 'None'} | Dice: {diceNumber}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

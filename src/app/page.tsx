@@ -21,6 +21,8 @@ import SettingsUI from '@/components/SettingsUI';
 import InGameWarnMsgs from '@/components/InGameWarnMsgs';
 import DeathUI from '@/components/DeathUI';
 import HomePage from '@/components/HomePage';
+import UISizingPanel from '@/components/UISizingPanel';
+import UISizingInitializer from '@/components/UISizingInitializer';
 import type { GameData } from '@/stores/gameStore';
 
 export default function Home() {
@@ -58,24 +60,25 @@ export default function Home() {
         }
         
         return {
-          provider: 'openrouter',
+          provider: 'groq',
           apiKey: '',
           customEndpoint: '',
-          model: 'anthropic/claude-3.5-sonnet',
+          model: 'llama3-70b-8192',
           useCustomModel: false,
           customModelName: '',
           temperature: 0.7,
-          maxTokens: 2000
+          maxTokens: 2000,
+          useSystemProvider: true
         };
       };
 
       const aiConfig = getAIConfig();
       console.log('🔍 AI Config:', aiConfig);
       
-      // Check if AI is configured
-      if (!aiConfig.apiKey || aiConfig.apiKey.trim() === '') {
-        console.log('❌ AI not configured - no API key');
-        toast.error('AI not configured. Please set up your AI configuration in Settings to start your adventure.', {
+      // Check if AI is configured - allow system provider or user-provided API key
+      if (!aiConfig.useSystemProvider && (!aiConfig.apiKey || aiConfig.apiKey.trim() === '')) {
+        console.log('❌ AI not configured - no API key and system provider disabled');
+        toast.error('AI not configured. Please set up your AI configuration in Settings or enable "Use System Provider" to start your adventure.', {
           duration: 8000,
           action: {
             label: 'Open Settings',
@@ -86,6 +89,12 @@ export default function Home() {
           }
         });
         return;
+      }
+      
+      if (aiConfig.useSystemProvider) {
+        console.log('✅ Using system provider for AI configuration');
+      } else {
+        console.log('✅ Using user-provided API key for AI configuration');
       }
 
       console.log('✅ AI configured, making request...');
@@ -118,6 +127,18 @@ All of your responses MUST include a valid json object, with this exact properti
   "lootBox": []
 }
 
+🎁 CRITICAL LOOT SYSTEM RULES:
+- After defeating enemies, ALWAYS offer loot-checking choices like "Search the fallen enemy" or "Check for loot"
+- If player chooses to check loot: populate gameData.lootBox with 1-3 items AND set lootMode: true
+- If gameData.lootBox has items: set lootMode to true ALWAYS!
+- NPCs giving items: add to lootBox and set lootMode: true
+
+📦 LOOT EXAMPLES:
+- Weapon: {"name": "Iron Sword", "damage": 5, "price": 85, "type": "weapon", "weaponClass": "sword"}
+- Spell: {"name": "Lightning Bolt", "damage": 7, "manaCost": 20, "type": "destruction spell", "element": "lightning", "cooldown": 3}
+- Potion: {"name": "Health Potion", "healing": 50, "type": "potion"}
+- Gold: {"name": "gold", "type": "currency", "amount": 50}
+
 Important rules:
 - Always provide at least 3 unique choices
 - inCombat, shopMode, and lootMode must be null/false if not in use
@@ -141,6 +162,8 @@ Current game state: ${JSON.stringify(gameData)}`
         apiKey: aiConfig.apiKey,
         baseURL: aiConfig.provider === 'custom' ? aiConfig.customEndpoint : 
                  aiConfig.provider === 'openai' ? 'https://api.openai.com/v1' :
+                 aiConfig.provider === 'groq' ? 'https://api.groq.com/openai/v1' :
+                 aiConfig.provider === 'gemini' ? 'https://generativelanguage.googleapis.com/v1beta' :
                  'https://openrouter.ai/api/v1',
         model: aiConfig.useCustomModel ? aiConfig.customModelName : aiConfig.model,
         useCustomModel: aiConfig.useCustomModel,
@@ -436,23 +459,37 @@ Current game state: ${JSON.stringify(gameData)}`
   }, [setDeath]);
 
   const handleChoiceSelection = useCallback(async (choice: string) => {
+    console.log('🎯 Page: Choice selection initiated:', {
+      choice: choice.substring(0, 50) + '...',
+      choiceLength: choice.length,
+      currentGameState: {
+        hasStory: !!gameData.story,
+        choicesCount: gameData.choices?.length || 0,
+        inCombat: gameData.event?.inCombat,
+        shopMode: gameData.event?.shopMode
+      }
+    });
+    
     try {
       // Add user's choice to chat/story
-      console.log('User selected choice:', choice);
+      console.log('🎯 Page: User selected choice:', choice.substring(0, 100));
       
       // Check for inappropriate content
       if (choice.includes('sex') || choice.includes('kill')) {
         if (!choice.includes('skill')) {
+          console.log('🎯 Page: Inappropriate content detected');
           toast.error("There's a flawed word in your answer.");
           return;
         }
       }
       
+      console.log('🎯 Page: Processing valid choice, decrementing cooldowns');
       // Decrement all spell cooldowns when a choice is made
       decrementCooldowns();
       
       // Clear previous choices and shop data (but keep the story until new one arrives)
       const currentGameData = useGameStore.getState().gameData;
+      console.log('🎯 Page: Clearing choices and updating game state');
       setGameData({
         ...currentGameData,
         choices: [],
@@ -470,51 +507,40 @@ Current game state: ${JSON.stringify(gameData)}`
           try {
             const savedConfig = localStorage.getItem('mythic-conjurer-ai-config');
             return savedConfig ? JSON.parse(savedConfig) : {
-              provider: 'openrouter',
+              provider: 'groq',
               apiKey: '',
-              baseURL: 'https://openrouter.ai/api/v1',
-              model: 'meta-llama/llama-3.1-8b-instruct:free'
+              baseURL: 'https://api.groq.com/openai/v1',
+              model: 'llama3-70b-8192',
+              useSystemProvider: true
             };
           } catch (error) {
             console.error('Failed to parse AI config:', error);
             return {
-              provider: 'openrouter',
+              provider: 'groq',
               apiKey: '',
-              baseURL: 'https://openrouter.ai/api/v1',
-              model: 'meta-llama/llama-3.1-8b-instruct:free'
+              baseURL: 'https://api.groq.com/openai/v1',
+              model: 'llama3-70b-8192',
+              useSystemProvider: true
             };
           }
         };
         
         const aiConfig = getAIConfig();
         
-        if (!aiConfig.apiKey && aiConfig.provider !== 'local') {
-          toast.error('Please configure your AI settings first');
+        // Check if AI is configured - allow system provider or user-provided API key
+        if (!aiConfig.useSystemProvider && !aiConfig.apiKey && aiConfig.provider !== 'local') {
+          toast.error('Please configure your AI settings first or enable "Use System Provider"');
           setLoading(false);
           return;
         }
         
-        // Prepare the prompt for continuing the story
+        // Prepare the prompt for continuing the story using the comprehensive system
+        const { getSystemPrompt } = await import('@/lib/aiPrompts');
+        
         const messages = [
           {
             role: 'system',
-            content: `You are the game master for "Mythic Conjurer", an interactive fantasy RPG. Continue the story based on the player's choice: "${choice}". Respond only with a JSON object containing the game state. Include story, choices (array of 3 options), event status, and any relevant game elements.
-
-Format example:
-{
-  "gameData": {
-    "story": "Your story continuation here...",
-    "choices": ["Choice 1", "Choice 2", "Choice 3"],
-    "event": {
-      "inCombat": false,
-      "shopMode": null,
-      "lootMode": false
-    },
-    "enemy": {},
-    "lootBox": [],
-    "shop": []
-  }
-}`
+            content: getSystemPrompt(gameData)
           },
           {
             role: 'user',
@@ -532,13 +558,27 @@ Format example:
             config: aiConfig
           }),
         });
-        
+
+        console.log('🎯 Page: API response received:', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok
+        });
+
         if (!response.ok) {
+          console.error('🎯 Page: API request failed:', {
+            status: response.status,
+            statusText: response.statusText
+          });
           throw new Error(`AI request failed: ${response.statusText}`);
         }
-        
+
         const data = await response.json();
-        console.log('AI Response:', data);
+        console.log('🎯 Page: AI Response received successfully:', {
+          hasContent: !!data.content,
+          contentLength: data.content?.length || 0,
+          contentPreview: data.content?.substring(0, 100) + '...'
+        });
         
         // Parse the AI response
         const aiContent = data.content;
@@ -546,21 +586,38 @@ Format example:
         
         try {
           // Try to parse JSON from the response
-          console.log('Raw AI content:', aiContent);
+          console.log('🎯 Page: Attempting to parse AI response');
           const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-          console.log('JSON match found:', !!jsonMatch);
+          console.log('🎯 Page: JSON extraction result:', {
+            foundMatch: !!jsonMatch,
+            matchLength: jsonMatch?.[0]?.length || 0
+          });
+          
           if (jsonMatch) {
-            console.log('Matched JSON string:', jsonMatch[0]);
             const parsedData = JSON.parse(jsonMatch[0]);
-            console.log('Parsed data:', parsedData);
+            console.log('🎯 Page: JSON parsed successfully:', {
+              hasGameData: !!parsedData.gameData,
+              hasDirectData: !!parsedData.story || !!parsedData.choices,
+              keys: Object.keys(parsedData)
+            });
             gameDataUpdate = parsedData.gameData || parsedData;
-            console.log('Game data update extracted:', gameDataUpdate);
+            console.log('🎯 Page: Game data update extracted:', {
+              hasStory: !!gameDataUpdate.story,
+              hasChoices: Array.isArray(gameDataUpdate.choices),
+              choicesCount: gameDataUpdate.choices?.length || 0,
+              hasEvent: !!gameDataUpdate.event
+            });
           } else {
+            console.warn('🎯 Page: No JSON found in AI response, using fallback');
             throw new Error('No JSON found in response');
           }
         } catch (parseError) {
-          console.error('Failed to parse AI response:', parseError);
+          console.error('🎯 Page: Failed to parse AI response:', {
+            error: parseError instanceof Error ? parseError.message : String(parseError),
+            contentPreview: aiContent?.substring(0, 200)
+          });
           // Fallback: create a basic response
+          console.log('🎯 Page: Creating fallback response');
           gameDataUpdate = {
             story: aiContent,
             choices: [
@@ -577,9 +634,15 @@ Format example:
         }
         
         // Update the game state
-        console.log('About to update game data with:', gameDataUpdate);
+        console.log('🎯 Page: Preparing to update game state');
         const currentGameData = useGameStore.getState().gameData;
-        console.log('Current game data before update:', currentGameData);
+        console.log('🎯 Page: Current game data before update:', {
+          hasStory: !!currentGameData.story,
+          hasChoices: !!currentGameData.choices?.length,
+          heroClass: currentGameData.heroClass,
+          inCombat: currentGameData.event?.inCombat,
+          shopMode: currentGameData.event?.shopMode
+        });
         
         const newGameData = {
           ...currentGameData,
@@ -588,36 +651,58 @@ Format example:
           heroClass: currentGameData.heroClass,
           placeAndTime: gameDataUpdate.placeAndTime || currentGameData.placeAndTime
         };
-        console.log('New game data to set:', newGameData);
+        
+        console.log('🎯 Page: New game data prepared:', {
+          hasNewStory: !!newGameData.story,
+          hasNewChoices: !!newGameData.choices?.length,
+          newChoicesCount: newGameData.choices?.length || 0,
+          heroClassPreserved: newGameData.heroClass === currentGameData.heroClass,
+          hasEvent: !!newGameData.event,
+          inCombat: newGameData.event?.inCombat,
+          shopMode: newGameData.event?.shopMode,
+          lootMode: newGameData.event?.lootMode
+        });
         
         setGameData(newGameData);
-        console.log('Game data updated with:', gameDataUpdate);
+        console.log('🎯 Page: Game data updated successfully');
         
         // Verify the update took effect
         setTimeout(() => {
           const updatedGameData = useGameStore.getState().gameData;
-          console.log('Game data after update (async check):', updatedGameData);
+          console.log('🎯 Page: Verification - Game data after update:', {
+            storyUpdated: updatedGameData.story === newGameData.story,
+            choicesUpdated: updatedGameData.choices?.length === newGameData.choices?.length,
+            eventUpdated: JSON.stringify(updatedGameData.event) === JSON.stringify(newGameData.event)
+          });
         }, 100);
         
         // Update adventure in store
         if (currentAdventure) {
+          console.log('🎯 Page: Updating adventure in store:', currentAdventure.id);
           updateAdventure(currentAdventure.id, gameDataUpdate);
         }
         
-        console.log('Game data updated after choice selection');
+        console.log('🎯 Page: Choice selection processing completed successfully');
         
       } catch (aiError) {
-        console.error('AI request failed:', aiError);
+        console.error('🎯 Page: AI request failed:', {
+          error: aiError instanceof Error ? aiError.message : String(aiError),
+          stack: aiError instanceof Error ? aiError.stack : undefined
+        });
         toast.error('Failed to process your choice. Please try again.');
       } finally {
+        console.log('🎯 Page: Setting loading state to false');
         setLoading(false);
       }
       
     } catch (error) {
-      console.error('Error handling choice selection:', error);
+      console.error('🎯 Page: Critical error in choice selection:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       toast.error('Failed to process your choice');
     }
-  }, [decrementCooldowns, setGameData, currentAdventure, updateAdventure]);
+  }, [decrementCooldowns, setGameData, currentAdventure, updateAdventure, gameData]);
 
   const handleLootAnswer = useCallback(async (answer: string) => {
     try {
@@ -650,17 +735,19 @@ Format example:
   // Determine if any major overlay is active (Combat UI should NOT hide main UI)
   const isOverlayActive = useMemo(() => {
     const overlayState = death || settingsWindow || shopWindow || gameData.event.lootMode || !!gameData.event.shopMode;
-    console.log('Overlay state check:', {
+    console.log('🔍 Overlay state check:', {
       death,
       settingsWindow,
       shopWindow,
       lootMode: gameData.event.lootMode,
       inCombat: gameData.event.inCombat,
       shopMode: gameData.event.shopMode,
-      isOverlayActive: overlayState
+      isOverlayActive: overlayState,
+      hasChoices: gameData.choices?.length || 0,
+      hasStory: !!gameData.story
     });
     return overlayState;
-  }, [death, settingsWindow, shopWindow, gameData.event]);
+  }, [death, settingsWindow, shopWindow, gameData.event, gameData.choices?.length, gameData.story]);
 
   // Show home page if no active adventure or user wants to go home
   if (showHomePage) {
@@ -668,45 +755,131 @@ Format example:
   }
 
   return (
-    <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden flex flex-col">
+    <div className="relative h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+      {/* Initialize UI sizing CSS properties */}
+      <UISizingInitializer />
+      
+      {/* Combat Banner - Fixed at top */}
+      {gameData.event.inCombat && <CombatUI />}
+      
       {/* Background Images */}
       <BackgroundImgs />
       
-      {/* Main Game UI - Render if no major overlay is active AND not dead */}
+      {/* Main Game UI - Improved Mobile Combat Layout */}
       {!death && !isOverlayActive && (
-        // Flex container for the three main columns
-        <div className="flex flex-1 p-4 gap-4 overflow-hidden">
-          {/* Left Column: Game Story and Choices (Flex-grow) */}
-          <div className="flex flex-col flex-grow gap-4 overflow-y-auto p-2 bg-black/30 rounded-lg">
+        <div className={`
+          flex flex-col items-center gap-2 h-screen w-full p-2 overflow-hidden max-w-7xl mx-auto
+          ${gameData.event.inCombat ? 'pt-16' : 'pt-2'} 
+          md:gap-4 md:p-4 lg:gap-6 lg:p-6
+        `}>
+          {/* Story Display Area - Responsive Heights */}
+          <div className={`
+            w-full bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-2xl 
+            border border-amber-500/20 rounded-lg md:rounded-xl p-2 md:p-4 lg:p-6 
+            shadow-xl overflow-y-auto
+            ${gameData.event.inCombat 
+              ? 'h-[30%] md:h-[35%] lg:h-[30%]' 
+              : 'h-[45%] md:h-[40%] lg:h-[35%]'
+            }
+          `}>
             <StoryDisplay />
-            <div className="mt-auto"> {/* Push choices to the bottom */} 
-              <Choices onChoiceSelect={handleChoiceSelection} />
-            </div>
           </div>
 
-          {/* Right Column: Panels and Buttons (Fixed Width) */}
-          <div className="flex flex-col gap-4 w-[300px] md:w-[350px] overflow-y-auto p-2 bg-black/30 rounded-lg">
-            {/* Inventory Panel */}
-            <div className="h-1/2 overflow-y-auto">
-              <GamePanel title="Inventory" actions={inventory} />
+          {/* Game Controls - Mobile: Optimized for Combat, Desktop: Row Layout */}
+          <div className={`
+            w-full overflow-hidden
+            ${gameData.event.inCombat 
+              ? 'h-[65%] md:h-[60%] lg:h-[65%]' 
+              : 'h-[50%] md:h-[55%] lg:h-[60%]'
+            }
+          `}>
+            {/* Mobile Layout: Stacked for Combat Clarity - More Compact */}
+            <div className="flex flex-col md:hidden h-full"
+                 style={{ gap: 'var(--main-gap-mobile, 6px)' }}>
+              {/* Mobile: Inventory + Spells in Same Row for Combat Access - Thinner */}
+              <div className="flex h-20"
+                   style={{ 
+                     gap: 'var(--main-gap-mobile, 6px)',
+                     height: 'var(--panel-height-mobile, 80px)'
+                   }}>
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                     style={{ 
+                       padding: 'var(--panel-padding-mobile, 6px)',
+                       borderRadius: 'var(--panel-border-radius, 8px)',
+                       borderWidth: 'var(--border-width, 1px)',
+                     }}>
+                  <GamePanel title="Inventory" actions={inventory} />
+                </div>
+                <div className="flex-1 bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                     style={{ 
+                       padding: 'var(--panel-padding-mobile, 6px)',
+                       borderRadius: 'var(--panel-border-radius, 8px)',
+                       borderWidth: 'var(--border-width, 1px)',
+                     }}>
+                  <GamePanel title="Spells" actions={spells} />
+                </div>
+              </div>
+              
+              {/* Mobile: Choices Take Remaining Space - No Scrolling - More Compact */}
+              <div className="flex-1 bg-slate-900/80 border border-blue-500/30 rounded-lg backdrop-blur-lg shadow-xl"
+                   style={{ 
+                     padding: 'var(--container-padding-mobile, 8px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
+                <Choices onChoiceSelect={handleChoiceSelection} />
+              </div>
             </div>
-            
-            {/* Spells Panel */}
-            <div className="h-1/2 overflow-y-auto">
-              <GamePanel title="Spells" actions={spells} />
-            </div>
-            
-            {/* UI Buttons and Description Window (Potentially stack or manage space) */}
-            <div className="mt-auto"> {/* Push buttons to bottom of this column */} 
-              <UiButtons onMapTravel={handleMapTravel} onBackToHome={handleBackToHome} />
-              <DescriptionWindow />
+
+            {/* Desktop Layout: Traditional Side Panels - More Compact */}
+            <div className="hidden md:flex w-full h-full"
+                 style={{ gap: 'var(--main-gap-desktop, 12px)' }}>
+              {/* Desktop: Inventory Panel - Narrower */}
+              <div className="h-full bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                   style={{ 
+                     width: 'var(--panel-width-desktop, 208px)',
+                     padding: 'var(--panel-padding-desktop, 12px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
+                <GamePanel title="Inventory" actions={inventory} />
+              </div>
+              
+              {/* Desktop: Choices Center - Less Padding */}
+              <div className="flex-1 min-w-0 h-full bg-slate-900/80 border border-blue-500/30 rounded-lg backdrop-blur-lg shadow-xl overflow-y-auto"
+                   style={{ 
+                     padding: 'var(--container-padding-desktop, 16px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
+                <Choices onChoiceSelect={handleChoiceSelection} />
+              </div>
+              
+              {/* Desktop: Spells Panel - Narrower */}
+              <div className="h-full bg-slate-900/80 border border-slate-600/30 rounded-lg backdrop-blur-lg shadow-lg overflow-hidden"
+                   style={{ 
+                     width: 'var(--panel-width-desktop, 208px)',
+                     padding: 'var(--panel-padding-desktop, 12px)',
+                     borderRadius: 'var(--panel-border-radius, 8px)',
+                     borderWidth: 'var(--border-width, 1px)',
+                   }}>
+                <GamePanel title="Spells" actions={spells} />
+              </div>
             </div>
           </div>
         </div>
       )}
       
+      {/* Overlay UI Components */}
+      <div className="ui-buttons-overlay">
+        <UiButtons onMapTravel={handleMapTravel} onBackToHome={handleBackToHome} />
+      </div>
+      <DescriptionWindow />
+      
+      {/* UI Sizing Panel - Available everywhere */}
+      <UISizingPanel />
+      
       {/* Modal/Overlay Components - Render based on their specific states */}
-      {gameData.event.inCombat && <CombatUI />}
       {(shopWindow || gameData.event.shopMode) && <ShopUI />}
       {gameData.event.lootMode && <LootUI onAnswer={handleLootAnswer} />}
       {settingsWindow && <SettingsUI />}

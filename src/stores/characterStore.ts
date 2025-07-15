@@ -39,12 +39,17 @@ interface CharacterState {
   character: Character
   stats: CharacterStats
   gold: number
+  experience: number
+  level: number
   spells: CharacterItem[]
   inventory: CharacterItem[]
   
   // Actions
   setStats: (stats: Partial<CharacterStats>) => void
   setGold: (gold: number) => void
+  setExperience: (exp: number) => void
+  setLevel: (level: number) => void
+  addExperience: (amount: number) => { leveledUp: boolean; newLevel: number; oldLevel: number }
   addGold: (amount: number) => void
   subtractGold: (amount: number) => void
   setSpells: (spells: CharacterItem[]) => void
@@ -90,6 +95,8 @@ export const useCharacterStore = create<CharacterState>()(
       },
       stats: initialStats,
       gold: 30,
+      experience: 0,
+      level: 1,
       spells: [],
       inventory: [],
       
@@ -98,6 +105,56 @@ export const useCharacterStore = create<CharacterState>()(
       })),
       
       setGold: (gold) => set({ gold }),
+      
+      setExperience: (experience) => set({ experience }),
+      
+      setLevel: (level) => set({ level }),
+      
+      addExperience: (amount) => {
+        const state = get();
+        const currentExp = state.experience;
+        const newExp = currentExp + amount;
+        
+        // Simple level calculation (every 100 exp = 1 level)
+        const oldLevel = Math.floor(currentExp / 100) + 1;
+        const newLevel = Math.floor(newExp / 100) + 1;
+        
+        const leveledUp = newLevel > oldLevel;
+        
+        set({ 
+          experience: newExp,
+          level: newLevel 
+        });
+        
+        if (leveledUp) {
+          // Increase max stats on level up
+          const hpIncrease = 10;
+          const mpIncrease = 10;
+          
+          set((state) => ({
+            stats: {
+              ...state.stats,
+              maxHp: state.stats.maxHp + hpIncrease,
+              maxMp: state.stats.maxMp + mpIncrease,
+              hp: state.stats.maxHp + hpIncrease, // Full heal on level up
+              mp: state.stats.maxMp + mpIncrease  // Full mana restore on level up
+            }
+          }));
+          
+          console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}`, {
+            hpIncrease,
+            mpIncrease,
+            newMaxHp: state.stats.maxHp + hpIncrease,
+            newMaxMp: state.stats.maxMp + mpIncrease
+          });
+        }
+        
+        return {
+          leveledUp,
+          newLevel,
+          oldLevel
+        };
+      },
       
       addGold: (amount) => set((state) => ({
         gold: state.gold + amount
@@ -135,11 +192,7 @@ export const useCharacterStore = create<CharacterState>()(
       })),
       
       removeInventoryItem: (itemName) => set((state) => ({
-        inventory: state.inventory.filter(item => item.name !== itemName),
-        character: {
-          ...state.character,
-          inventory: state.character.inventory.filter(item => item.name !== itemName)
-        }
+        inventory: state.inventory.filter(item => item.name !== itemName)
       })),
       
       removeItemFromInventory: (itemId) => set((state) => ({
@@ -206,6 +259,8 @@ export const useCharacterStore = create<CharacterState>()(
         },
         stats: initialStats,
         gold: 30,
+        experience: 0,
+        level: 1,
         spells: [],
         inventory: []
       })

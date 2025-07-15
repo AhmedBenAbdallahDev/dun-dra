@@ -1,7 +1,12 @@
 'use client';
 
-import { useCharacterStore, useSelectedItemStore, useUIStore } from '@/stores';
-import { useCooldownsStore } from '@/stores/selectedItemStore';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { useCharacterStore } from '@/stores/characterStore';
+import { useUIStore } from '@/stores/uiStore';
+import { useCooldownsStore, useSelectedItemStore } from '@/stores/selectedItemStore';
+import { useGameStore } from '@/stores/gameStore';
+import { useDescriptionStore } from '@/stores/miscStore';
 import { CharacterItem } from '@/stores/characterStore';
 
 interface GamePanelProps {
@@ -10,67 +15,427 @@ interface GamePanelProps {
 }
 
 export default function GamePanel({ title, actions }: GamePanelProps) {
-  const { stats, heal, restoreMp, removeInventoryItem } = useCharacterStore();
-  const { setSelectedItem, name: selectedItemName } = useSelectedItemStore();
-  const { setShowDescription } = useUIStore();
-  const { cooldowns, setCooldown, isCooldownActive } = useCooldownsStore();
+  const [isExpanded, setIsExpanded] = useState(false); // Always start collapsed
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check if mobile on mount and resize
+  React.useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 767;
+      setIsMobile(mobile);
+      // Auto-collapse on mobile when screen becomes mobile size
+      if (mobile) {
+        setIsExpanded(false);
+      } else {
+        // On desktop, expand by default
+        setIsExpanded(true);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  const { stats, heal, restoreMp, removeInventoryItem, spendMp } = useCharacterStore();
+  const { setErrorMessage, setShowDescription, setDiceNumber } = useUIStore();
+  const { cooldowns, setCooldown } = useCooldownsStore();
+  const { name: selectedName, setSelectedItem, clearSelectedItem } = useSelectedItemStore();
+  const { gameData, addChatMessage } = useGameStore();
+  const { setDescription } = useDescriptionStore();
 
   const hpPercentage = (stats.hp / stats.maxHp) * 100;
   const mpPercentage = (stats.mp / stats.maxMp) * 100;
-  const handleItemClick = (item: CharacterItem) => {
-    // Check if spell is on cooldown
-    if (item.type === 'spell' && item.cooldown && isCooldownActive(item.name, item.cooldown)) {
-      console.log(`${item.name} is on cooldown`);
-      return;
-    }
 
-    // Set selected item for combat or general use
-    setSelectedItem({
+  // Enhanced combat score calculation with character stats influence
+  const calculateCombatScore = (baseValue: number, type: string): { combatScore: number, diceNumber: number } => {
+    const maxDice = type === 'weapon' ? 20 : 23;
+    const diceNumber = Math.floor(Math.random() * maxDice) + 1;
+    
+    // 🎯 NEW FEATURE: Character stats affect combat effectiveness
+    const { level, experience } = useCharacterStore.getState();
+    
+    // Calculate stat bonuses based on character progression
+    const levelBonus = Math.floor(level * 0.5); // Small level bonus
+    const experienceBonus = Math.floor((experience || 0) / 100); // 1 point per 100 exp
+    
+    // Weapon type bonuses (could be expanded with character classes)
+    const weaponTypeBonus = type === 'weapon' ? 1 : 0;
+    const spellTypeBonus = type.includes('spell') ? Math.floor(level * 0.3) : 0;
+    
+    // Calculate total stat bonus
+    const totalStatBonus = levelBonus + experienceBonus + weaponTypeBonus + spellTypeBonus;
+    
+    // Apply bonus to base value (not dice) to maintain balance
+    const enhancedBaseValue = Math.max(1, baseValue + totalStatBonus);
+    const combatScore = enhancedBaseValue * diceNumber;
+    
+    // 🎯 CRITICAL FIX: Store dice number immediately like Svelte does with $misc.diceNumber
+    setDiceNumber(diceNumber);
+    
+    console.log('🎯 GamePanel: Enhanced combat score calculated:', {
+      baseValue,
+      enhancedBaseValue,
+      type,
+      level,
+      experience,
+      statBonuses: {
+        levelBonus,
+        experienceBonus,
+        weaponTypeBonus,
+        spellTypeBonus,
+        totalStatBonus
+      },
+      diceNumber,
+      maxDice,
+      combatScore,
+      calculation: `(${baseValue} + ${totalStatBonus}) × ${diceNumber} = ${combatScore}`
+    });
+    
+    return { combatScore, diceNumber };
+  };
+
+  // Generate combat prompt based on combat score - EXACTLY MATCHES SVELTE
+  const generateCombatPrompt = (name: string, combatScore: number, enemyHp: number, isSpell: boolean = false): string => {
+    const attackType = isSpell ? 'spell' : '';
+    const exclamation = isSpell ? '!' : '!';
+    
+    if (combatScore >= 1 && combatScore < 20) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give hard times to player in gameData.story, where player lands the worst possible attack, which leads to player receiving damage but giving a little damage back at least. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 20 && combatScore < 50) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give a medi-ocre gameData.story, where player lands a decent attack, which leads to player giving some damage to enemy but taking some damage back. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 50 && combatScore < 85) {
+      if (enemyHp > combatScore) {
+        return `Attack with ${name}${attackType}${exclamation} (give a great gameData.story where player lands a powerful attack, giving great damage but receiving some little damage back. Combat goes on.)`;
+      } else {
+        return `Attack with ${name}${attackType}${exclamation} (this blow destroys the enemy and ends the combat successfully!)`;
+      }
+    }
+    if (combatScore >= 85) {
+      return `Attack with ${name}${attackType}${exclamation} (Create an epic gameData.story where player unleashes a devastating attack, wiping out the enemy end winning the combat.)`;
+    }
+    
+    return `Attack with ${name}${attackType}${exclamation}`;
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLButtonElement>, item: CharacterItem) => {
+    const { setMousePosition } = useUIStore.getState();
+    setShowDescription('block');
+    setMousePosition(event.clientX, event.clientY);
+    
+    // Set description data
+    setDescription({
       name: item.name,
       damage: item.damage,
-      healing: item.healing,
-      manaCost: item.manaCost,
       type: item.type,
-      weaponClass: item.weaponClass,
+      healing: item.healing,
+      mana: item.mana,
+      armor: item.armor,
       element: item.element,
-      combatScore: item.damage || item.healing || 0,
-      showDescription: item.name
+      weaponClass: item.weaponClass,
+      manaCost: item.manaCost,
+      price: item.price
     });
+  };
 
-    // Show item description
-    if (setShowDescription) {
-      setShowDescription(item.name);
+  const hideWindow = () => {
+    setShowDescription('none');
+  };
+
+  const isDisabled = (item: CharacterItem): boolean => {
+    if (item.type === 'spell' && item.manaCost && stats.mp < item.manaCost) {
+      return true;
     }
-
-    // If it's a consumable item (potion), use it immediately
-    if (item.type === 'potion') {
-      handlePotionUse(item);
-    }
-
-    // If it's a spell, set cooldown
     if (item.type === 'spell' && item.cooldown) {
-      setCooldown(item.name, item.cooldown);
+      const currentCooldown = cooldowns[item.name] || 0;
+      if (currentCooldown > 0) {
+        return true;
+      }
     }
+    return false;
   };
 
-  const handlePotionUse = (item: CharacterItem) => {
-    if (item.healing && stats.hp < stats.maxHp) {
-      heal(item.healing);
-      removeInventoryItem(item.name);
-      console.log(`Used ${item.name} - healed for ${item.healing} HP`);
-    } else if (item.manaCost && item.manaCost < 0 && stats.mp < stats.maxMp) {
-      // Negative mana cost means it restores mana
-      restoreMp(Math.abs(item.manaCost));
-      removeInventoryItem(item.name);
-      console.log(`Used ${item.name} - restored ${Math.abs(item.manaCost)} MP`);
+  const getItemIcon = (item: CharacterItem): string => {
+    // Weapons - specific weapon class icons with expanded variety
+    if (item.type === 'weapon') {
+      const weaponIcons: Record<string, string> = {
+        // Melee Weapons
+        'sword': '/images/sword.svg',
+        'greatsword': '/images/sword.svg',
+        'longsword': '/images/sword.svg',
+        'shortsword': '/images/sword.svg',
+        'broadsword': '/images/sword.svg',
+        'scimitar': '/images/sword.svg',
+        'rapier': '/images/sword.svg',
+        'katana': '/images/sword.svg',
+        
+        // Axes
+        'axe': '/images/axe.svg',
+        'hatchet': '/images/axe.svg',
+        'battleaxe': '/images/axe.svg',
+        'greataxe': '/images/axe.svg',
+        'tomahawk': '/images/axe.svg',
+        
+        // Ranged Weapons
+        'bow': '/images/bow.svg',
+        'longbow': '/images/bow.svg',
+        'shortbow': '/images/bow.svg',
+        'crossbow': '/images/bow.svg',
+        'compound bow': '/images/bow.svg',
+        
+        // Daggers & Knives
+        'dagger': '/images/dagger.svg',
+        'knife': '/images/dagger.svg',
+        'stiletto': '/images/dagger.svg',
+        'dirk': '/images/dagger.svg',
+        'kukri': '/images/dagger.svg',
+        'tanto': '/images/dagger.svg',
+        
+        // Blunt Weapons
+        'mace': '/images/mace.svg',
+        'club': '/images/mace.svg',
+        'hammer': '/images/mace.svg',
+        'warhammer': '/images/mace.svg',
+        'maul': '/images/mace.svg',
+        'morningstar': '/images/mace.svg',
+        
+        // Polearms
+        'spear': '/images/spear.svg',
+        'lance': '/images/spear.svg',
+        'pike': '/images/spear.svg',
+        'halberd': '/images/spear.svg',
+        'glaive': '/images/spear.svg',
+        'trident': '/images/spear.svg',
+        
+        // Flails & Chains
+        'flail': '/images/flail.svg',
+        'chain': '/images/flail.svg',
+        'nunchaku': '/images/flail.svg',
+        
+        // Magic Weapons
+        'staff': '/images/arcane.svg',
+        'wand': '/images/arcane.svg',
+        'rod': '/images/arcane.svg',
+        'scepter': '/images/arcane.svg',
+        'orb': '/images/arcane.svg',
+      };
+      return weaponIcons[item.weaponClass?.toLowerCase() || 'sword'] || '/images/sword.svg';
     }
-  };
-  const isItemSelected = (item: CharacterItem) => {
-    return selectedItemName === item.name;
-  };
-
-  const isItemDisabled = (item: CharacterItem) => {
-    return item.type === 'spell' && item.cooldown && isCooldownActive(item.name, item.cooldown);
+    
+    // Potions - Enhanced with different potion types
+    if (item.type === 'potion' || item.name?.toLowerCase().includes('potion')) {
+      const itemName = item.name?.toLowerCase() || '';
+      
+      // Health potions (red)
+      if (itemName.includes('health') || itemName.includes('healing') || itemName.includes('life') || item.healing) {
+        return '/images/potion.svg'; // Red healing potion
+      }
+      
+      // Mana potions (blue) 
+      if (itemName.includes('mana') || itemName.includes('magic') || itemName.includes('arcane') || item.mana) {
+        return '/images/ice.svg'; // Blue mana effect
+      }
+      
+      // Poison potions (green)
+      if (itemName.includes('poison') || itemName.includes('toxic') || itemName.includes('venom')) {
+        return '/images/toxic.svg';
+      }
+      
+      return '/images/potion.svg';
+    }
+    
+    // Spells - Enhanced element-based icons with more variety
+    if (item.type === 'spell' || item.type === 'healing spell' || item.type === 'destruction spell') {
+      const spellIcons: Record<string, string> = {
+        // Primary Elements
+        'fire': '/images/fire.svg',
+        'flame': '/images/fire.svg',
+        'burn': '/images/fire.svg',
+        'inferno': '/images/fire.svg',
+        'ignite': '/images/fire.svg',
+        
+        'ice': '/images/ice.svg',
+        'frost': '/images/ice.svg',
+        'freeze': '/images/ice.svg',
+        'blizzard': '/images/ice.svg',
+        'chill': '/images/ice.svg',
+        'cold': '/images/ice.svg',
+        
+        'lightning': '/images/lightning.svg',
+        'thunder': '/images/lightning.svg',
+        'shock': '/images/lightning.svg',
+        'storm': '/images/lightning.svg',
+        'electric': '/images/lightning.svg',
+        'bolt': '/images/lightning.svg',
+        
+        // Nature Elements
+        'toxic': '/images/toxic.svg',
+        'poison': '/images/toxic.svg',
+        'acid': '/images/toxic.svg',
+        'venom': '/images/toxic.svg',
+        'earth': '/images/toxic.svg',
+        'nature': '/images/toxic.svg',
+        'plant': '/images/toxic.svg',
+        'thorn': '/images/toxic.svg',
+        
+        // Light & Dark
+        'light': '/images/light.svg',
+        'holy': '/images/light.svg',
+        'divine': '/images/light.svg',
+        'radiant': '/images/light.svg',
+        'heal': '/images/light.svg',
+        'cure': '/images/light.svg',
+        'blessing': '/images/light.svg',
+        
+        'dark': '/images/dark.svg',
+        'shadow': '/images/dark.svg',
+        'unholy': '/images/dark.svg',
+        'curse': '/images/dark.svg',
+        'death': '/images/dark.svg',
+        'drain': '/images/dark.svg',
+        'necro': '/images/dark.svg',
+        
+        // Arcane & Mystic
+        'arcane': '/images/arcane.svg',
+        'magic': '/images/arcane.svg',
+        'mystic': '/images/arcane.svg',
+        'enchant': '/images/arcane.svg',
+        'charm': '/images/arcane.svg',
+        'illusion': '/images/arcane.svg',
+        'teleport': '/images/arcane.svg',
+        'summon': '/images/arcane.svg',
+        
+        // Hybrid Elements
+        'water': '/images/ice.svg',
+        'steam': '/images/fire.svg',
+        'wind': '/images/lightning.svg',
+        'air': '/images/lightning.svg',
+        'spirit': '/images/light.svg',
+        'psychic': '/images/arcane.svg',
+        'force': '/images/arcane.svg',
+      };
+      
+      // Check both element and name for icon matching
+      const element = item.element?.toLowerCase() || '';
+      const spellName = item.name?.toLowerCase() || '';
+      
+      // First try element match
+      if (element && spellIcons[element]) {
+        return spellIcons[element];
+      }
+      
+      // Then try name-based matching
+      for (const [key, icon] of Object.entries(spellIcons)) {
+        if (spellName.includes(key)) {
+          return icon;
+        }
+      }
+      
+      return '/images/arcane.svg'; // Default for spells
+    }
+    
+    // Enhanced special items based on name patterns and type
+    const itemName = item.name?.toLowerCase() || '';
+    const itemType = item.type?.toLowerCase() || '';
+    
+    // Currency and valuables
+    if (itemType === 'gold' || itemName.includes('gold') || itemName.includes('coin') || 
+        itemName.includes('currency') || itemName.includes('money')) {
+      return '/images/gold.svg';
+    }
+    
+    // Tools and utilities
+    if (itemName.includes('key') || itemName.includes('lockpick') || itemName.includes('tool')) {
+      return '/images/item.svg';
+    }
+    
+    // Magical artifacts and gems
+    if (itemName.includes('gem') || itemName.includes('crystal') || itemName.includes('orb') ||
+        itemName.includes('stone') || itemName.includes('shard')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Books, scrolls and knowledge items
+    if (itemName.includes('scroll') || itemName.includes('book') || itemName.includes('tome') || 
+        itemName.includes('grimoire') || itemName.includes('manual') || itemName.includes('guide')) {
+      return '/images/arcane.svg';
+    }
+    
+    // Jewelry and accessories
+    if (itemName.includes('ring') || itemName.includes('amulet') || itemName.includes('necklace') || 
+        itemName.includes('pendant') || itemName.includes('charm') || itemName.includes('talisman') ||
+        itemType === 'accessory' || itemType === 'jewelry') {
+      return '/images/unique.svg';
+    }
+    
+    // Food and consumables
+    if (itemName.includes('bread') || itemName.includes('food') || itemName.includes('meal') || 
+        itemName.includes('ration') || itemName.includes('apple') || itemName.includes('meat') ||
+        itemType === 'food' || itemType === 'consumable') {
+      return '/images/potion.svg'; // Use potion icon for consumables
+    }
+    
+    // Bombs and explosives
+    if (itemName.includes('bomb') || itemName.includes('explosive') || itemName.includes('grenade') ||
+        itemName.includes('dynamite') || itemName.includes('powder')) {
+      return '/images/fire.svg'; // Fire for explosives
+    }
+    
+    // Arrows and ammunition
+    if (itemName.includes('arrow') || itemName.includes('bolt') || itemName.includes('ammo') ||
+        itemName.includes('dart') || itemName.includes('shot')) {
+      return '/images/bow.svg';
+    }
+    
+    // Armor and protection
+    if (itemType === 'armor' || itemName.includes('armor') || itemName.includes('shield') ||
+        itemName.includes('helmet') || itemName.includes('boots') || itemName.includes('gloves')) {
+      return '/images/item.svg'; // Generic item for armor
+    }
+    
+    // Special artifacts and legendary items
+    if (itemName.includes('artifact') || itemName.includes('relic') || itemName.includes('legendary') || 
+        itemName.includes('epic') || itemName.includes('ancient') || itemName.includes('blessed') ||
+        item.rarity === 'legendary' || item.rarity === 'epic') {
+      return '/images/unique.svg';
+    }
+    
+    // Skills and abilities
+    if (itemType === 'skill' || itemName.includes('skill') || itemName.includes('ability') ||
+        itemName.includes('technique') || itemName.includes('backstab') || itemName.includes('stealth')) {
+      return '/images/dagger.svg'; // Skill icon
+    }
+    
+    // Element-based fallback for items with element property
+    if (item.element) {
+      const elementIcons: Record<string, string> = {
+        'fire': '/images/fire.svg',
+        'ice': '/images/ice.svg',
+        'lightning': '/images/lightning.svg',
+        'arcane': '/images/arcane.svg',
+        'toxic': '/images/toxic.svg',
+        'light': '/images/light.svg',
+        'dark': '/images/dark.svg',
+      };
+      return elementIcons[item.element.toLowerCase()] || '/images/arcane.svg';
+    }
+    
+    // Type-based fallback
+    if (itemType === 'unique' || itemType === 'rare') {
+      return '/images/unique.svg';
+    }
+    
+    // Ultimate fallback
+    return '/images/item.svg';
   };
 
   const getItemCooldownText = (item: CharacterItem) => {
@@ -83,141 +448,480 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
     return null;
   };
 
-  return (<div className="game-panel h-full bg-black/60 backdrop-blur-lg rounded-lg md:rounded-xl border border-gray-700/50 overflow-hidden">
-      {/* Panel Header */}
-      <div className="panel-header bg-gradient-to-r from-amber-900/80 to-amber-800/80 px-3 md:px-4 py-2 md:py-3 border-b border-amber-700/50">
-        <h3 className="text-base md:text-lg font-semibold text-amber-200 font-medieval">{title}</h3>
+  const handleItemUsage = (item: CharacterItem) => {
+    // 🛡️ SAFETY: Prevent multiple rapid clicks
+    if (!item || !item.name) {
+      console.log('❌ Invalid item provided to handleItemUsage');
+      return;
+    }
+
+    console.log('🔥🔥🔥 ITEM CLICKED - DETAILED DEBUG:', {
+      itemName: item.name,
+      itemType: item.type,
+      itemDamage: item.damage,
+      itemManaCost: item.manaCost,
+      gameState: {
+        inCombat: gameData.event?.inCombat,
+        shopMode: gameData.event?.shopMode,
+        hasEnemy: !!gameData.enemy,
+        enemyHp: gameData.enemy?.enemyHp
+      },
+      playerStats: {
+        hp: stats.hp,
+        maxHp: stats.maxHp,
+        mp: stats.mp,
+        maxMp: stats.maxMp
+      }
+    });
+    
+    const { type, name, damage, manaCost, healing, mana, cooldown } = item;
+    const { mp, maxMp, hp, maxHp } = stats;
+    const { inCombat, shopMode } = gameData.event || {};
+
+    // 🚨 CRITICAL FIX: Use the hooks directly instead of getState()
+    // Clear previous selection first
+    clearSelectedItem();
+    
+    // 🚨 ADD IMMEDIATE VISUAL FEEDBACK
+    console.log(`🎯 PROCESSING ${type.toUpperCase()}: ${name}`);
+
+    // Handle different item types like in Svelte version
+    if (type === 'weapon') {
+      console.log('🗡️ WEAPON CLICKED:', name);
+      if (shopMode) {
+        console.log('⚠️ Cannot use weapon in shop mode');
+        return;
+      }
+      if (!damage) {
+        console.log('⚠️ Weapon has no damage, can only sell');
+        setErrorMessage('You can only sell that item.');
+        return;
+      }
+      if (!inCombat) {
+        console.log('⚠️ Not in combat, cannot use weapon');
+        setErrorMessage('You are not in a combat.');
+        return;
+      }
+      
+      const { combatScore, diceNumber } = calculateCombatScore(damage, type);
+      const enemyHp = gameData.enemy?.enemyHp || 0;
+      const prompt = generateCombatPrompt(name, combatScore, enemyHp);
+      
+      // Set selectedItem exactly like Svelte
+      console.log('🔥 GamePanel: Setting weapon selection:', {
+        name,
+        damage,
+        combatScore,
+        prompt: prompt.substring(0, 100) + '...',
+        calculatedDice: diceNumber
+      });
+      setSelectedItem({
+        name,
+        damage,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: 0
+      });
+      
+      console.log('✅ WEAPON SELECTED SUCCESSFULLY!');
+      return;
+    }
+
+    if (type === 'destruction spell') {
+      console.log('🔥 DESTRUCTION SPELL CLICKED:', name);
+      if (shopMode) {
+        console.log('⚠️ Cannot use spell in shop mode');
+        return;
+      }
+      if (!damage) {
+        console.log('⚠️ Spell has no damage, can only sell');
+        setErrorMessage('You can only sell that item.');
+        return;
+      }
+      if (!inCombat) {
+        console.log('⚠️ Not in combat, cannot use spell');
+        setErrorMessage('You are not in a combat.');
+        return;
+      }
+      if (mp < (manaCost || 0)) {
+        console.log('⚠️ Not enough mana');
+        setErrorMessage('You have not enough mana.');
+        return;
+      }
+      if (cooldown && cooldowns[name] && cooldowns[name] < cooldown) {
+        console.log('⚠️ Spell on cooldown');
+        setErrorMessage(`This spell is on cooldown. ${cooldowns[name]}/${cooldown}`);
+        return;
+      }
+      
+      // Set cooldown first like Svelte
+      if (cooldown) {
+        setCooldown(name, cooldown);
+      }
+      
+      const { combatScore, diceNumber } = calculateCombatScore(damage, type);
+      const enemyHp = gameData.enemy?.enemyHp || 0;
+      const prompt = generateCombatPrompt(name, combatScore, enemyHp, true);
+      
+      // Set selectedItem exactly like Svelte  
+      console.log('🔥 GamePanel: Setting spell selection:', {
+        name,
+        damage,
+        combatScore,
+        manaCost,
+        prompt: prompt.substring(0, 100) + '...',
+        calculatedDice: diceNumber
+      });
+      setSelectedItem({
+        name,
+        damage,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: manaCost || 0
+      });
+      
+      console.log('✅ DESTRUCTION SPELL SELECTED SUCCESSFULLY!');
+      return;
+    }
+
+    if (type === 'healing spell') {
+      if (shopMode) return;
+      if (hp >= maxHp) {
+        setErrorMessage("You're at full health.");
+        return;
+      }
+      if (mp < (manaCost || 0)) {
+        setErrorMessage('You have not enough mana.');
+        return;
+      }
+      if (cooldown && cooldowns[name] && cooldowns[name] < cooldown) {
+        setErrorMessage(`This spell is on cooldown. ${cooldowns[name]}/${cooldown}`);
+        return;
+      }
+
+      if (!inCombat) {
+        // Direct healing outside combat like Svelte
+        const { combatScore } = calculateCombatScore(healing || 0, type);
+        addChatMessage({
+          content: `Heal myself with ${name} spell by ${combatScore} amount.`,
+          type: 'user',
+          timestamp: Date.now()
+        });
+        heal(combatScore);
+        if (manaCost) spendMp(manaCost);
+        return;
+      }
+
+      // Set cooldown for combat healing like Svelte
+      if (cooldown) {
+        setCooldown(name, cooldown);
+      }
+      
+      const { combatScore } = calculateCombatScore(healing || 0, type);
+      
+      // Set selectedItem for combat healing
+      setSelectedItem({
+        name,
+        damage: undefined,
+        healing,
+        combatScore,
+        prompt: `Heal myself with ${name} spell by ${combatScore} amount.`,
+        manaCost: manaCost || 0
+      });
+      return;
+    }
+
+    if (type === 'unique spell') {
+      if (shopMode) return;
+      if (!inCombat) {
+        setErrorMessage('You are not in a combat.');
+        return;
+      }
+      if (mp < (manaCost || 0)) {
+        setErrorMessage('You have not enough mana.');
+        return;
+      }
+      if (cooldown && cooldowns[name] && cooldowns[name] < cooldown) {
+        setErrorMessage(`This spell is on cooldown. ${cooldowns[name]}/${cooldown}`);
+        return;
+      }
+      
+      // Set cooldown like Svelte
+      if (cooldown) {
+        setCooldown(name, cooldown);
+      }
+      
+      const { combatScore } = calculateCombatScore(1, type);
+      let prompt = '';
+      
+      // Generate unique spell prompts exactly like Svelte
+      if (name === 'Summon') {
+        if (combatScore >= 1 && combatScore < 5) {
+          prompt = 'Use my Summon spell and summon a little bird to help me in this combat.';
+        } else if (combatScore >= 5 && combatScore < 10) {
+          prompt = 'Use my Summon spell and summon a powerful tiger to help me in this combat.';
+        } else if (combatScore >= 10 && combatScore < 15) {
+          prompt = 'Use my Summon spell and summon a storm spirit (which is a magician) to help me in this combat.';
+        } else if (combatScore >= 15 && combatScore <= 20) {
+          prompt = 'Use my Summon spell and summon an ultimate demon to help me in this combat. (combat immedietaly ends with the power of the demon)';
+        }
+      } else if (name === 'Teleportation') {
+        prompt = 'Use my Teleportation spell and teleport myself to a secure place away from combat.';
+      }
+      
+      // Set selectedItem for unique spell
+      setSelectedItem({
+        name,
+        damage: 0,
+        healing: undefined,
+        combatScore,
+        prompt,
+        manaCost: manaCost || 0,
+        other: false
+      });
+      return;
+    }
+
+    if (type === 'potion') {
+      if (shopMode) return;
+      if (healing && hp >= maxHp) {
+        setErrorMessage("You're at full health.");
+        return;
+      }
+      if (inCombat) {
+        setErrorMessage("You can't drink in combat.");
+        return;
+      }
+
+      if (healing && hp < maxHp) {
+        heal(parseInt(healing.toString()));
+        removeInventoryItem(name);
+        hideWindow();
+        return;
+      }
+      
+      if (mana && mp >= maxMp) {
+        setErrorMessage("You're at full mana.");
+        return;
+      }
+      
+      if (mana && mp < maxMp) {
+        restoreMp(parseInt(mana.toString()));
+        removeInventoryItem(name);
+        hideWindow();
+        return;
+      }
+    }
+
+    // For items that are not specifically implemented (like consumable foods etc) - exactly like Svelte
+    if (
+      type !== 'potion' &&
+      type !== 'weapon' &&
+      type !== 'destruction spell' &&
+      type !== 'healing spell' &&
+      type !== 'unique spell'
+    ) {
+      if (shopMode) return;
+      if (healing && hp >= maxHp) {
+        setErrorMessage("You're at full health.");
+        return;
+      }
+      if (mana && mp >= maxMp) {
+        setErrorMessage("You're at full mana.");
+        return;
+      }
+      if (healing || (mana && inCombat)) {
+        setErrorMessage("You can't consume in combat.");
+        return;
+      }
+      
+      if (damage && damage > 0) {
+        const { combatScore } = calculateCombatScore(damage, type);
+        const enemyHp = gameData.enemy?.enemyHp || 0;
+        const prompt = generateCombatPrompt(name, combatScore, enemyHp);
         
-        {/* Stats Bars - only show in Inventory panel */}
+        // Set selectedItem for other items
+        setSelectedItem({
+          name,
+          damage,
+          healing: undefined,
+          combatScore,
+          prompt,
+          other: true
+        });
+        
+        // Remove item from inventory like Svelte
+        removeInventoryItem(name);
+        hideWindow();
+        return;
+      } else {
+        setErrorMessage('You can only sell this item.');
+        return;
+      }
+    }
+  };
+
+  return (
+    <div className={`game-panel-container ${isExpanded ? 'expanded' : ''} h-full flex flex-col bg-slate-900/60 border border-slate-600/30 rounded-lg overflow-hidden backdrop-blur-sm`}
+         style={{ 
+           borderRadius: 'var(--panel-border-radius, 8px)',
+           borderWidth: 'var(--border-width, 1px)',
+         }}>
+      {/* Header with HP/MP bars - More Compact */}
+      <div 
+        className={`game-panel cursor-pointer select-none transition-all duration-200 ${
+          isMobile ? 'hover:bg-slate-800/50 active:bg-slate-700/50' : ''
+        }`}
+        style={{
+          padding: isMobile ? 'var(--panel-padding-mobile, 6px)' : 'var(--panel-padding-desktop, 12px)',
+        }}
+        onClick={isMobile ? () => setIsExpanded(!isExpanded) : undefined}
+      >
+        <h3 className={`game-panel ${isExpanded ? 'expanded' : ''} text-center font-semibold text-blue-400 mb-1.5 flex items-center justify-between`}
+            style={{ 
+              fontSize: isMobile ? 'var(--title-font-size-mobile, 12px)' : 'var(--title-font-size-desktop, 14px)'
+            }}>
+          <span>{title}</span>
+          {isMobile && (
+            <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          )}
+        </h3>
+        
+        {/* HP Bar for Inventory - Compact */}
         {title === 'Inventory' && (
-          <div className="mt-2 space-y-1 md:space-y-2">
-            {/* HP Bar */}
-            <div className="stat-bar">
-              <div className="flex justify-between text-xs text-red-300 mb-1">
-                <span>HP</span>
-                <span>{stats.hp}/{stats.maxHp}</span>
-              </div>
-              <div className="w-full bg-gray-800 rounded-full h-1.5 md:h-2">
-                <div 
-                  className="bg-red-500 h-1.5 md:h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${hpPercentage}%` }}
-                />
-              </div>
+          <div className="mb-1.5">
+            <div 
+              className="hp-bar text-center text-xs font-medium py-1 px-2 rounded border border-red-500/40 text-red-100"
+              style={{ '--hp-percentage': `${hpPercentage}%` } as React.CSSProperties}
+            >
+              HP: {stats.hp}/{stats.maxHp}
             </div>
-            
-            {/* MP Bar */}
-            <div className="stat-bar">
-              <div className="flex justify-between text-xs text-blue-300 mb-1">
-                <span>MP</span>
-                <span>{stats.mp}/{stats.maxMp}</span>
-              </div>              <div className="w-full bg-gray-800 rounded-full h-1.5 md:h-2">
-                <div 
-                  className="bg-blue-500 h-1.5 md:h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${mpPercentage}%` }}
-                />
-              </div>
+          </div>
+        )}
+        
+        {/* MP Bar for Spells - Compact */}
+        {title === 'Spells' && (
+          <div className="mb-1.5">
+            <div 
+              className="mp-bar text-center text-xs font-medium py-1 px-2 rounded border border-blue-500/40 text-blue-100"
+              style={{ '--mp-percentage': `${mpPercentage}%` } as React.CSSProperties}
+            >
+              MP: {stats.mp}/{stats.maxMp}
             </div>
           </div>
         )}
       </div>
 
-      {/* Panel Content */}
-      <div className="panel-content p-2 md:p-4 h-full overflow-y-auto">
+      {/* Items Grid - Mobile Optimized for Combat - More Compact */}
+      <div className={`game-panel-content flex-1 ${!isExpanded && isMobile ? 'hidden' : ''}`}
+           style={{ 
+             padding: 'var(--panel-padding-mobile, 6px)' 
+           }}>
         {actions && actions.length > 0 ? (
-          <div className="space-y-1 md:space-y-2">            {actions.map((item, index) => {
+          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 h-full content-start"
+               style={{ 
+                 gap: isMobile ? 'var(--item-gap-mobile, 4px)' : 'var(--item-gap-desktop, 8px)' 
+               }}>
+            {actions.map((item, index) => {
+              const disabled = isDisabled(item);
               const cooldownText = getItemCooldownText(item);
-              const disabled = isItemDisabled(item);
+              const isSelected = selectedName === item.name;
               
               return (
-                <div
+                <button
                   key={index}
-                  className={`action-item border rounded-md md:rounded-lg p-2 md:p-3 transition-all duration-200 group ${
-                    disabled
-                      ? 'bg-gray-900/60 border-gray-700 cursor-not-allowed opacity-50'
-                      : isItemSelected(item) 
-                        ? 'bg-amber-800/60 border-amber-500 hover:bg-amber-700/60 cursor-pointer' 
-                        : 'bg-gray-800/60 hover:bg-gray-700/60 border-gray-600/50 hover:border-amber-500/50 cursor-pointer'
-                  }`}
-                  onClick={() => !disabled && handleItemClick(item)}
+                  className={`
+                    relative group aspect-square w-full p-1
+                    rounded-md border transition-all duration-200 overflow-hidden
+                    flex items-center justify-center
+                    ${disabled 
+                      ? 'opacity-50 cursor-not-allowed bg-slate-800/50 border-slate-600/30' 
+                      : 'hover:scale-105 hover:shadow-md bg-slate-800/70 border-slate-600/50 hover:border-slate-500/70'
+                    }
+                    ${isSelected 
+                      ? 'ring-2 ring-green-400 bg-green-900/30 border-green-500/50 shadow-green-400/20 shadow-md scale-105 selected' 
+                      : ''
+                    }
+                    ${gameData.event?.inCombat 
+                      ? 'border-red-500/30 hover:border-red-400/50 cursor-pointer' 
+                      : ''
+                    }
+                  `}
+                  style={{
+                    minWidth: isMobile ? 'var(--item-size-mobile, 32px)' : 'var(--item-size-desktop, 48px)',
+                    maxWidth: isMobile ? 'var(--item-size-mobile, 32px)' : 'var(--item-size-desktop, 48px)',
+                    borderRadius: 'var(--button-border-radius, 6px)',
+                    borderWidth: 'var(--border-width, 1px)',
+                  }}
+                  data-selected={isSelected}
+                  disabled={disabled}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                    e.stopPropagation();
+                    console.log('🚨 ITEM BUTTON CLICKED!', { itemName: item.name, itemType: item.type });
+                    try {
+                      handleItemUsage(item);
+                    } catch (error) {
+                      console.error('❌ ERROR in handleItemUsage:', error);
+                    }
+                  }}
+                  onMouseMove={(event: React.MouseEvent<HTMLButtonElement>) => handleMouseMove(event, item)}
+                  onMouseLeave={hideWindow}
+                  title={gameData.event?.inCombat ? `Click to select ${item.name} for combat` : item.name}
                 >
-                <div className="flex items-center gap-2 md:gap-3">
-                  {/* Item Icon */}
-                  <div className="item-icon w-6 h-6 md:w-8 md:h-8 bg-gradient-to-br from-amber-600 to-amber-800 rounded border border-amber-500/50 flex items-center justify-center">
-                    <span className="text-xs font-bold text-amber-200">
-                      {getItemIcon(item)}
-                    </span>
-                  </div>
+                  {/* Item Icon - More Compact */}
+                  <Image
+                    src={getItemIcon(item)}
+                    alt={item.name}
+                    width={16}
+                    height={16}
+                    className="pointer-events-none transition-transform group-hover:scale-110"
+                    style={{
+                      width: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
+                      height: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
+                    }}
+                  />
                   
-                  {/* Item Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-200 group-hover:text-white transition-colors text-sm md:text-base">
-                      {item.name}
+                  {/* Selection Indicator - Smaller */}
+                  {selectedName === item.name && (
+                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-400 rounded-full animate-pulse">
+                      <div className="absolute inset-0 bg-green-400 rounded-full animate-ping"></div>
                     </div>
-                    <div className="text-xs text-gray-400 space-x-1 md:space-x-2">
-                      {item.damage && <span className="text-red-400">⚔ {item.damage}</span>}
-                      {item.healing && <span className="text-green-400">💚 {item.healing}</span>}
-                      {item.manaCost && <span className="text-blue-400">🔮 {item.manaCost}</span>}
-                      {item.element && <span className="text-purple-400">{getElementIcon(item.element)} {item.element}</span>}
+                  )}
+                  
+                  {/* Combat Mode Indicator - Smaller */}
+                  {gameData.event.inCombat && !disabled && (
+                    <div className="absolute -bottom-0.5 -left-0.5 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse">
+                      <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-60"></div>
                     </div>
-                  </div>
-                    {/* Item Count/Price/Cooldown */}
+                  )}
+                  
+                  {/* Cooldown Display - Compact */}
+                  {cooldownText && (
+                    <div className="absolute inset-0 bg-slate-900/80 rounded-md flex items-center justify-center">
+                      <span className="text-xs font-bold text-amber-300">{cooldownText}</span>
+                    </div>
+                  )}
+                  
+                  {/* Item Count for Stackable Items - Smaller */}
                   {item.quantity && item.quantity > 1 && (
-                    <div className="text-xs bg-amber-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
+                    <div className="absolute bottom-0 right-0 bg-blue-600/90 text-white text-xs rounded-tl-md px-1 min-w-[14px] text-center">
                       {item.quantity}
                     </div>
                   )}
-                  {cooldownText && (
-                    <div className="text-xs bg-red-600 text-white px-1.5 md:px-2 py-0.5 md:py-1 rounded-full">
-                      {cooldownText}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
+                </button>
+              );
             })}
           </div>
         ) : (
-          <div className="text-center text-gray-500 py-4 md:py-8">
-            <div className="text-2xl md:text-4xl mb-2">📦</div>
-            <p className="text-sm md:text-base">No {title.toLowerCase()} available</p>
+          <div className="flex items-center justify-center h-full text-center text-slate-400 text-sm">
+            No {title.toLowerCase()} available
           </div>
         )}
       </div>
     </div>
   );
-}
-
-// Helper function to get item icon
-function getItemIcon(item: CharacterItem): string {
-  if (item.type === 'weapon') {
-    switch (item.weaponClass) {
-      case 'sword': return '⚔️';
-      case 'bow': return '🏹';
-      case 'axe': return '🪓';
-      case 'dagger': return '🗡️';
-      case 'mace': return '🔨';
-      case 'spear': return '🗳️';
-      default: return '⚔️';
-    }
-  }
-  if (item.type === 'spell') {
-    return '🔮';
-  }
-  if (item.type === 'potion') {
-    return '🧪';
-  }
-  return '📦';
-}
-
-// Helper function to get element icon
-function getElementIcon(element: string): string {
-  switch (element) {
-    case 'fire': return '🔥';
-    case 'ice': return '❄️';
-    case 'lightning': return '⚡';
-    case 'light': return '✨';
-    case 'dark': return '🌑';
-    case 'toxic': return '☠️';
-    default: return '💫';
-  }
 }

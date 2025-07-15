@@ -26,14 +26,15 @@ export default function ActionBox() {
     
     // Default config if none saved
     return {
-      provider: 'openrouter',
+      provider: 'groq',
       apiKey: '',
       customEndpoint: '',
-      model: 'anthropic/claude-3.5-sonnet',
+      model: 'llama3-70b-8192',
       useCustomModel: false,
       customModelName: '',
       temperature: 0.7,
-      maxTokens: 2000
+      maxTokens: 2000,
+      useSystemProvider: true
     };
   };
   const handleSubmit = async () => {
@@ -60,45 +61,13 @@ export default function ActionBox() {
     const maxRetries = 3;
     
     try {
-      // Prepare messages for AI
+      // Prepare messages for AI with comprehensive system prompt
+      const { getSystemPrompt } = await import('@/lib/aiPrompts');
+      
       const messages = [
         {
           role: 'system',
-          content: `This is a role-playing game where you'll be the 1st person character and storyteller. You'll describe the world from a 3rd person perspective but when it's time for a conversation, interact with the player from a 1st person npc perspective.
-
-All of your responses MUST include a valid json object, with this exact properties:
-
-"gameData": {
-  "placeAndTime": {
-    "place": "Location Name",
-    "time": "HH:MM"
-  },
-  "story": "Your narrative content here",
-  "event": {
-    "inCombat": false,
-    "shopMode": null,
-    "lootMode": false
-  },
-  "choices": [
-    "Choice 1",
-    "Choice 2", 
-    "Choice 3"
-  ],
-  "enemy": {},
-  "lootBox": []
-}
-
-Important rules:
-- Always provide at least 3 unique choices
-- inCombat, shopMode, and lootMode must be null/false if not in use
-- Use these races for enemies: bandit, golem, kobold, satyr, skritt, ghoul, goblin, wolf, ogre, harpy, gargoyle, gnoll, jinn, arachne, demon, giant, undead
-- Use these weapon classes: sword, dagger, bow, mace, spear, axe, flail
-- Use these spell elements: light, fire, dark, ice, lightning, toxic
-- Maximum damage for weapons: 9
-- Maximum gold in lootBox: 200
-- Available potions: Health Potion, Mana Potion, Interactive Chat Potion
-
-Current game state: ${JSON.stringify(gameData)}`
+          content: getSystemPrompt(gameData)
         },
         {
           role: 'user',
@@ -116,6 +85,8 @@ Current game state: ${JSON.stringify(gameData)}`
         apiKey: aiConfig.apiKey,
         baseURL: aiConfig.provider === 'custom' ? aiConfig.customEndpoint : 
                  aiConfig.provider === 'openai' ? 'https://api.openai.com/v1' :
+                 aiConfig.provider === 'groq' ? 'https://api.groq.com/openai/v1' :
+                 aiConfig.provider === 'gemini' ? 'https://generativelanguage.googleapis.com/v1beta' :
                  'https://openrouter.ai/api/v1',
         model: aiConfig.useCustomModel ? aiConfig.customModelName : aiConfig.model,
         useCustomModel: aiConfig.useCustomModel,
@@ -211,32 +182,82 @@ Current game state: ${JSON.stringify(gameData)}`
   };
   return (
     <div className="p-4 bg-slate-800/95 backdrop-blur-sm border-t border-slate-700/60 shadow-2xl">
+      {/* Header with enhanced guidance */}
+      <div className="max-w-4xl mx-auto mb-3">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-yellow-400 text-sm font-medium">💭 Your Turn</span>
+            <div className="h-1 w-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
+          </div>
+          <span className="text-gray-400 text-xs">
+            ⌨️ Enter to send • 💡 Be creative!
+          </span>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto flex gap-3">
-        <Textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="What do you do next? Describe your actions..."
-          className="flex-1 min-h-[60px] bg-slate-700/80 border-slate-600/60 text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200"
-          disabled={isLoading}
-        />
-        <Button 
-          onClick={handleSubmit}
-          disabled={!input.trim() || isLoading}
-          className="px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-none shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Thinking...
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4 mr-2" />
-              Send
-            </>
+        <div className="flex-1 relative">
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="What do you do next? Describe your actions... (e.g., 'I search for hidden treasures', 'I attempt to negotiate')"
+            className="w-full min-h-[80px] bg-slate-700/80 border-slate-600/60 text-slate-100 placeholder:text-slate-400 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200 pr-16"
+            disabled={isLoading}
+          />
+          
+          {/* Character counter */}
+          <div className="absolute bottom-3 right-3 text-xs text-gray-500">
+            {input.length}/500
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Button 
+            onClick={handleSubmit}
+            disabled={!input.trim() || isLoading}
+            className={`
+              px-6 min-w-[120px] transition-all duration-200 transform
+              ${isLoading 
+                ? 'bg-gray-600 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 hover:scale-105 active:scale-95 shadow-lg hover:shadow-purple-500/25'
+              }
+            `}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <span className="hidden sm:inline">Thinking...</span>
+                <span className="sm:hidden">...</span>
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Send</span>
+                <span className="sm:hidden">Go</span>
+              </>
+            )}
+          </Button>
+
+          {/* Quick action buttons */}
+          {!isLoading && (
+            <div className="flex flex-col gap-1">
+              {[
+                { text: "🔍", action: "I look around carefully" },
+                { text: "💬", action: "I try to negotiate" }
+              ].map((quick, index) => (
+                <button
+                  key={index}
+                  onClick={() => setInput(quick.action)}
+                  className="text-xs bg-slate-600/50 hover:bg-slate-500/60 text-slate-300 hover:text-white px-2 py-1 rounded-md transition-all duration-200 border border-slate-500/50 hover:border-slate-400"
+                  title={quick.action}
+                >
+                  {quick.text}
+                </button>
+              ))}
+            </div>
           )}
-        </Button>
+        </div>
       </div>
     </div>
   );

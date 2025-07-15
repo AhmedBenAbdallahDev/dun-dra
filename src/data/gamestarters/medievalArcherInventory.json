@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Wooden Bow",
+    "damage": 4,
+    "price": 60,
+    "type": "weapon",
+    "weaponClass": "bow"
+  },
+  {
+    "name": "Iron Arrows",
+    "damage": 2,
+    "price": 40,
+    "type": "ammunition",
+    "weaponClass": "arrow"
+  },
+  {
+    "name": "Healing Potion",
+    "damage": 0,
+    "price": 200,
+    "type": "potion",
+    "weaponClass": "potion"
+  },
+  {
+    "name": "Quiver",
+    "damage": 0,
+    "price": 80,
+    "type": "equipment",
+    "weaponClass": "equipment"
+  },
+  {
+    "name": "Rope",
+    "damage": 0,
+    "price": 25,
+    "type": "tool",
+    "weaponClass": "tool"
+  },
+  {
+    "name": "Grappling Hook",
+    "damage": 0,
+    "price": 150,
+    "type": "tool",
+    "weaponClass": "tool"
+  }
+]

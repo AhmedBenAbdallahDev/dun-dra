@@ -13,6 +13,14 @@ import medievalMageInventory from '@/data/gamestarters/medievalMageInventory.jso
 import medievalMageSpells from '@/data/gamestarters/medievalMageSpells.json';
 import medievalWarriorInventory from '@/data/gamestarters/medievalWarriorInventory.json';
 import medievalWarriorSpells from '@/data/gamestarters/medievalWarriorSpells.json';
+import medievalRogueInventory from '@/data/gamestarters/medievalRogueInventory.json';
+import medievalRogueSpells from '@/data/gamestarters/medievalRogueSpells.json';
+import medievalArcherInventory from '@/data/gamestarters/medievalArcherInventory.json';
+import medievalArcherSpells from '@/data/gamestarters/medievalArcherSpells.json';
+import medievalBarbarianInventory from '@/data/gamestarters/medievalBarbarianInventory.json';
+import medievalBarbarianSpells from '@/data/gamestarters/medievalBarbarianSpells.json';
+import medievalClericInventory from '@/data/gamestarters/medievalClericInventory.json';
+import medievalClericSpells from '@/data/gamestarters/medievalClericSpells.json';
 
 export interface GameDataSets {
   weapons: CharacterItem[];
@@ -53,8 +61,20 @@ export function loadCharacterStarterData(heroClass: string): StarterData {
   } else if (classLower === 'warrior' || classLower === 'knight') {
     inventory = medievalWarriorInventory as CharacterItem[];
     spells = medievalWarriorSpells as CharacterItem[];
+  } else if (classLower === 'rogue' || classLower === 'thief') {
+    inventory = medievalRogueInventory as CharacterItem[];
+    spells = medievalRogueSpells as CharacterItem[];
+  } else if (classLower === 'archer' || classLower === 'ranger') {
+    inventory = medievalArcherInventory as CharacterItem[];
+    spells = medievalArcherSpells as CharacterItem[];
+  } else if (classLower === 'barbarian' || classLower === 'berserker') {
+    inventory = medievalBarbarianInventory as CharacterItem[];
+    spells = medievalBarbarianSpells as CharacterItem[];
+  } else if (classLower === 'cleric' || classLower === 'priest') {
+    inventory = medievalClericInventory as CharacterItem[];
+    spells = medievalClericSpells as CharacterItem[];
   } else {
-    // Default fallback for other classes (Rogue, Archer, etc.)
+    // Default fallback for unknown classes
     inventory = medievalWarriorInventory as CharacterItem[];
     spells = medievalWarriorSpells as CharacterItem[];
   }
