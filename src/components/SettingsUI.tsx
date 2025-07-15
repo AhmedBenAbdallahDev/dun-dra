@@ -39,7 +39,7 @@ export default function SettingsUI() {
     'llama3-70b-8192',
     'llama3-8b-8192',
     'mixtral-8x7b-32768',
-    'gemma-7b-it',
+    'moonshotai/kimi-k2-instruct',
     'llama2-70b-4096',
     'llama2-13b-4096',
     'llama2-7b-4096',
