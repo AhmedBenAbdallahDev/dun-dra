@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useGameStore, useCharacterStore, useSelectedItemStore, useUIStore, useCooldownsStore } from '@/stores';
 import { generateCombatLoot } from '@/lib/lootSystem';
+import { getVictoryPrompt } from '@/lib/aiPrompts';
 import Image from 'next/image';
 
 export default function CombatUI() {
@@ -126,42 +127,46 @@ export default function CombatUI() {
           // Generate loot based on enemy level
           const lootItems = generateCombatLoot(enemy.enemyName || 'enemy', enemy.enemyMaxHp || 20);
           
-          // End combat and transition to victory
-          setTimeout(() => {
-            // Clear combat state
-            setEvent({ inCombat: false, shopMode: null, lootMode: false });
-            setEnemy(null);
-            clearSelectedItem();
-            setDiceNumber(0);
-            setDiceThrown(false);
-            
-            // Add experience and handle level ups
-            const levelResult = addExperience(expGained);
-            
-            let victoryMessage = `Victory! You defeated the ${enemy.enemyName}! You gained ${expGained} experience points.`;
-            
-            if (levelResult.leveledUp) {
-              victoryMessage += ` 🎉 LEVEL UP! You are now level ${levelResult.newLevel}! Your stats have increased!`;
-            }
-            
-            if (lootItems.length > 0) {
-              victoryMessage += ' You found some loot!';
-            }
-            
-            // Set loot if any
-            if (lootItems.length > 0) {
-              setLootBox(lootItems);
-              setEvent({ inCombat: false, shopMode: null, lootMode: true });
-            }
-            
-            // Add victory message
-            addChatMessage({
-              content: victoryMessage,
-              type: 'system',
-              timestamp: Date.now()
-            });
-          }, 1500); // Delay to show defeat animation
+          // VICTORY LOGIC - IMMEDIATE
+          // Clear combat state from zustand
+          setEvent({ inCombat: false, shopMode: null, lootMode: false });
+          setEnemy(null);
+          clearSelectedItem();
+          setDiceNumber(0);
+          setDiceThrown(false);
+
+          // Add experience and handle level ups
+          const levelResult = addExperience(expGained);
           
+          let victoryMessage = `Victory! You defeated the ${enemy.enemyName}! You gained ${expGained} experience points.`;
+          if (levelResult.leveledUp) {
+            victoryMessage += ` 🎉 LEVEL UP! You are now level ${levelResult.newLevel}! Your stats have increased!`;
+          }
+          if (lootItems.length > 0) {
+            victoryMessage += ' You found some loot!';
+          }
+
+          // Add system message to chat
+          addChatMessage({
+            content: victoryMessage,
+            type: 'system',
+            timestamp: Date.now()
+          });
+
+          // Set loot if any, which also sets lootMode to true
+          if (lootItems.length > 0) {
+            setLootBox(lootItems);
+            setEvent({ inCombat: false, shopMode: null, lootMode: true });
+          }
+
+          // Send victory prompt to AI for narrative
+          const victoryPrompt = getVictoryPrompt(enemy.enemyName || 'the enemy', expGained, lootItems, gameData);
+          addChatMessage({
+            content: victoryPrompt,
+            type: 'user',
+            timestamp: Date.now()
+          });
+
           return; // Skip the rest of combat logic
         }
       }

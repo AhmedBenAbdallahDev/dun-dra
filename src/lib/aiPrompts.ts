@@ -1,4 +1,4 @@
-import { GameData } from '@/stores/gameStore';
+import { GameData, LootItem } from '@/stores/gameStore';
 
 export const getSystemPrompt = (gameData: GameData) => `This is a role-playing game where you'll be the 1st person character and storyteller. You'll describe the world from a 3rd person perspective but when it's time for a conversation, interact with the player from a 1st person npc perspective. All these 1st person and 3rd person content will be in gameData.story! Shape the storyline based on players choices.
 
@@ -127,13 +127,24 @@ Do not seperate story to more than 1 paragraphs! make it only 1 paragraph, so no
 Current game state context: ${JSON.stringify(gameData)}`;
 
 export const getCombatPrompt = (combatAction: string, gameData: GameData) => `
-Continue the combat with this action: "${combatAction}"
+The player takes an action in combat: "${combatAction}".
+
+Narrate the result of this action. The current enemy is ${gameData.enemy?.enemyName} with ${gameData.enemy?.enemyHp} HP.
+The game's frontend has already calculated damage and updated the enemy's health. Do NOT modify the enemy's HP or end the combat yourself. Your only role is to describe the scene based on the action.
+
+After narrating the action, provide three new choices for the player's next move in the ongoing combat.
 
 ${getSystemPrompt(gameData)}
+`;
 
-Make sure to:
-1. Update enemy HP based on the combat action
-2. Set inCombat to false if enemy is defeated
-3. Add loot to lootBox if enemy is defeated and set lootMode to true
-4. Provide realistic combat narrative based on the action taken
+export const getVictoryPrompt = (enemyName: string, expGained: number, lootItems: LootItem[], gameData: GameData) => `
+The player has just defeated ${enemyName}! They gained ${expGained} experience points.
+${lootItems.length > 0 ? 'They found some loot.' : ''}
+
+Your task is to write a compelling story narrative for this victory. Describe the final blow, the enemy's defeat, and the aftermath.
+The frontend has already handled all game state changes (ending combat, awarding loot and XP).
+
+Do NOT change "inCombat" to false, do NOT award loot, and do NOT give choices. Your response should only contain the "story" field updating the narrative. The rest of the gameData object should be returned as is, but with a new story.
+
+${getSystemPrompt(gameData)}
 `;

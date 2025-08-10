@@ -193,126 +193,105 @@ export default function Choices({ onChoiceSelect }: ChoicesProps) {
           )}
 
           {/* Choices - Mobile Fixed Layout vs Desktop Scrollable */}
-          <div className="flex-1">
+          <div className="flex-1 h-full flex flex-col">
             {choices.length > 0 ? (
               <>
-                {/* Mobile: Fixed 4-Button Layout (No Scrolling) - Compact */}
-                <div className="md:hidden h-full flex flex-col pt-8" style={{
-                  gap: 'var(--choice-gap-mobile, 8px)'
-                }}>
-                  {/* Always show 4 buttons: 3 story choices + 1 custom input */}
-                  {choices.slice(0, 3).map((choice: string, index: number) => {
-                    const isSelected = selectedChoice === index;
-                    const isDisabled = loading || isProcessing;
-                    
-                    return (
-                      <button
-                        key={index}
-                        disabled={isDisabled}
-                        onClick={() => handleChoiceClick(choice, index)}
-                        className={`
-                          flex-1 p-2.5 text-left text-sm leading-tight
-                          rounded-lg transition-all duration-200 relative overflow-hidden
-                          flex items-center group border
-                          ${isSelected 
-                            ? 'bg-blue-600/30 border-blue-400/80 scale-[0.98] shadow-md shadow-blue-500/20' 
-                            : isDisabled 
-                              ? 'bg-slate-800/50 border-slate-600/30 text-slate-400 opacity-50 cursor-not-allowed'
-                              : 'bg-slate-800/80 hover:bg-blue-600/20 border-slate-600/40 hover:border-blue-500/70 cursor-pointer hover:scale-[1.01] hover:shadow-md hover:shadow-blue-500/20 active:scale-95'
-                          }
-                        `}
-                        style={{
-                          minHeight: 'var(--choice-button-height-mobile, 48px)',
-                          fontSize: 'var(--body-font-size-mobile, 14px)',
-                          borderRadius: 'var(--button-border-radius, 6px)',
-                          borderWidth: 'var(--border-width, 1px)',
-                        }}
-                      >
-                        {/* Choice number indicator - smaller */}
-                        <div className={`
-                          absolute left-2 top-2 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold
-                          ${isSelected 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-slate-700 text-slate-300 group-hover:bg-slate-500 group-hover:text-white'
-                          }
-                        `}>
-                          {index + 1}
-                        </div>
-                        
-                        {/* Choice text - more compact */}
-                        <div className="ml-7 pr-6 flex-1 text-slate-100 word-wrap break-words"
-                             style={{ fontSize: 'var(--body-font-size-mobile, 14px)' }}>
-                          {choice}
-                        </div>
-                        
-                        {/* Loading indicator for selected choice */}
-                        {isSelected && isProcessing && (
-                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                            <div className="w-3 h-3 border-2 border-blue-400 rounded-full animate-spin border-t-transparent"></div>
-                          </div>
-                        )}
-                        
-                        {/* Hover arrow indicator */}
-                        {!isSelected && !isDisabled && (
-                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="text-blue-400 text-sm">→</span>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
+                {/* Mobile: Scrollable Choices + Separate Custom Input */}
+                <div className="md:hidden h-full flex flex-col pt-8" style={{ gap: 'var(--choice-gap-mobile, 12px)' }}>
+                  <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+                    {choices.map((choice: string, index: number) => {
+                      const isSelected = selectedChoice === index;
+                      const isDisabled = loading || isProcessing;
 
-                  {/* Custom Input as 4th Button on Mobile - Compact */}
-                  <div className={`
-                    flex-1 p-2.5 rounded-lg border transition-all duration-200
-                    ${customInput.trim() 
-                      ? 'bg-purple-600/20 border-purple-500/60' 
-                      : 'bg-slate-800/80 border-slate-600/40'
-                    }
-                  `}
-                  style={{
-                    minHeight: 'var(--choice-button-height-mobile, 48px)',
-                    borderRadius: 'var(--button-border-radius, 6px)',
-                    borderWidth: 'var(--border-width, 1px)',
-                  }}>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-4 h-4 rounded-full bg-purple-500 flex items-center justify-center text-xs font-bold text-white">
-                        4
+                      return (
+                        <button
+                          key={index}
+                          disabled={isDisabled}
+                          onClick={() => handleChoiceClick(choice, index)}
+                          className={`
+                            w-full p-4 text-left text-base leading-tight
+                            rounded-lg transition-all duration-200 relative overflow-hidden
+                            flex items-center group border
+                            ${isSelected
+                              ? 'bg-blue-600/30 border-blue-400/80 scale-[0.98] shadow-md shadow-blue-500/20'
+                              : isDisabled
+                                ? 'bg-slate-800/50 border-slate-600/30 text-slate-400 opacity-50 cursor-not-allowed'
+                                : 'bg-slate-800/80 hover:bg-blue-600/20 border-slate-600/40 hover:border-blue-500/70 cursor-pointer hover:scale-[1.01] hover:shadow-md hover:shadow-blue-500/20 active:scale-95'
+                            }
+                          `}
+                          style={{
+                            minHeight: 'var(--choice-button-height-mobile, 60px)',
+                            fontSize: 'var(--body-font-size-mobile, 16px)',
+                            borderRadius: 'var(--button-border-radius, 8px)',
+                            borderWidth: 'var(--border-width, 1px)',
+                          }}
+                        >
+                          <div className={`
+                            absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold
+                            ${isSelected
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-slate-700 text-slate-300 group-hover:bg-slate-500 group-hover:text-white'
+                            }
+                          `}>
+                            {index + 1}
+                          </div>
+
+                          <div className="ml-10 pr-6 flex-1 text-slate-100 word-wrap break-words"
+                               style={{ fontSize: 'var(--body-font-size-mobile, 16px)' }}>
+                            {choice}
+                          </div>
+
+                          {isSelected && isProcessing && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <div className="w-4 h-4 border-2 border-blue-400 rounded-full animate-spin border-t-transparent"></div>
+                            </div>
+                          )}
+
+                          {!isSelected && !isDisabled && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-blue-400 text-lg">→</span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Custom Input Section for Mobile */}
+                  <div className="pt-2 border-t border-slate-700/50">
+                     <div className={`p-2 rounded-lg border ${customInput.trim() ? 'bg-purple-600/20 border-purple-500/60' : 'bg-slate-800/80 border-slate-600/40'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-sm font-bold text-white">
+                          ?
+                        </div>
+                        <span className="text-purple-300 text-sm font-medium">Custom Action</span>
+                        <span className="text-slate-400 text-xs ml-auto">({interactivePoints} Points)</span>
                       </div>
-                      <span className="text-purple-400 text-xs font-medium">Custom</span>
-                      <span className="text-slate-500 text-xs ml-auto">({interactivePoints})</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={customInput}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomInput(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Write your action..."
-                        disabled={loading || isProcessing}
-                        className="flex-1 px-2 py-1.5 bg-slate-900/60 border border-slate-600/50 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 disabled:opacity-50 text-xs"
-                        style={{
-                          fontSize: 'var(--body-font-size-mobile, 14px)',
-                          borderRadius: 'var(--button-border-radius, 6px)',
-                        }}
-                      />
-                      <button
-                        onClick={handleCustomAnswer}
-                        disabled={loading || isProcessing || !customInput.trim() || interactivePoints <= 0}
-                        className="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white rounded-md transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 active:scale-95 text-xs"
-                        style={{
-                          borderRadius: 'var(--button-border-radius, 6px)',
-                          fontSize: 'var(--body-font-size-mobile, 14px)',
-                        }}
-                      >
-                        {isProcessing ? (
-                          <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        ) : (
-                          <span>✨</span>
-                        )}
-                        Send
-                      </button>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={customInput}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomInput(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          placeholder="Write your own action..."
+                          disabled={loading || isProcessing}
+                          className="flex-1 px-3 py-2 bg-slate-900/60 border border-slate-600/50 rounded-md text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 text-base"
+                          style={{ borderRadius: 'var(--button-border-radius, 6px)' }}
+                        />
+                        <button
+                          onClick={handleCustomAnswer}
+                          disabled={loading || isProcessing || !customInput.trim() || interactivePoints <= 0}
+                          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white rounded-md transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95 text-base"
+                          style={{ borderRadius: 'var(--button-border-radius, 6px)' }}
+                        >
+                          {isProcessing ? (
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          ) : (
+                            <span>✨</span>
+                          )}
+                          Send
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

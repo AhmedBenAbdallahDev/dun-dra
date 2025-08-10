@@ -795,7 +795,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         {title === 'Inventory' && (
           <div className="mb-1.5">
             <div 
-              className="hp-bar text-center text-xs font-medium py-1 px-2 rounded border border-red-500/40 text-red-100"
+              className="hp-bar text-center text-sm font-medium py-1 px-2 rounded border border-red-500/40 text-red-100"
               style={{ '--hp-percentage': `${hpPercentage}%` } as React.CSSProperties}
             >
               HP: {stats.hp}/{stats.maxHp}
@@ -807,7 +807,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
         {title === 'Spells' && (
           <div className="mb-1.5">
             <div 
-              className="mp-bar text-center text-xs font-medium py-1 px-2 rounded border border-blue-500/40 text-blue-100"
+              className="mp-bar text-center text-sm font-medium py-1 px-2 rounded border border-blue-500/40 text-blue-100"
               style={{ '--mp-percentage': `${mpPercentage}%` } as React.CSSProperties}
             >
               MP: {stats.mp}/{stats.maxMp}
@@ -822,7 +822,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
              padding: 'var(--panel-padding-mobile, 6px)' 
            }}>
         {actions && actions.length > 0 ? (
-          <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 h-full content-start"
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 h-full content-start"
                style={{ 
                  gap: isMobile ? 'var(--item-gap-mobile, 4px)' : 'var(--item-gap-desktop, 8px)' 
                }}>
@@ -835,7 +835,7 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                 <button
                   key={index}
                   className={`
-                    relative group aspect-square w-full p-1
+                    relative group aspect-square w-full p-2
                     rounded-md border transition-all duration-200 overflow-hidden
                     flex items-center justify-center
                     ${disabled 
@@ -876,12 +876,12 @@ export default function GamePanel({ title, actions }: GamePanelProps) {
                   <Image
                     src={getItemIcon(item)}
                     alt={item.name}
-                    width={16}
-                    height={16}
+                    width={24}
+                    height={24}
                     className="pointer-events-none transition-transform group-hover:scale-110"
                     style={{
-                      width: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
-                      height: isMobile ? 'var(--icon-size-mobile, 12px)' : 'var(--icon-size-desktop, 16px)',
+                      width: isMobile ? 'var(--icon-size-mobile, 20px)' : 'var(--icon-size-desktop, 24px)',
+                      height: isMobile ? 'var(--icon-size-mobile, 20px)' : 'var(--icon-size-desktop, 24px)',
                     }}
                   />
                   
